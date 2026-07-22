@@ -691,12 +691,16 @@ const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#
 /* ════════════════════════════════
    STATE
 ════════════════════════════════ */
+/* localStorage 접근 실패 대비 (샌드박스·시크릿 모드 등) */
+function _ls(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
+function _lsJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')||fallback;}catch(e){return fallback;}}
+
 const S={
-  schoolName: localStorage.getItem('si_school')||'',
-  deptName:   localStorage.getItem('si_dept')||'',
-  tasks:      JSON.parse(localStorage.getItem('si_tasks')||'{}'),
-  cats:       JSON.parse(localStorage.getItem('si_cats')||'null')||defaultCats(),
-  lastBackup: localStorage.getItem('si_lastBackup')||null,  // ISO 날짜 문자열
+  schoolName: _ls('si_school'),
+  deptName:   _ls('si_dept'),
+  tasks:      _lsJson('si_tasks',{}),
+  cats:       _lsJson('si_cats',null)||defaultCats(),
+  lastBackup: _ls('si_lastBackup',null)||null,
   year:       schoolYear(),
   curMonth:   initMonth(),
   filter:     {status:'all',cat:''},
@@ -733,11 +737,11 @@ function defaultCats(){
   return PRESET_CATS.slice(0,5).map(c=>({...c}));
 }
 
-function saveTasks(){localStorage.setItem('si_tasks',JSON.stringify(S.tasks));}
-function saveCats() {localStorage.setItem('si_cats', JSON.stringify(S.cats));}
-function saveDept() {localStorage.setItem('si_dept', S.deptName);}
-function saveSchool(){localStorage.setItem('si_school',S.schoolName);}
-function saveBackupDate(iso){S.lastBackup=iso;localStorage.setItem('si_lastBackup',iso);}
+function saveTasks(){try{localStorage.setItem('si_tasks',JSON.stringify(S.tasks));}catch(e){}}
+function saveCats() {try{localStorage.setItem('si_cats', JSON.stringify(S.cats));}catch(e){}}
+function saveDept() {try{localStorage.setItem('si_dept', S.deptName);}catch(e){}}
+function saveSchool(){try{localStorage.setItem('si_school',S.schoolName);}catch(e){}}
+function saveBackupDate(iso){S.lastBackup=iso;try{localStorage.setItem('si_lastBackup',iso);}catch(e){}}
 
 /* ── 백업 경고 시스템 ── */
 function backupDaysSince(){
