@@ -210,15 +210,23 @@ header{
 .backup-badge.show{display:flex;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.65;}}
 
-/* ── YEAR BAR ── */
-.year-bar{background:var(--navy-l);color:#fff;}
-.year-bar-inner{
-  max-width:var(--container);margin:0 auto;padding:0 20px;
-  height:40px;display:flex;align-items:center;justify-content:center;gap:14px;
+/* ③ 학년도 컨트롤 (월 탭 줄에 통합) */
+.tabs-row{
+  max-width:var(--container);margin:0 auto;
+  display:flex;align-items:stretch;
 }
-.year-display{font-size:14px;font-weight:700;}
-.year-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.year-control{
+  display:flex;align-items:center;gap:8px;
+  padding:0 16px;background:var(--navy-l);color:#fff;
+  flex-shrink:0;
+}
+.year-display{font-size:13px;font-weight:700;white-space:nowrap;}
+.year-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;}
 .year-btn:hover{background:rgba(255,255,255,.32);}
+@media(max-width:640px){
+  .tabs-row{flex-direction:column;}
+  .year-control{padding:8px 16px;justify-content:center;}
+}
 
 /* ③ 필터+검색 통합 한 줄 */
 .filter-bar{background:#fff;border-bottom:1px solid var(--border);}
@@ -263,8 +271,8 @@ header{
   pointer-events:none;z-index:1;
 }
 .month-tabs{
-  max-width:var(--container);margin:0 auto;padding:0 20px;
-  display:flex;overflow-x:auto;scrollbar-width:none;
+  flex:1;padding:0 20px;
+  display:flex;overflow-x:auto;scrollbar-width:none;min-width:0;
 }
 .month-tabs::-webkit-scrollbar{display:none;}
 .month-tab{padding:11px 17px;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray-m);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;}
@@ -313,10 +321,10 @@ header{
 
 /* 넘버 배지 — ⑤ 왼쪽 상단으로 이동 */
 .task-num{
-  position:absolute;top:10px;left:14px;
   font-size:10px;font-weight:700;color:rgba(255,255,255,.9);
   background:var(--navy-l);border-radius:8px;
   padding:1px 6px;line-height:1.6;
+  white-space:nowrap;
 }
 
 /* ① 카드 액션 — 더보기 메뉴 */
@@ -654,37 +662,44 @@ header{
       <div>
         <div style="font-size:44px;margin-bottom:14px;">🏫</div>
         <h1 style="font-family:var(--font-serif);font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">학교 업무 인계인수 관리</h1>
-        <p style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:24px;">
-          말로 전달하던 업무 내용을<br>텍스트로 정리하고<br>
+        <p style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.8;margin-bottom:24px;">
+          말로 전달하던 업무 내용을 텍스트로 정리하고<br>
           <strong style="color:#fff;">파일 하나로 후임자에게 전달</strong>하세요
         </p>
 
-        <!-- 오해 차단 -->
-        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:13px 15px;margin-bottom:12px;">
-          <p style="font-size:12px;font-weight:700;color:#ffaaaa;margin-bottom:4px;">❌ 이런 앱이 아닙니다</p>
-          <p style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.65;">한글·엑셀 파일을 올리는 곳이 아닙니다.<br>파일은 USB·공유폴더로 따로 전달하세요.</p>
+        <!-- ⑤ 긍정적 설명 먼저 -->
+        <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:13px 15px;margin-bottom:12px;">
+          <p style="font-size:12px;font-weight:700;color:#aaffcc;margin-bottom:6px;">✅ 이런 도구입니다</p>
+          <p style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.7;">
+            업무 방법·절차를 텍스트로 남기는<br>
+            <strong style="color:#fff;">업무 설명서</strong>입니다.<br>
+            후임자가 묻지 않아도 스스로 처리할 수 있습니다.
+          </p>
         </div>
-        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:13px 15px;">
-          <p style="font-size:12px;font-weight:700;color:#aaffcc;margin-bottom:4px;">✅ 이런 도구입니다</p>
-          <p style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.65;">업무 방법·절차를 텍스트로 남기는<br>업무 설명서입니다.</p>
+        <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:11px 15px;">
+          <p style="font-size:11px;font-weight:700;color:rgba(255,150,150,.9);margin-bottom:3px;">❌ 한글·엑셀 파일을 올리는 앱이 아닙니다</p>
+          <p style="font-size:11px;color:rgba(255,255,255,.6);line-height:1.6;">파일은 USB·공유폴더로 따로 전달하세요.</p>
         </div>
       </div>
 
-      <!-- 사용 흐름 -->
-      <div style="display:flex;align-items:center;gap:6px;margin-top:24px;flex-wrap:wrap;">
-        <div style="text-align:center;flex:1;">
-          <div style="font-size:18px;">✏️</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;">업무 입력</div>
-        </div>
-        <div style="color:rgba(255,255,255,.35);font-size:14px;">→</div>
-        <div style="text-align:center;flex:1;">
-          <div style="font-size:18px;">📤</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;">내보내기</div>
-        </div>
-        <div style="color:rgba(255,255,255,.35);font-size:14px;">→</div>
-        <div style="text-align:center;flex:1;">
-          <div style="font-size:18px;">📥</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;">후임자 시작</div>
+      <!-- ⑨ 사용 흐름 — 크고 명확하게 -->
+      <div style="margin-top:28px;">
+        <p style="font-size:10px;color:rgba(255,255,255,.45);margin-bottom:10px;letter-spacing:.5px;">사용 흐름</p>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="text-align:center;flex:1;background:rgba(255,255,255,.1);border-radius:8px;padding:10px 6px;">
+            <div style="font-size:20px;">✏️</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px;font-weight:600;">업무 입력</div>
+          </div>
+          <div style="color:rgba(255,255,255,.3);font-size:16px;">→</div>
+          <div style="text-align:center;flex:1;background:rgba(255,255,255,.1);border-radius:8px;padding:10px 6px;">
+            <div style="font-size:20px;">📤</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px;font-weight:600;">내보내기</div>
+          </div>
+          <div style="color:rgba(255,255,255,.3);font-size:16px;">→</div>
+          <div style="text-align:center;flex:1;background:rgba(255,255,255,.1);border-radius:8px;padding:10px 6px;">
+            <div style="font-size:20px;">📥</div>
+            <div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px;font-weight:600;">후임자 시작</div>
+          </div>
         </div>
       </div>
     </div>
@@ -692,7 +707,13 @@ header{
     <!-- 오른쪽: 입력 폼 -->
     <div class="setup-right">
 
-      <!-- 부서명 (필수) -->
+      <!-- ⑤ 오른쪽 패널 제목 -->
+      <div style="margin-bottom:20px;">
+        <h2 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:4px;">시작하기</h2>
+        <p style="font-size:12px;color:var(--gray-m);">정보를 입력하고 아래 버튼을 눌러 시작하세요.</p>
+      </div>
+
+      <!-- ③ 필수 항목 먼저 — 부서명 -->
       <label class="setup-label">내 부서·직책 <span style="color:var(--red);">*</span></label>
       <input class="setup-input" id="setupDeptInput" placeholder="예: 교무부장" maxlength="20"
         onkeydown="if(event.key==='Enter')document.getElementById('setupSchoolInput').focus()">
@@ -706,29 +727,32 @@ header{
         <div class="preset-chip" onclick="pickPreset('문화예술부장')">🎨 문화예술부장</div>
       </div>
 
-      <!-- 학교 이름 (선택) -->
+      <!-- ③ 선택 항목 나중에 — 학교 이름 -->
       <label class="setup-label" style="margin-top:4px;">학교 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
       <input class="setup-input" id="setupSchoolInput" placeholder="예: 운남초등학교" maxlength="30"
-        onkeydown="if(event.key==='Enter')startApp(true)">
+        onkeydown="if(event.key==='Enter')startApp(false)">
 
       <!-- 숨겨진 필드 -->
       <input type="hidden" id="setupHandoverDate">
       <input type="hidden" id="setupHandoverTo">
 
-      <!-- 시작 버튼 -->
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
-        <button class="btn btn-primary setup-btn" onclick="startApp(true)" style="position:relative;background:var(--navy-l);border-color:var(--navy-l);">
-          📋 예시 업무로 채워서 시작
-          <span class="recommend-badge">추천</span>
+      <!-- ① 버튼 위계 교정 — 인계인수서 작성이 주 버튼 -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px;">
+        <button class="btn btn-primary setup-btn" onclick="startApp(false)"
+          style="background:var(--navy-l);border-color:var(--navy-l);font-size:15px;font-weight:700;">
+          ✏️ 내 업무 인계인수서 작성하기
         </button>
-        <p style="font-size:11px;color:var(--gray-m);text-align:center;margin:-2px 0 2px;">처음이라면 예시로 시작하세요. 언제든 삭제할 수 있습니다.</p>
-        <button class="btn setup-btn" style="background:#fff;color:var(--navy-l);font-size:14px;border:1.5px solid var(--navy-l);" onclick="startApp(false)">
-          ✏️ 내 업무 직접 입력하기
+        <!-- ② 예시 보조 버튼 — 강조 -->
+        <button class="btn setup-btn" onclick="startApp(true)"
+          style="background:var(--sky);color:var(--navy-l);font-size:14px;border:1.5px solid var(--sky-m);font-weight:600;">
+          📋 예시 업무 살펴보기
         </button>
+        <p style="font-size:11px;color:var(--gray-m);text-align:center;margin:-2px 0 2px;">예시는 참고용입니다. 언제든 삭제할 수 있습니다.</p>
 
-        <div style="display:flex;align-items:center;gap:8px;margin:6px 0 2px;">
+        <div style="display:flex;align-items:center;gap:8px;margin:4px 0 2px;">
           <div style="flex:1;height:1px;background:var(--border);"></div>
-          <span style="font-size:11px;color:var(--gray-m);">전임자 파일이 있다면</span>
+          <!-- ⑦ 문구 수정 -->
+          <span style="font-size:11px;color:var(--gray-m);">이전에 작업한 파일이 있다면</span>
           <div style="flex:1;height:1px;background:var(--border);"></div>
         </div>
 
@@ -793,6 +817,7 @@ header{
               📥 불러오기
               <input type="file" accept=".json" onchange="importData(event);closeMoreMenu()">
             </label>
+            <button class="more-menu-item" onclick="openHelpModal();closeMoreMenu()">❓ 사용 도움말</button>
             <div class="more-menu-divider"></div>
             <button class="more-menu-item danger" onclick="openResetModal();closeMoreMenu()">🗑 초기화</button>
           </div>
@@ -801,12 +826,12 @@ header{
     </div>
   </header>
 
-  <div class="year-bar">
-    <div class="year-bar-inner">
-      <button class="year-btn" onclick="changeYear(-1)">◀</button>
-      <span class="year-display" id="yearDisplay"></span>
-      <button class="year-btn" onclick="changeYear(1)">▶</button>
-    </div>
+  <!-- ① 브라우저 저장 경고 -->
+  <div id="storageBanner" style="background:#FFF8E8;border-bottom:1px solid #f5d6b0;padding:6px 20px;text-align:center;font-size:12px;color:#a04000;display:none;">
+    ⚠️ 데이터는 이 브라우저에만 저장됩니다. 다른 컴퓨터·브라우저에서 열면 데이터가 없습니다.
+    <strong style="margin-left:6px;cursor:pointer;text-decoration:underline;" onclick="openExportModal()">📤 지금 내보내기</strong>
+    <button onclick="document.getElementById('storageBanner').style.display='none'"
+      style="background:none;border:none;cursor:pointer;color:#a04000;font-size:14px;margin-left:8px;opacity:.6;">×</button>
   </div>
 
   <div class="filter-bar">
@@ -818,7 +843,8 @@ header{
       <button class="filter-chip" id="fTodo" onclick="setStatusFilter('todo')">미결</button>
       <button class="filter-chip" id="fDone" onclick="setStatusFilter('done')">완료</button>
       <button class="filter-chip" id="fSens" onclick="setStatusFilter('sensitive')">🔒</button>
-      <!-- ③ 검색 인라인 -->
+      <button class="filter-chip" id="fReset" onclick="resetAllFilters()"
+        style="display:none;border-color:var(--accent);color:var(--accent);">✕ 초기화</button>
       <div class="filter-search-wrap" style="position:relative;">
         <input type="text" id="searchInput" placeholder="🔍 업무 검색 (전체 탭)..."
           oninput="onSearch()" onkeydown="if(event.key==='Escape')clearSearch()">
@@ -828,8 +854,18 @@ header{
     </div>
   </div>
 
+  <!-- ③ 학년도 컨트롤 + 월 탭 통합 -->
   <div class="month-tabs-wrap">
-    <div class="month-tabs" id="monthTabs"></div>
+    <div class="tabs-row">
+      <div class="year-control">
+        <button class="year-btn" onclick="changeYear(-1)" title="이전 학년도">◀</button>
+        <span class="year-display" id="yearDisplay"></span>
+        <button class="year-btn" onclick="changeYear(1)" title="다음 학년도">▶</button>
+        <!-- ⑥ 전체 진행률 -->
+        <span id="yearProgress" style="font-size:11px;color:var(--gray-m);margin-left:10px;white-space:nowrap;"></span>
+      </div>
+      <div class="month-tabs" id="monthTabs"></div>
+    </div>
   </div>
 
   <div class="main">
@@ -967,7 +1003,7 @@ header{
             </div>
           </div>
           <label class="form-check"><input type="checkbox" id="taskSensitive"><span>🔒 개인정보</span></label>
-          <label class="form-check"><input type="checkbox" id="taskRepeat"><span>🔁 반복</span></label>
+          <label class="form-check" title="매년 반복되는 업무임을 표시합니다 (자동 생성 아님)"><input type="checkbox" id="taskRepeat"><span>🔁 매년 반복</span></label>
           <label class="form-check">
             <input type="checkbox" id="taskPending" style="accent-color:#8e44ad;">
             <span style="color:#8e44ad;font-weight:600;">🚨 미결 (후임자 처리 필요)</span>
@@ -1105,22 +1141,8 @@ header{
           후임자가 이 사이트에서 <strong>"파일로 시작"</strong>을 눌러 불러올 때 사용합니다.
         </div>
       </div>
-      <!-- ⑥ 인계일·인수자 — 내보내기 직전에 입력 -->
-      <div style="background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:13px 16px;">
-        <p style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;">📋 인계 정보 (선택사항)</p>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">인계일</label>
-            <input class="form-input" type="date" id="exportHandoverDate">
-          </div>
-          <div class="form-group">
-            <label class="form-label">인수자 이름</label>
-            <input class="form-input" id="exportHandoverTo" placeholder="예: 홍길동" maxlength="20">
-          </div>
-        </div>
-        <p style="font-size:11px;color:var(--gray-m);margin-top:4px;">출력물 상단에 표시됩니다. 비워두면 기존 설정값 사용.</p>
-      </div>
-      <div style="font-size:12px;color:var(--gray-m);">
+      <div style="background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--navy);line-height:1.75;">
+        📋 인계일·인수자는 <strong>✏️ 설정 변경</strong>에서 미리 입력해 두세요.<br>
         📄 내용을 문서로 보려면 <strong>🖨️ 출력</strong> 버튼을 이용하세요.
       </div>
     </div>
@@ -1261,6 +1283,48 @@ header{
   </div>
 </div>
 
+<!-- ── 도움말 MODAL ── -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <span>❓ 사용 도움말</span>
+      <button class="modal-close" onclick="closeModal('helpModal')">×</button>
+    </div>
+    <div class="modal-body" style="gap:16px;">
+      <div>
+        <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px;">📋 이 앱은 무엇인가요?</p>
+        <p style="font-size:13px;color:var(--gray-d);line-height:1.7;">업무 방법·절차를 텍스트로 정리해두는 <strong>업무 설명서</strong>입니다. 파일을 올리는 게 아니라, 후임자에게 말로 설명하던 내용을 미리 적어두는 도구입니다.</p>
+      </div>
+      <div style="border-top:1px solid var(--gray-l);padding-top:14px;">
+        <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">주요 용어</p>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;color:var(--gray-d);line-height:1.6;">
+          <div><strong style="color:#8e44ad;">🚨 미결</strong> — 후임자가 이어서 처리해야 하는 미완료 업무입니다.</div>
+          <div><strong style="color:#1a6b9a;">📅 기간 업무</strong> — 여러 달에 걸친 업무. 시작 월에 등록하면 해당 기간 모든 탭에 <strong>↗ 연속</strong> 표시로 자동 표시됩니다.</div>
+          <div><strong style="color:#e74c3c;">⭐ 중요도</strong> — 상/중/하로 구분. '상'만 카드에 표시됩니다.</div>
+          <div><strong>🔁 매년 반복</strong> — 매년 반복되는 업무임을 표시합니다. (자동 생성은 아니며, '다른 월로 복사'로 복제할 수 있습니다.)</div>
+          <div><strong>🏷️ 카테고리</strong> — 업무를 색상으로 분류합니다. 필터로 특정 카테고리만 볼 수 있습니다.</div>
+          <div><strong style="color:#8e44ad;">전 학년도 2월</strong> — 새 학년도 준비 업무(인사·업무분장 등)를 위한 탭입니다.</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--gray-l);padding-top:14px;">
+        <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">인계인수 흐름</p>
+        <div style="font-size:12px;color:var(--gray-d);line-height:1.8;">
+          1. 업무를 입력하고 완료 여부를 체크합니다.<br>
+          2. <strong>📤 내보내기</strong>로 파일을 저장해 후임자에게 전달합니다.<br>
+          3. 후임자는 시작 화면에서 <strong>📥 파일로 시작</strong>으로 불러옵니다.<br>
+          4. 종이 인계서가 필요하면 <strong>🖨️ 출력</strong>을 사용합니다.
+        </div>
+      </div>
+      <div style="background:#FFF8E8;border-radius:8px;padding:11px 14px;font-size:12px;color:#a04000;line-height:1.6;">
+        ⚠️ 데이터는 이 브라우저에만 저장됩니다. 다른 기기에서 이어가려면 <strong>📤 내보내기</strong>로 백업하세요.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('helpModal')">확인</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1295,6 +1359,10 @@ document.addEventListener('click',e=>{
     document.querySelectorAll('.card-more-menu.open').forEach(m=>m.classList.remove('open'));
   }
 });
+
+function openHelpModal(){
+  document.getElementById('helpModal').classList.add('open');
+}
 
 /* ── 더보기 메뉴 ── */
 function toggleMoreMenu(){
@@ -1769,6 +1837,16 @@ function launchApp(push=true){
   // 브라우저 탭 제목
   document.title=`${S.deptName} · 업무 인계인수${S.schoolName?' · '+S.schoolName:''}`;
   loadSampleIfEmpty();
+  // ① 브라우저 저장 경고 배너 — 최근 7일 내 백업 안 했을 때만 표시
+  const sb=document.getElementById('storageBanner');
+  if(sb){
+    let recentBackup=false;
+    if(S.lastBackup){
+      const days=(Date.now()-new Date(S.lastBackup).getTime())/(1000*60*60*24);
+      recentBackup=days<7;
+    }
+    sb.style.display=recentBackup?'none':'block';
+  }
   render();
   showApp(push);
   checkBackupOnLaunch();
@@ -1825,7 +1903,22 @@ function render(){
   renderTaskList();
 }
 function renderYearDisplay(){
-  document.getElementById('yearDisplay').textContent=`${S.year}학년도 (${S.year}.3 ~ ${S.year+1}.2)`;
+  document.getElementById('yearDisplay').textContent=`${S.year}학년도`;
+  // ⑥ 전체 학년도 진행률
+  let total=0, done=0;
+  const allMonths=[{y:S.year-1,m:2},...MONTHS.map(m=>({y:S.year,m}))];
+  allMonths.forEach(({y,m})=>{
+    const mKey=getKey(y,m);
+    getMonthTasks(y,m).filter(t=>!t._spanRef).forEach((t,i)=>{
+      total++;
+      if(isDone(y,mKey,i)) done++;
+    });
+  });
+  const pct=total?Math.round(done/total*100):0;
+  const el=document.getElementById('yearProgress');
+  if(el) el.innerHTML=total
+    ? `전체 <strong style="color:#fff;">${done}/${total}</strong> · ${pct}%`
+    : '';
 }
 function renderTabs(){
   const el=document.getElementById('monthTabs');
@@ -1943,7 +2036,12 @@ function renderTaskList(){
   } else if(summaryEl){ summaryEl.innerHTML=''; }
 
   if(!allT.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>이 달에 등록된 업무가 없습니다.<br><strong>+ 업무 추가</strong>로 등록하세요.</p></div>`;
+    el.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <p style="margin-bottom:16px;">${MN[m]}에 등록된 업무가 없습니다.<br>이 달에 처리하는 업무를 추가해보세요.</p>
+      <button class="btn btn-accent" onclick="openAddModal()" style="font-size:14px;padding:10px 24px;">+ 첫 업무 추가하기</button>
+      <p style="font-size:12px;color:var(--gray-m);margin-top:14px;">막막하다면 시작 화면에서 <strong>예시 업무 살펴보기</strong>를 참고하세요.</p>
+    </div>`;
     return;
   }
 
@@ -1975,10 +2073,11 @@ function renderTaskList(){
       ondragleave="onDragLeave(event)"
       ondrop="onDrop(event,${ri})"
       ondragend="onDragEnd(event)">
-      <div class="task-num">${displayNum}</div>
       <div class="task-top">
-        <!-- ④ 드래그 핸들 -->
-        <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;padding-top:2px;">
+          <div class="task-num">${displayNum}</div>
+          <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
+        </div>
         <!-- ⑥ 큰 체크박스 완료 토글 -->
         <div class="task-check-wrap">
           <div class="task-checkbox${done?' checked':''}" onclick="toggleDoneByYear('${origKey}',${origIdx})" title="${done?'미처리로 되돌리기':'완료 처리'}">
@@ -2033,14 +2132,25 @@ function renderTaskList(){
    YEAR / FILTER
 ════════════════════════════════ */
 function changeYear(d){S.year+=d;S.curMonth=3;S.curYear=S.year;render();}
+function updateResetBtn(){
+  const active=S.filter.status!=='all'||S.filter.cat!=='';
+  const btn=document.getElementById('fReset');
+  if(btn) btn.style.display=active?'inline-flex':'none';
+}
+function resetAllFilters(){
+  S.filter.status='all'; S.filter.cat='';
+  ['fAll','fTodo','fDone','fSens'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById('fAll').classList.add('active');
+  renderCatFilters(); renderTabs(); renderTaskList();
+  updateResetBtn();
+}
 function setStatusFilter(v){
   S.filter.status=v;
   ['fAll','fTodo','fDone','fSens'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById({all:'fAll',todo:'fTodo',done:'fDone',sensitive:'fSens'}[v]).classList.add('active');
-  renderTabs();
-  renderTaskList();
+  renderTabs(); renderTaskList(); updateResetBtn();
 }
-function setCatFilter(id){S.filter.cat=id;renderCatFilters();renderTabs();renderTaskList();}
+function setCatFilter(id){S.filter.cat=id;renderCatFilters();renderTabs();renderTaskList();updateResetBtn();}
 
 /* ════════════════════════════════
    TASK MODAL
@@ -2254,7 +2364,7 @@ function saveTask(){
     sensitive:document.getElementById('taskSensitive').checked,
     repeat:document.getElementById('taskRepeat').checked,
     pending:document.getElementById('taskPending').checked,
-    done:!document.getElementById('taskPending').checked,  // 미결이면 미완료, 아니면 완료
+    done:false,  // 새로 추가/수정한 업무는 항상 미처리 상태
   };
 
   // 항상 startMonth 기준으로 저장 (전 학년도 2월이면 curYear=year-1)
@@ -2289,8 +2399,9 @@ function saveTask(){
 }
 function confirmDelete(btn,idx){
   document.querySelectorAll('.task-card.deleting').forEach(c=>c.classList.remove('deleting'));
-  // btn이 null이면 idx로 카드 찾기
-  const card=btn?btn.closest('.task-card'):document.querySelector(`.task-card[data-idx="${idx}"]`);
+  const card=btn
+    ? btn.closest('.task-card')
+    : document.querySelector(`.task-card[data-idx="${idx}"]`);
   if(card) card.classList.add('deleting');
 }
 function cancelDelete(btn){
@@ -2530,17 +2641,9 @@ function deleteCat(i){
    IMPORT / EXPORT
 ════════════════════════════════ */
 function openExportModal(){
-  // ⑥ 기존 설정값을 기본값으로 채우기
-  document.getElementById('exportHandoverDate').value=S.handoverDate||'';
-  document.getElementById('exportHandoverTo').value=S.handoverTo||'';
   document.getElementById('exportModal').classList.add('open');
 }
 function doExport(){
-  // ⑥ 내보내기 직전 인계일·인수자 임시 반영
-  const hDate=document.getElementById('exportHandoverDate').value;
-  const hTo=document.getElementById('exportHandoverTo').value.trim();
-  if(hDate){ S.handoverDate=hDate; saveHandover(); }
-  if(hTo){ S.handoverTo=hTo; saveHandover(); }
   closeModal('exportModal');
   exportData();
 }
@@ -2590,7 +2693,9 @@ function doPrint(){
   const showFileList=document.getElementById('pShowFileList').checked;
   const doneMode=document.querySelector('input[name=pDone]:checked').value;
   closeModal('printModal');
+  // ⑥ 전체 인쇄 시 전 학년도 2월 포함
   const months=range==='current'?[S.curMonth]:MONTHS;
+  const printPrevFeb=range==='all'&&getMonthTasks(S.year-1,2).filter(t=>!t._spanRef).length>0;
 
   function splitTasks(tasks, m){
     const mKey=getKey(S.year,m);
@@ -2686,6 +2791,15 @@ function doPrint(){
     ${S.handoverTo?`<span>👤 <strong>인수자:</strong> ${esc(S.handoverTo)}</span>`:''}
     <span>🏢 <strong>인계자(부서):</strong> ${esc(S.deptName)}</span>
   </div>`:''}`;
+
+  // ⑥ 전 학년도 2월 준비 업무 먼저 출력
+  if(printPrevFeb){
+    const prevTasks=getMonthTasks(S.year-1,2).filter(t=>!t._spanRef);
+    if(prevTasks.length){
+      html+=`<h2 style="border-left-color:#8e44ad;background:#f4ecf7;color:#6c3483;">2월 (전 학년도 준비) · 신학년준비 (${prevTasks.length}건)</h2>`;
+      prevTasks.forEach(t=>{ html+=taskCard(t, privacy==='hide'&&t.sensitive); });
+    }
+  }
 
   months.forEach(m=>{
     const allTasks=getMonthTasks(S.year,m);
