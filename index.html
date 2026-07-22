@@ -5,9 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>학교 업무 인계인수 관리</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;700&display=swap');
-
+/* ── 시스템 폰트 스택 (인터넷 불필요, 망분리 환경 완전 대응) ──
+   Windows : 맑은 고딕
+   macOS   : Apple SD Gothic Neo
+   Android : Noto Sans CJK KR (기기 내장)
+   iOS     : Apple SD Gothic Neo
+   공통 후보: Malgun Gothic, 돋움, sans-serif                  */
 :root {
+  --font-sans: 'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',
+               'Noto Sans CJK KR','Noto Sans KR',
+               '돋움',Dotum,'굴림',Gulim,sans-serif;
+  --font-serif:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕',
+               'Noto Sans CJK KR',sans-serif;  /* 한글 세리프 폰트 미내장이 많아 고딕 계열 활용 */
+
   --navy:#1B3A6B; --navy-l:#2A5298;
   --sky:#E8F0FB; --sky-m:#C5D8F5;
   --accent:#E67E22; --accent-l:#FEF3E8;
@@ -21,7 +31,7 @@
   --container:960px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans KR',sans-serif;background:#F2F5FB;color:var(--gray-d);min-height:100vh;}
+body{font-family:var(--font-sans);background:#F2F5FB;color:var(--gray-d);min-height:100vh;}
 
 /* ── 공통 컨테이너 ── */
 .container{max-width:var(--container);margin:0 auto;padding:0 20px;}
@@ -56,7 +66,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F2F5FB;color:var(--gray-d
 }
 .setup-logo{text-align:center; margin-bottom:28px;}
 .setup-logo .emoji{font-size:48px; display:block; margin-bottom:10px;}
-.setup-logo h1{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.setup-logo h1{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;}
 .setup-logo p{font-size:14px;color:var(--gray-m);}
 .setup-label{font-size:13px;font-weight:700;color:var(--gray-d);margin-bottom:6px;display:block;}
 .setup-input{
@@ -89,7 +99,7 @@ header{
 }
 .header-left{display:flex;align-items:center;gap:14px;}
 .header-logo{
-  font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;
+  font-family:var(--font-serif);font-size:17px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;gap:7px;
   color:#fff;text-decoration:none;
   transition:opacity .15s;
@@ -102,7 +112,20 @@ header{
 }
 .dept-name-badge .edit-icon{font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;}
 .dept-name-badge .edit-icon:hover{color:#fff;}
-.header-actions{display:flex;gap:7px;flex-wrap:wrap;}
+.header-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+
+/* ── 백업 경고 배지 ── */
+.backup-badge{
+  display:none;align-items:center;gap:5px;
+  font-size:12px;font-weight:600;
+  padding:4px 10px;border-radius:6px;cursor:pointer;
+  transition:opacity .15s;white-space:nowrap;
+}
+.backup-badge:hover{opacity:.85;}
+.backup-badge.warn{background:rgba(230,126,34,.25);color:#ffcb8a;border:1px solid rgba(230,126,34,.4);}
+.backup-badge.danger{background:rgba(231,76,60,.3);color:#ffaaaa;border:1px solid rgba(231,76,60,.5);animation:pulse 2s infinite;}
+.backup-badge.show{display:flex;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.65;}}
 
 /* ── YEAR BAR ── */
 .year-bar{background:var(--navy-l);color:#fff;}
@@ -144,8 +167,8 @@ header{
 /* ── MAIN ── */
 .main{max-width:var(--container);margin:0 auto;padding:22px 20px 48px;}
 .month-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
-.month-title{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
-.month-badge{font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:500;background:var(--sky);color:var(--navy-l);border-radius:20px;padding:3px 10px;}
+.month-title{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
+.month-badge{font-family:var(--font-sans);font-size:12px;font-weight:500;background:var(--sky);color:var(--navy-l);border-radius:20px;padding:3px 10px;}
 
 /* ── TASK CARD ── */
 .task-list{display:flex;flex-direction:column;gap:10px;}
@@ -173,7 +196,42 @@ header{
 .task-note{font-size:12px;color:var(--gray-m);margin-top:3px;}
 .task-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
 
-/* ── EMPTY ── */
+/* ── 순서 이동 버튼 ── */
+.btn-order{
+  background:#fff;color:var(--gray-m);
+  border:1.5px solid var(--border);
+  padding:3px 8px;border-radius:5px;font-size:13px;
+  cursor:pointer;transition:all .15s;line-height:1;
+}
+.btn-order:hover:not(:disabled){background:var(--sky);color:var(--navy);border-color:var(--sky-m);}
+.btn-order:disabled{opacity:.25;cursor:not-allowed;}
+
+/* ── 삭제 확인 인라인 UI ── */
+.task-card.deleting{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(231,76,60,.15)!important;}
+.task-card.deleting .task-actions{display:none;}
+.delete-confirm{
+  display:none;margin-top:10px;
+  align-items:center;gap:10px;
+  background:#FFF0EF;border-radius:7px;
+  padding:8px 12px;
+}
+.task-card.deleting .delete-confirm{display:flex;}
+.delete-confirm-msg{font-size:13px;font-weight:600;color:var(--red);flex:1;}
+.delete-confirm-msg span{font-size:11px;font-weight:400;color:#c0392b;display:block;margin-top:1px;}
+
+/* ── 설명 입력 가이드 ── */
+.desc-guide{
+  display:flex;gap:6px;flex-wrap:wrap;margin-bottom:5px;
+}
+.desc-tpl{
+  padding:3px 10px;border-radius:14px;
+  border:1.5px solid var(--border);
+  font-size:11px;font-weight:500;cursor:pointer;
+  background:#fff;color:var(--gray-m);
+  transition:all .15s;white-space:nowrap;
+}
+.desc-tpl:hover{border-color:var(--navy-l);color:var(--navy);background:var(--sky);}
+.desc-guide-label{font-size:11px;color:var(--gray-m);align-self:center;}
 .empty-state{text-align:center;padding:56px 20px;color:var(--gray-m);}
 .empty-icon{font-size:42px;margin-bottom:10px;}
 
@@ -225,6 +283,25 @@ header{
 .pol{font-size:13px;font-weight:600;}
 .pod{font-size:12px;color:var(--gray-m);}
 
+/* ── 백업 경고 모달 ── */
+.backup-modal-body{padding:24px 24px 8px;display:flex;flex-direction:column;gap:16px;}
+.backup-info-box{
+  border-radius:10px;padding:16px 18px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.backup-info-box.danger{background:#FFF0EF;border:1.5px solid #f5c6c2;}
+.backup-info-box.warn{background:#FEF3E8;border:1.5px solid #f5d6b0;}
+.backup-info-box .bi-icon{font-size:28px;flex-shrink:0;}
+.backup-info-box .bi-text{}
+.backup-info-box .bi-title{font-size:15px;font-weight:700;margin-bottom:4px;}
+.backup-info-box.danger .bi-title{color:#c0392b;}
+.backup-info-box.warn .bi-title{color:#a04000;}
+.backup-info-box .bi-desc{font-size:13px;color:var(--gray-m);line-height:1.6;}
+.backup-steps{background:var(--sky);border-radius:8px;padding:12px 16px;}
+.backup-steps p{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.backup-steps ol{padding-left:16px;display:flex;flex-direction:column;gap:5px;}
+.backup-steps li{font-size:13px;color:var(--gray-d);line-height:1.5;}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gray-d);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;transition:transform .3s;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
@@ -237,6 +314,8 @@ header{
   .form-row{flex-direction:column;}
   .copy-month-grid{grid-template-columns:repeat(3,1fr);}
   .header-actions .btn{padding:5px 8px;font-size:12px;}
+  .backup-badge{font-size:11px;padding:3px 7px;}
+  .app-title{display:none;}
 }
 @media print{
   header,.year-bar,.filter-bar,.month-tabs-wrap,.task-actions,.month-header .btn-accent,.app-footer{display:none!important;}
@@ -272,7 +351,15 @@ header{
       <div class="preset-chip" onclick="pickPreset('행정실장')">💼 행정실장</div>
       <div class="preset-chip" onclick="pickPreset('보건교사')">🩺 보건교사</div>
     </div>
-    <button class="btn btn-primary setup-btn" onclick="startApp()">시작하기 →</button>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+      <button class="btn btn-primary setup-btn" onclick="startApp(true)">
+        📋 샘플 업무와 함께 시작
+      </button>
+      <button class="btn setup-btn" style="background:var(--gray-l);color:var(--gray-d);font-size:14px;" onclick="startApp(false)">
+        빈 화면으로 시작
+      </button>
+    </div>
+    <p style="font-size:11px;color:var(--gray-m);text-align:center;margin-top:10px;">샘플 업무는 참고용입니다. 언제든 삭제할 수 있습니다.</p>
   </div>
 </div>
 
@@ -293,6 +380,7 @@ header{
         </div>
       </div>
       <div class="header-actions">
+        <div class="backup-badge" id="backupBadge" onclick="openBackupModal()"></div>
         <button class="btn btn-outline btn-sm" onclick="openPrintModal()">🖨️ 출력</button>
         <button class="btn btn-outline btn-sm" onclick="exportData()">📤 내보내기</button>
         <label class="btn btn-outline btn-sm" style="cursor:pointer">
@@ -381,7 +469,15 @@ header{
       </div>
       <div class="form-group">
         <label class="form-label">업무 설명 / 처리 방법</label>
-        <textarea class="form-textarea" id="taskDesc" placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요."></textarea>
+        <div class="desc-guide">
+          <span class="desc-guide-label">템플릿:</span>
+          <button type="button" class="desc-tpl" onclick="applyDescTpl('steps')">📋 단계별</button>
+          <button type="button" class="desc-tpl" onclick="applyDescTpl('system')">💻 시스템</button>
+          <button type="button" class="desc-tpl" onclick="applyDescTpl('doc')">📄 서류</button>
+          <button type="button" class="desc-tpl" onclick="applyDescTpl('caution')">⚠️ 주의사항</button>
+        </div>
+        <textarea class="form-textarea" id="taskDesc"
+          placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.&#10;&#10;예)&#10;1. 에듀파인 로그인 → 공문 → 새 공문 작성&#10;2. 교장·교감 결재 후 발송&#10;3. 공문 번호 업무일지에 기록"></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">참고 메모</label>
@@ -475,6 +571,40 @@ header{
   </div>
 </div>
 
+<!-- ── 백업 경고 MODAL ── -->
+<div class="modal-overlay" id="backupModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <span id="backupModalTitle">⚠️ 백업 경고</span>
+      <button class="modal-close" onclick="closeModal('backupModal')">×</button>
+    </div>
+    <div class="backup-modal-body">
+      <div class="backup-info-box" id="backupInfoBox">
+        <div class="bi-icon" id="backupInfoIcon"></div>
+        <div class="bi-text">
+          <div class="bi-title" id="backupInfoTitle"></div>
+          <div class="bi-desc" id="backupInfoDesc"></div>
+        </div>
+      </div>
+      <div class="backup-steps">
+        <p>📋 지금 바로 백업하는 방법</p>
+        <ol>
+          <li>오른쪽 상단 <strong>📤 내보내기</strong> 버튼 클릭</li>
+          <li>저장된 JSON 파일을 <strong>USB 또는 학교 공유 폴더</strong>에 보관</li>
+          <li>인계 시 후임자에게 파일 전달</li>
+        </ol>
+      </div>
+      <p style="font-size:12px;color:var(--gray-m);padding:0 2px;">
+        ※ 이 앱의 데이터는 이 브라우저에만 저장됩니다. 브라우저 데이터를 삭제하거나 다른 컴퓨터에서 열면 데이터가 없습니다. 정기적인 내보내기로 반드시 백업하세요.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('backupModal')">나중에</button>
+      <button class="btn btn-accent" onclick="exportData();closeModal('backupModal')">📤 지금 내보내기</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 출력 MODAL ── -->
 <div class="modal-overlay" id="printModal">
   <div class="modal" style="max-width:460px;">
@@ -498,6 +628,14 @@ header{
         </div>
       </div>
       <label class="form-check"><input type="checkbox" id="pShowAssignee" checked><span>담당자 이름 출력에 포함</span></label>
+      <div class="form-group">
+        <label class="form-label">완료된 업무 처리</label>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <label class="print-option"><input type="radio" name="pDone" value="separate" checked><div><div class="pol">완료·미완료 구분하여 출력</div><div class="pod">미완료 업무를 위에, 완료 업무를 아래에 분리 표시</div></div></label>
+          <label class="print-option"><input type="radio" name="pDone" value="all"><div><div class="pol">모두 함께 출력</div><div class="pod">등록 순서대로 전체 출력</div></div></label>
+          <label class="print-option"><input type="radio" name="pDone" value="todoOnly"><div><div class="pol">미완료만 출력</div><div class="pod">완료된 업무는 제외하고 출력</div></div></label>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('printModal')">취소</button>
@@ -521,15 +659,16 @@ const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#
    STATE
 ════════════════════════════════ */
 const S={
-  deptName:  localStorage.getItem('si_dept')||'',
-  tasks:     JSON.parse(localStorage.getItem('si_tasks')||'{}'),
-  cats:      JSON.parse(localStorage.getItem('si_cats')||'null')||defaultCats(),
-  year:      schoolYear(),
-  curMonth:  initMonth(),
-  filter:    {status:'all',cat:''},
-  editingIdx:null,
-  copyRef:   null,
-  copyMonths:new Set(),
+  deptName:   localStorage.getItem('si_dept')||'',
+  tasks:      JSON.parse(localStorage.getItem('si_tasks')||'{}'),
+  cats:       JSON.parse(localStorage.getItem('si_cats')||'null')||defaultCats(),
+  lastBackup: localStorage.getItem('si_lastBackup')||null,  // ISO 날짜 문자열
+  year:       schoolYear(),
+  curMonth:   initMonth(),
+  filter:     {status:'all',cat:''},
+  editingIdx: null,
+  copyRef:    null,
+  copyMonths: new Set(),
   newCatColor:CAT_COLORS[3],
 };
 
@@ -548,6 +687,52 @@ function defaultCats(){
 function saveTasks(){localStorage.setItem('si_tasks',JSON.stringify(S.tasks));}
 function saveCats() {localStorage.setItem('si_cats', JSON.stringify(S.cats));}
 function saveDept() {localStorage.setItem('si_dept', S.deptName);}
+function saveBackupDate(iso){S.lastBackup=iso;localStorage.setItem('si_lastBackup',iso);}
+
+/* ── 백업 경고 시스템 ── */
+function backupDaysSince(){
+  if(!S.lastBackup) return Infinity;
+  return Math.floor((Date.now()-new Date(S.lastBackup).getTime())/(1000*60*60*24));
+}
+function updateBackupBadge(){
+  const days=backupDaysSince();
+  const badge=document.getElementById('backupBadge');
+  badge.classList.remove('show','warn','danger');
+  if(days===Infinity){
+    badge.className='backup-badge show danger';
+    badge.innerHTML='⚠️ 백업 없음';
+  } else if(days>=30){
+    badge.className='backup-badge show danger';
+    badge.innerHTML=`🔴 ${days}일 전 백업`;
+  } else if(days>=7){
+    badge.className='backup-badge show warn';
+    badge.innerHTML=`🟡 ${days}일 전 백업`;
+  } else {
+    badge.className='backup-badge';  // 7일 이내 — 숨김
+  }
+}
+function openBackupModal(){
+  const days=backupDaysSince();
+  const isDanger=days>=30||days===Infinity;
+  const box=document.getElementById('backupInfoBox');
+  box.className='backup-info-box '+(isDanger?'danger':'warn');
+  document.getElementById('backupInfoIcon').textContent=isDanger?'🚨':'⚠️';
+  document.getElementById('backupModalTitle').textContent=isDanger?'🚨 백업이 필요합니다':'⚠️ 백업 권장';
+  document.getElementById('backupInfoTitle').textContent=
+    days===Infinity ? '아직 한 번도 백업하지 않았습니다' :
+    `마지막 백업으로부터 ${days}일이 지났습니다`;
+  document.getElementById('backupInfoDesc').textContent=
+    days===Infinity
+      ? '브라우저 데이터가 삭제되면 모든 업무 데이터가 사라집니다. 지금 바로 내보내기로 백업 파일을 만들어 두세요.'
+      : `백업 파일이 오래될수록 데이터 손실 위험이 커집니다. USB나 학교 공유 폴더에 최신 파일을 보관하세요.`;
+  document.getElementById('backupModal').classList.add('open');
+}
+// 앱 시작 시 오래된 백업 자동 팝업 (14일 이상)
+function checkBackupOnLaunch(){
+  updateBackupBadge();
+  const days=backupDaysSince();
+  if(days>=14) setTimeout(()=>openBackupModal(),800);
+}
 
 function getKey(year,month){return month<=2?`${year+1}-${month}`:`${year}-${month}`;}
 function getMonthTasks(year,month){return S.tasks[getKey(year,month)]||[];}
@@ -605,10 +790,14 @@ function pickPreset(name){
   document.getElementById('setupDeptInput').value=name;
   document.getElementById('setupDeptInput').focus();
 }
-function startApp(){
+function startApp(withSample=false){
   const name=document.getElementById('setupDeptInput').value.trim();
   if(!name){showToast('부서명을 입력하세요.');return;}
   S.deptName=name;saveDept();
+  // 샘플 데이터 플래그: 첫 실행에서만 적용
+  if(!localStorage.getItem('si_tasks')||Object.keys(S.tasks).length===0){
+    S._loadSample=withSample;
+  }
   launchApp(true);
 }
 function launchApp(push=true){
@@ -616,6 +805,7 @@ function launchApp(push=true){
   loadSampleIfEmpty();
   render();
   showApp(push);
+  checkBackupOnLaunch();
 }
 
 /* ════════════════════════════════
@@ -659,11 +849,18 @@ function renderYearDisplay(){
 function renderTabs(){
   const el=document.getElementById('monthTabs');
   el.innerHTML='';
+  const isFiltered=S.filter.status!=='all'||S.filter.cat!=='';
   MONTHS.forEach(m=>{
-    const cnt=getMonthTasks(S.year,m).length;
+    const allT=getMonthTasks(S.year,m);
+    const cnt=allT.length;
+    const filtCnt=filteredTasks(allT).length;
+    const showFilter=isFiltered&&cnt>0;
     const div=document.createElement('div');
     div.className='month-tab'+(m===S.curMonth?' active':'');
-    div.innerHTML=`<span>${MN[m]}</span><span class="tc${cnt===0?' zero':''}">${cnt}</span>`;
+    div.innerHTML=`<span>${MN[m]}</span>
+      <span class="tc${cnt===0?' zero':''}">
+        ${showFilter?`<span style="color:${filtCnt<cnt?'var(--accent)':'inherit'}">${filtCnt}</span><span style="color:rgba(255,255,255,.5);font-weight:400">/${cnt}</span>`:cnt}
+      </span>`;
     div.onclick=()=>{S.curMonth=m;render();};
     el.appendChild(div);
   });
@@ -707,6 +904,8 @@ function renderTaskList(){
   }
   el.innerHTML=tasks.map(t=>{
     const ri=allT.indexOf(t);
+    const isFirst=ri===0;
+    const isLast=ri===allT.length-1;
     const cat=t.category?getCat(t.category):null;
     const cc=cat?cat.color:'transparent';
     return `<div class="task-card${t.sensitive?' sensitive':''}${t.done?' done':''}">
@@ -730,9 +929,16 @@ function renderTaskList(){
         </div>
       </div>
       <div class="task-actions">
+        <button class="btn-order" onclick="moveTask(${ri},-1)" ${isFirst?'disabled':''} title="위로">▲</button>
+        <button class="btn-order" onclick="moveTask(${ri},1)"  ${isLast?'disabled':''} title="아래로">▼</button>
         <button class="btn btn-ghost btn-sm" onclick="openEditModal(${ri})">✏️ 수정</button>
         <button class="btn btn-copy btn-sm" onclick="openCopyModal(${ri})">📋 복사</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteTask(${ri})">🗑 삭제</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDelete(this,${ri})">🗑 삭제</button>
+      </div>
+      <div class="delete-confirm">
+        <div class="delete-confirm-msg">정말 삭제하시겠습니까?<span>삭제 후 복구할 수 없습니다.</span></div>
+        <button class="btn btn-ghost btn-sm" onclick="cancelDelete(this)">취소</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTask(${ri})">삭제</button>
       </div>
     </div>`;
   }).join('');
@@ -746,9 +952,10 @@ function setStatusFilter(v){
   S.filter.status=v;
   ['fAll','fTodo','fDone','fSens'].forEach(id=>document.getElementById(id).classList.remove('active'));
   document.getElementById({all:'fAll',todo:'fTodo',done:'fDone',sensitive:'fSens'}[v]).classList.add('active');
+  renderTabs();
   renderTaskList();
 }
-function setCatFilter(id){S.filter.cat=id;renderCatFilters();renderTaskList();}
+function setCatFilter(id){S.filter.cat=id;renderCatFilters();renderTabs();renderTaskList();}
 
 /* ════════════════════════════════
    TASK MODAL
@@ -813,15 +1020,46 @@ function saveTask(){
   if(month!==S.curMonth)S.curMonth=month;
   closeModal('taskModal');render();
 }
+function confirmDelete(btn,idx){
+  // 이미 다른 카드가 deleting 중이면 해제
+  document.querySelectorAll('.task-card.deleting').forEach(c=>c.classList.remove('deleting'));
+  btn.closest('.task-card').classList.add('deleting');
+}
+function cancelDelete(btn){
+  btn.closest('.task-card').classList.remove('deleting');
+}
 function deleteTask(idx){
-  if(!confirm('이 업무를 삭제하시겠습니까?'))return;
   const tasks=getMonthTasks(S.year,S.curMonth);
   tasks.splice(idx,1);setMonthTasks(S.year,S.curMonth,tasks);
   render();showToast('삭제되었습니다.');
 }
+
+/* ── 설명 템플릿 ── */
+const DESC_TPLS={
+  steps:`1. \n2. \n3. \n\n※ 주의사항:\n- `,
+  system:`■ 사용 시스템: \n■ 접속 경로: \n■ 처리 절차:\n  1. \n  2. \n■ 담당자 연락처: `,
+  doc:`■ 필요 서류:\n  - \n  - \n■ 제출처: \n■ 제출 기한: \n■ 보관 위치: `,
+  caution:`⚠️ 주의사항:\n- \n- \n\n✅ 반드시 확인할 것:\n- \n\n📌 이전에 문제가 됐던 점:\n- `,
+};
+function applyDescTpl(key){
+  const el=document.getElementById('taskDesc');
+  if(el.value.trim()&&!confirm('현재 내용을 템플릿으로 대체하시겠습니까?'))return;
+  el.value=DESC_TPLS[key];
+  el.focus();
+  // 첫 번째 빈 칸으로 커서 이동
+  const pos=el.value.indexOf(': \n')>-1?el.value.indexOf(': \n')+2:el.value.length;
+  el.setSelectionRange(pos,pos);
+}
 function toggleDone(idx){
   const tasks=getMonthTasks(S.year,S.curMonth);
   tasks[idx].done=!tasks[idx].done;setMonthTasks(S.year,S.curMonth,tasks);render();
+}
+function moveTask(idx,dir){
+  const tasks=getMonthTasks(S.year,S.curMonth);
+  const to=idx+dir;
+  if(to<0||to>=tasks.length)return;
+  [tasks[idx],tasks[to]]=[tasks[to],tasks[idx]];
+  setMonthTasks(S.year,S.curMonth,tasks);render();
 }
 
 /* ════════════════════════════════
@@ -897,10 +1135,13 @@ function deleteCat(i){
    IMPORT / EXPORT
 ════════════════════════════════ */
 function exportData(){
-  const blob=new Blob([JSON.stringify({version:4,exportedAt:new Date().toISOString(),dept:S.deptName,year:S.year,tasks:S.tasks,cats:S.cats},null,2)],{type:'application/json'});
+  const now=new Date().toISOString();
+  const blob=new Blob([JSON.stringify({version:4,exportedAt:now,dept:S.deptName,year:S.year,tasks:S.tasks,cats:S.cats},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=`인계인수_${S.deptName}_${S.year}-${S.year+1}.json`;a.click();
-  showToast('내보내기 완료!','green');
+  saveBackupDate(now);
+  updateBackupBadge();
+  showToast('내보내기 완료! 파일을 안전한 곳에 보관하세요.','green');
 }
 function importData(e){
   const file=e.target.files[0];if(!file)return;
@@ -926,17 +1167,47 @@ function doPrint(){
   const range=document.querySelector('input[name=pRange]:checked').value;
   const privacy=document.querySelector('input[name=pPrivacy]:checked').value;
   const showAssignee=document.getElementById('pShowAssignee').checked;
+  const doneMode=document.querySelector('input[name=pDone]:checked').value;
   closeModal('printModal');
   const months=range==='current'?[S.curMonth]:MONTHS;
+
+  // 완료/미완료 분류 헬퍼
+  function splitTasks(tasks){
+    if(doneMode==='all') return {main:tasks,done:[]};
+    if(doneMode==='todoOnly') return {main:tasks.filter(t=>!t.done),done:[]};
+    return {main:tasks.filter(t=>!t.done), done:tasks.filter(t=>t.done)};
+  }
+
+  function taskCard(t,hideDesc){
+    const cat=t.category?getCat(t.category):null;
+    return `<div class="card${t.sensitive?' sensitive':''}${t.done?' card-done':''}">
+      <div class="title">${t.done?'<span class="done-mark">✓</span> ':''}<span style="${t.done?'text-decoration:line-through;color:#aaa;':''}">${esc(t.name)}</span>
+        <span class="tags">
+          ${cat?`<span class="tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.name)}</span>`:''}
+          ${t.sensitive?'<span class="tag ts">🔒 개인정보</span>':''}
+          ${t.repeat?'<span class="tag tr">🔁 반복</span>':''}
+        </span>
+      </div>
+      <div class="m2">
+        ${t.deadline?`<span class="dl">📅 ${esc(t.deadline)}</span>`:''}
+        ${showAssignee&&t.assignee?`<span class="as">👤 ${esc(t.assignee)}</span>`:''}
+      </div>
+      ${t.desc?`<div class="desc${hideDesc?' hidden':''}">${hideDesc?'[개인정보 포함 — 가림 처리]':esc(t.desc)}</div>`:''}
+      ${t.note?`<div class="note">📌 ${esc(t.note)}</div>`:''}
+    </div>`;
+  }
+
   let html=`<html><head><meta charset="UTF-8">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-    body{font-family:'Noto Sans KR',sans-serif;color:#2c3e50;margin:28px;font-size:13px;}
+    body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans CJK KR',돋움,sans-serif;color:#2c3e50;margin:28px;font-size:13px;}
     h1{font-size:19px;border-bottom:3px solid #1B3A6B;padding-bottom:7px;margin-bottom:3px;color:#1B3A6B;}
     .meta{font-size:11px;color:#7f8c8d;margin-bottom:20px;}
     h2{font-size:14px;background:#E8F0FB;padding:6px 11px;border-left:4px solid #1B3A6B;margin:16px 0 7px;}
+    .section-done-title{font-size:12px;font-weight:700;color:#aaa;border-top:1px dashed #ddd;padding-top:10px;margin:10px 0 7px;letter-spacing:.5px;}
     .card{border:1px solid #D5E0F0;border-radius:6px;padding:9px 13px;margin-bottom:7px;page-break-inside:avoid;}
     .card.sensitive{border-left:4px solid #E67E22;}
+    .card.card-done{background:#fafafa;border-color:#e8e8e8;}
+    .done-mark{color:#27AE60;font-weight:700;}
     .title{font-weight:700;font-size:13px;margin-bottom:3px;}
     .m2{font-size:11px;color:#7f8c8d;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:3px;}
     .dl{color:#E67E22;font-weight:600;}.as{color:#8E44AD;font-weight:600;}
@@ -950,30 +1221,22 @@ function doPrint(){
     @media print{body{margin:12px;}}
   </style></head><body>
   <h1>🏫 ${esc(S.deptName)} — 업무 인계인수</h1>
-  <div class="meta">${S.year}년 3월 ~ ${S.year+1}년 2월 &nbsp;|&nbsp; 출력일: ${new Date().toLocaleDateString('ko-KR')} &nbsp;|&nbsp; 개인정보: ${privacy==='hide'?'가림 처리':'표시'}</div>`;
+  <div class="meta">${S.year}년 3월 ~ ${S.year+1}년 2월 &nbsp;|&nbsp; 출력일: ${new Date().toLocaleDateString('ko-KR')} &nbsp;|&nbsp; 개인정보: ${privacy==='hide'?'가림 처리':'표시'} &nbsp;|&nbsp; 완료 업무: ${{separate:'구분 표시',all:'전체 표시',todoOnly:'제외'}[doneMode]}</div>`;
+
   months.forEach(m=>{
-    const tasks=getMonthTasks(S.year,m);
-    html+=`<h2>${MN[m]} · ${ML[m]||''} (${tasks.length}건)</h2>`;
-    if(!tasks.length){html+=`<p class="none">등록된 업무 없음</p>`;return;}
-    tasks.forEach(t=>{
-      const cat=t.category?getCat(t.category):null;
-      const hideDesc=privacy==='hide'&&t.sensitive;
-      html+=`<div class="card${t.sensitive?' sensitive':''}">
-        <div class="title">${esc(t.name)}
-          <span class="tags">
-            ${cat?`<span class="tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.name)}</span>`:''}
-            ${t.sensitive?'<span class="tag ts">🔒 개인정보</span>':''}
-            ${t.repeat?'<span class="tag tr">🔁 반복</span>':''}
-          </span>
-        </div>
-        <div class="m2">
-          ${t.deadline?`<span class="dl">📅 ${esc(t.deadline)}</span>`:''}
-          ${showAssignee&&t.assignee?`<span class="as">👤 ${esc(t.assignee)}</span>`:''}
-        </div>
-        ${t.desc?`<div class="desc${hideDesc?' hidden':''}">${hideDesc?'[개인정보 포함 — 가림 처리]':esc(t.desc)}</div>`:''}
-        ${t.note?`<div class="note">📌 ${esc(t.note)}</div>`:''}
-      </div>`;
-    });
+    const allTasks=getMonthTasks(S.year,m);
+    const {main,done}=splitTasks(allTasks);
+    const total=main.length+done.length;
+    if(total===0&&doneMode!=='all'){
+      html+=`<h2>${MN[m]} · ${ML[m]||''} (0건)</h2><p class="none">등록된 업무 없음</p>`;return;
+    }
+    html+=`<h2>${MN[m]} · ${ML[m]||''} (미완료 ${main.length}건${done.length?` / 완료 ${done.length}건`:''})</h2>`;
+    if(!main.length&&!done.length){html+=`<p class="none">등록된 업무 없음</p>`;return;}
+    main.forEach(t=>{ html+=taskCard(t, privacy==='hide'&&t.sensitive); });
+    if(done.length){
+      html+=`<div class="section-done-title">✓ 완료된 업무 (${done.length}건)</div>`;
+      done.forEach(t=>{ html+=taskCard(t, privacy==='hide'&&t.sensitive); });
+    }
   });
   html+='</body></html>';
   const w=window.open('','_blank');
@@ -996,6 +1259,7 @@ function showToast(msg,type=''){
 ════════════════════════════════ */
 function loadSampleIfEmpty(){
   if(Object.keys(S.tasks).length>0)return;
+  if(!S._loadSample)return;   // 사용자가 "빈 화면으로 시작" 선택 시 건너뜀
   const samples={
     3:[
       {name:'신입생 학적 등록',deadline:'3월 첫째 주',assignee:'교무부장',category:'c2',desc:'입학생 기본정보 나이스 등록\n- 학생 이름, 생년월일, 주소 입력\n- 학부모 연락처 등록',note:'교감선생님 확인 필요',sensitive:true,repeat:true,done:false},
