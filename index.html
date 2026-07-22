@@ -61,7 +61,7 @@ body{font-family:var(--font-sans);background:#F2F5FB;color:var(--gray-d);min-hei
 .setup-card{
   background:#fff; border-radius:20px;
   width:100%; max-width:460px;
-  padding:40px 36px;
+  padding:28px 32px;
   box-shadow:0 8px 40px rgba(27,58,107,.12);
   border:1px solid rgba(27,58,107,.08);
 }
@@ -289,13 +289,49 @@ header{
 .task-card.dragging{opacity:.4;border:2px dashed var(--navy-l);background:var(--sky);}
 .task-card.drag-over{border-top:3px solid var(--navy-l);background:#f0f5ff;}
 
-/* 넘버 배지 */
+/* 넘버 배지 — ⑤ 왼쪽 상단으로 이동 */
 .task-num{
-  position:absolute;top:10px;right:14px;
-  font-size:11px;font-weight:700;color:var(--gray-m);
-  background:var(--gray-l);border-radius:10px;
-  padding:1px 7px;line-height:1.6;
+  position:absolute;top:10px;left:14px;
+  font-size:10px;font-weight:700;color:rgba(255,255,255,.9);
+  background:var(--navy-l);border-radius:8px;
+  padding:1px 6px;line-height:1.6;
 }
+
+/* ① 카드 액션 — 더보기 메뉴 */
+.task-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center;}
+.card-more-wrap{position:relative;margin-left:auto;}
+.card-more-btn{
+  background:var(--gray-l);border:none;cursor:pointer;
+  color:var(--gray-m);border-radius:6px;
+  padding:4px 9px;font-size:14px;line-height:1;
+  transition:background .15s;
+}
+.card-more-btn:hover{background:var(--sky-m);color:var(--navy);}
+.card-more-menu{
+  display:none;position:absolute;bottom:calc(100% + 4px);right:0;
+  background:#fff;border:1.5px solid var(--border);border-radius:9px;
+  box-shadow:0 6px 24px rgba(27,58,107,.15);
+  min-width:140px;z-index:100;overflow:hidden;
+}
+.card-more-menu.open{display:block;}
+.card-more-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 14px;font-size:13px;font-weight:500;
+  color:var(--gray-d);cursor:pointer;border:none;
+  background:none;width:100%;text-align:left;
+  transition:background .1s;
+}
+.card-more-item:hover{background:var(--sky);}
+.card-more-item.danger{color:var(--red);}
+.card-more-item.danger:hover{background:#FFF0EF;}
+
+/* ⑧ 저장됨 표시 — 평소 숨김 */
+.save-indicator{
+  font-size:11px;color:rgba(255,255,255,.6);
+  display:none;align-items:center;gap:4px;
+  transition:opacity .3s;white-space:nowrap;
+}
+.save-indicator.show{display:flex;}
 
 .cat-stripe{position:absolute;top:0;right:0;width:5px;height:100%;border-radius:0 10px 10px 0;}
 .task-top{display:flex;align-items:flex-start;gap:10px;}
@@ -502,10 +538,12 @@ header{
 .task-card.done-card.card-expanded .task-note,
 .task-card.done-card.card-expanded .task-meta{display:flex;}
 .task-card.done-card.card-expanded .task-meta{display:flex;}
+/* 펼치기 화살표 회전 */
+.task-card.done-card .expand-hint{transition:transform .2s;display:inline-block;}
+.task-card.done-card.card-expanded .expand-hint{transform:rotate(90deg);}
+/* 펼친 상태에서 태그 표시 */
 .task-card.done-card .task-title-row .tag,
 .task-card.done-card.card-expanded .task-title-row .tag{display:inline-flex;}
-/* 펼치기 힌트 숨기기 */
-.task-card.done-card.card-expanded .task-title-row span[style*="▶"]{display:none;}
 
 /* ⑦ 저장 상태 표시 */
 .save-indicator{
@@ -644,38 +682,23 @@ header{
 <div id="setupScreen">
   <div class="setup-card">
 
-    <!-- 로고 + 가치 설명 -->
-    <div class="setup-logo">
-      <span class="emoji">🏫</span>
-      <h1>학교 업무 인계인수 관리</h1>
-      <p class="tagline">
-        말로 전달하던 업무 내용을 텍스트로 정리하고<br>
+    <!-- 로고 (축소) -->
+    <div class="setup-logo" style="margin-bottom:16px;">
+      <span class="emoji" style="font-size:36px;">🏫</span>
+      <h1 style="font-size:18px;">학교 업무 인계인수 관리</h1>
+      <p class="tagline" style="font-size:12px;">
+        말로 전달하던 업무 내용을 텍스트로 정리하고
         <strong>파일 하나로 후임자에게 전달</strong>하세요
       </p>
     </div>
 
-    <!-- 상시 안내 박스 (기본 펼침) -->
-    <div class="guide-box-wrap">
-      <p style="margin-bottom:6px;">
-        <strong style="color:#c0392b;">❌ 한글·엑셀 파일을 올리는 앱이 아닙니다.</strong><br>
-        업무 파일은 지금처럼 USB·공유폴더로 따로 전달하세요.
-      </p>
-      <p><strong style="color:var(--navy);">✅ 업무 방법·절차를 텍스트로 남기는 설명서입니다.</strong></p>
-      <div class="guide-row">
-        <span class="guide-chip">✏️ 업무 입력</span>
-        <span style="color:var(--gray-m);">→</span>
-        <span class="guide-chip">📤 파일 내보내기</span>
-        <span style="color:var(--gray-m);">→</span>
-        <span class="guide-chip">📥 후임자가 파일로 시작</span>
-      </div>
-    </div>
+    <!-- 안내 한 줄 -->
+    <p style="font-size:12px;color:var(--gray-m);background:#f0f7ff;border-radius:8px;padding:8px 12px;margin-bottom:14px;line-height:1.6;">
+      💡 <strong style="color:#c0392b;">한글·엑셀 파일을 올리는 앱이 아닙니다.</strong>
+      업무 방법·절차를 텍스트로 남기는 설명서입니다.
+    </p>
 
-    <!-- 학교 이름 (선택) -->
-    <label class="setup-label">학교 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
-    <input class="setup-input" id="setupSchoolInput" placeholder="예: 광주○○초등학교" maxlength="30"
-      onkeydown="if(event.key==='Enter')document.getElementById('setupDeptInput').focus()">
-
-    <!-- 부서명 (필수) -->
+    <!-- 부서명 (필수) — 학교이름 제거, 설정 변경에서 입력 -->
     <label class="setup-label">내 부서·직책 <span style="color:var(--red);">*</span></label>
     <input class="setup-input" id="setupDeptInput" placeholder="예: 교무부장" maxlength="20"
       onkeydown="if(event.key==='Enter')startApp(true)">
@@ -689,7 +712,8 @@ header{
       <div class="preset-chip" onclick="pickPreset('문화예술부장')">🎨 문화예술부장</div>
     </div>
 
-    <!-- 숨겨진 인계일·인수자 (설정 화면에서는 제거, 설정 변경 모달에서 입력) -->
+    <!-- 숨겨진 필드 -->
+    <input type="hidden" id="setupSchoolInput">
     <input type="hidden" id="setupHandoverDate">
     <input type="hidden" id="setupHandoverTo">
 
@@ -704,7 +728,7 @@ header{
         ✏️ 내 업무 직접 입력하기
       </button>
 
-      <div style="display:flex;align-items:center;gap:8px;margin:6px 0 2px;">
+      <div style="display:flex;align-items:center;gap:8px;margin:4px 0 2px;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
         <span style="font-size:11px;color:var(--gray-m);">전임자 파일 또는 내 백업 파일이 있다면</span>
         <div style="flex:1;height:1px;background:var(--border);"></div>
@@ -1253,6 +1277,23 @@ const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#
 function _ls(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
 function _lsJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')||fallback;}catch(e){return fallback;}}
 
+/* ── 카드 더보기 메뉴 ── */
+function toggleCardMore(btn){
+  const menu=btn.nextElementSibling;
+  const isOpen=menu.classList.contains('open');
+  // 다른 카드 메뉴 닫기
+  document.querySelectorAll('.card-more-menu.open').forEach(m=>m.classList.remove('open'));
+  if(!isOpen) menu.classList.add('open');
+}
+function closeCardMore(el){
+  el.closest('.card-more-menu')?.classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.card-more-wrap')){
+    document.querySelectorAll('.card-more-menu.open').forEach(m=>m.classList.remove('open'));
+  }
+});
+
 /* ── 더보기 메뉴 ── */
 function toggleMoreMenu(){
   document.getElementById('moreMenu').classList.toggle('open');
@@ -1313,13 +1354,12 @@ let _saveTimer=null;
 function showSaveIndicator(){
   const el=document.getElementById('saveIndicator');
   if(!el) return;
-  el.textContent='저장 중...';
-  el.className='save-indicator saving';
+  el.textContent='✓ 저장됨';
+  el.className='save-indicator show';
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(()=>{
-    el.textContent='✓ 저장됨';
-    el.className='save-indicator saved';
-  },400);
+    el.className='save-indicator';  // 1초 후 숨김
+  },1000);
 }
 
 
@@ -1722,13 +1762,12 @@ function startApp(withSample=false){
   if(!name){showToast('부서명을 입력하세요.');return;}
   const hasData=Object.keys(S.tasks).length>0;
   if(hasData){
-    const msg=withSample?'기존 업무 데이터를 모두 지우고 샘플 업무로 다시 시작하시겠습니까?':'기존 업무 데이터를 모두 지우고 빈 화면으로 다시 시작하시겠습니까?';
+    const msg=withSample?'기존 업무 데이터를 모두 지우고 예시 업무로 다시 시작하시겠습니까?':'기존 업무 데이터를 모두 지우고 빈 화면으로 다시 시작하시겠습니까?';
     if(!confirm(msg+'\n\n※ 삭제된 데이터는 복구할 수 없습니다.')) return;
     S.tasks={}; saveTasks();
   }
   S.deptName=name; saveDept();
-  S.schoolName=document.getElementById('setupSchoolInput').value.trim(); saveSchool();
-  // 인계일·인수자는 설정 변경 모달(✏️)에서 입력
+  // 학교 이름은 설정 변경(✏️)에서 입력 — 기존값 유지
   S._loadSample=withSample;
   launchApp(true);
 }
@@ -1748,7 +1787,6 @@ function launchApp(push=true){
 ════════════════════════════════ */
 function goHome(){
   showSetup(true);
-  document.getElementById('setupSchoolInput').value=S.schoolName;
   document.getElementById('setupDeptInput').value=S.deptName;
   document.getElementById('filePreview').style.display='none';
   _setupFileData=null;
@@ -1949,9 +1987,10 @@ function renderTaskList(){
           </div>
         </div>
         <div class="task-info">
-          <div class="task-title-row" style="${done?'opacity:.55;':''}" ${done?`onclick="this.closest('.task-card').classList.toggle('card-expanded')" style="cursor:pointer;"`:''}>
+          <div class="task-title-row" style="${done?'opacity:.55;cursor:pointer':''}"
+            ${done?`onclick="this.closest('.task-card').classList.toggle('card-expanded')"`:''}>
             <span class="task-title" style="${done?'text-decoration:line-through;color:var(--gray-m);':''}">${highlightText(t.name,q)}</span>
-            ${done?'<span style="font-size:10px;color:var(--gray-m);margin-left:4px;">▶ 펼치기</span>':''}
+            ${done?'<span style="font-size:10px;color:var(--gray-m);margin-left:4px;" class="expand-hint">▶</span>':''}
             ${(t.priority||'mid')==='high'?`<span class="tag" style="background:#fdecea;color:#e74c3c;font-size:11px;">⭐ 상</span>`:''}
             ${t.pending?'<span class="tag" style="background:#f4ecf7;color:#8e44ad;font-weight:600;">🚨 미결</span>':''}
             ${isSpan(t)?`<span class="tag tag-span">📅 ${MN[t.startMonth]}~${MN[t.endMonth]}</span>`:''}
@@ -1974,8 +2013,13 @@ function renderTaskList(){
       </div>
       <div class="task-actions">
         <button class="btn btn-ghost btn-sm" onclick="openEditModal(${ri})">✏️ 수정</button>
-        <button class="btn btn-copy btn-sm" onclick="openCopyModal(${ri})">📋 다른 월로 복사</button>
-        <button class="btn btn-danger btn-sm" onclick="confirmDelete(this,${ri})">🗑 삭제</button>
+        <div class="card-more-wrap">
+          <button class="card-more-btn" onclick="toggleCardMore(this)" title="더 보기">⋯</button>
+          <div class="card-more-menu">
+            <button class="card-more-item" onclick="openCopyModal(${ri});closeCardMore(this)">📋 다른 월로 복사</button>
+            <button class="card-more-item danger" onclick="confirmDelete(this.closest('.task-card').querySelector('.btn.btn-danger'),${ri});closeCardMore(this)">🗑 삭제</button>
+          </div>
+        </div>
       </div>
       <div class="delete-confirm">
         <div class="delete-confirm-msg">정말 삭제하시겠습니까?<span>삭제 후 복구할 수 없습니다.</span></div>
@@ -2246,7 +2290,9 @@ function saveTask(){
 }
 function confirmDelete(btn,idx){
   document.querySelectorAll('.task-card.deleting').forEach(c=>c.classList.remove('deleting'));
-  btn.closest('.task-card').classList.add('deleting');
+  // btn이 null이면 idx로 카드 찾기
+  const card=btn?btn.closest('.task-card'):document.querySelector(`.task-card[data-idx="${idx}"]`);
+  if(card) card.classList.add('deleting');
 }
 function cancelDelete(btn){
   btn.closest('.task-card').classList.remove('deleting');
@@ -2316,15 +2362,26 @@ function onDrop(e,destIdx){
   if(_dragSrcIdx===null||_dragSrcIdx===destIdx)return;
 
   const allT=getMonthTasks(S.year,S.curMonth);
-  // 참조 카드 드래그 불가
   if(allT[_dragSrcIdx]?._spanRef||allT[destIdx]?._spanRef){
     showToast('연속업무는 시작 월에서 순서를 변경하세요.');return;
   }
+
+  // ⑥ 2열 그리드: 같은 열(홀짝 위치)끼리만 드래그 허용
+  const cards=[...document.querySelectorAll('.task-list .task-card')];
+  const srcCard=cards.find(c=>parseInt(c.dataset.idx)===_dragSrcIdx);
+  const dstCard=cards.find(c=>parseInt(c.dataset.idx)===destIdx);
+  if(srcCard&&dstCard){
+    const srcPos=cards.indexOf(srcCard);
+    const dstPos=cards.indexOf(dstCard);
+    if(srcPos%2!==dstPos%2){
+      showToast('같은 열 안에서만 순서를 바꿀 수 있습니다.');return;
+    }
+  }
+
   const tasks=getDirectTasks(S.year,S.curMonth);
   const srcDirect=tasks.findIndex(t=>t===allT[_dragSrcIdx]);
   const dstDirect=tasks.findIndex(t=>t===allT[destIdx]);
   if(srcDirect<0||dstDirect<0)return;
-  // 배열에서 꺼내서 목적지에 삽입
   const [moved]=tasks.splice(srcDirect,1);
   tasks.splice(dstDirect,0,moved);
   setMonthTasks(S.year,S.curMonth,tasks);
@@ -2760,178 +2817,176 @@ function loadSampleIfEmpty(){
   const y=S.year;
   const samples={
     3:[
-      {name:'입학식 및 시업식 준비',startMonth:3,endMonth:null,deadline:'3월 2일',assignee:'교무부장',category:'c3',
+      {name:'입학식 및 시업식 준비',startMonth:3,endMonth:null,deadline:'3월 2일',assignee:S.deptName,category:'c3',
        desc:'1학년 입학식, 2~6학년 시업식 준비\n1. 식순 작성 및 사회자 지정\n2. 입학 통지서 및 학용품 준비\n3. 학부모 안내 가정통신문 발송\n4. 강당(또는 운동장) 배치 확인',
        note:'교장·교감 결재 필수. 전년도 식순 파일 참고',fileLocation:'공유폴더/교무부/행사/입학식',
        priority:'high',repeat:true,done:false,pending:false,contacts:[{name:'행정실 담당',tel:'958-5702'}]},
-      {name:'학급 편성 및 담임 배정 공문',startMonth:3,endMonth:null,deadline:'3월 초',assignee:'교무부장',category:'c1',
+      {name:'학급 편성 및 담임 배정 공문',startMonth:3,endMonth:null,deadline:'3월 초',assignee:S.deptName,category:'c1',
        desc:'학급 편성 결과를 교육청에 공문으로 제출\n1. 에듀파인 접속 → 공문 → 새 공문 작성\n2. 학급 수·학생 수 기재\n3. 교장 결재 후 발송',
        note:'전년도 공문 양식 참고',fileLocation:'에듀파인 공문 시스템',
        priority:'high',repeat:true,done:false,pending:false},
-      {name:'신입생 학적 등록 (나이스)',startMonth:3,endMonth:null,deadline:'3월 첫째 주',assignee:'교무부장',category:'c2',
+      {name:'신입생 학적 등록 (나이스)',startMonth:3,endMonth:null,deadline:'3월 첫째 주',assignee:S.deptName,category:'c2',
        desc:'입학생 기본정보 나이스 등록\n1. 나이스 접속 → 학적 → 신입생 등록\n2. 이름·생년월일·주소·학부모 연락처 입력\n3. 입력 완료 후 교감 확인',
        note:'개인정보 포함. 출력물 보안 유의',fileLocation:'나이스 → 학적관리',
        system:'나이스(NEIS) → 학적 → 학생 등록',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
-      {name:'진단평가 실시 및 결과 처리',startMonth:3,endMonth:null,deadline:'3월 말',assignee:'교무부장',category:'c8',
+      {name:'진단평가 실시 및 결과 처리',startMonth:3,endMonth:null,deadline:'3월 말',assignee:S.deptName,category:'c8',
        desc:'2~6학년 진단활동 실시 및 결과 취합\n1. 교육청 진단평가 계획 공문 확인\n2. 학급별 실시 일정 안내\n3. 결과 취합 후 교육청 보고',
        note:'기초학력 대상 학생 별도 관리',priority:'mid',repeat:true,done:false,pending:false},
-      {name:'인성·생명존중·친구사랑주간 운영',startMonth:3,endMonth:null,deadline:'3월 27~31일',assignee:'생활부장',category:'c4',
+      {name:'인성·생명존중·친구사랑주간 운영',startMonth:3,endMonth:null,deadline:'3월 27~31일',assignee:S.deptName,category:'c4',
        desc:'주간 운영 계획 수립 및 가정통신문 발송\n1. 학급별 활동 계획 안내\n2. 복도 게시물 부착\n3. 결과 보고서 작성',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     4:[
-      {name:'학부모 상담주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 3~14일',assignee:'교무부장',category:'c8',
+      {name:'학부모 상담주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 3~14일',assignee:S.deptName,category:'c8',
        desc:'학부모 상담주간 운영\n1. 가정통신문 발송 (상담 신청서 포함)\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고',
        note:'상담 내용 개인정보 관리 유의',priority:'mid',sensitive:true,repeat:true,done:false,pending:false},
-      {name:'장애인식개선교육주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 10~14일',assignee:'연구부장',category:'c4',
+      {name:'장애인식개선교육주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 10~14일',assignee:S.deptName,category:'c4',
        desc:'장애인식개선교육 실시\n1. 교육청 지침 공문 확인\n2. 학급별 수업 자료 배부\n3. 실적 보고서 제출',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'학교폭력 실태조사',startMonth:4,endMonth:null,deadline:'4월 중',assignee:'생활부장',category:'c4',
+      {name:'학교폭력 실태조사',startMonth:4,endMonth:null,deadline:'4월 중',assignee:S.deptName,category:'c4',
        desc:'온라인 학교폭력 실태조사 실시\n1. 교육청 안내 공문 확인\n2. 학생 대상 설문 링크 학급 배포\n3. 학급별 참여율 독려 및 결과 보고',
        note:'교육청 지침 공문 확인 필수',sensitive:true,repeat:true,done:false,pending:false,
        system:'학교폭력 실태조사 온라인 시스템',priority:'high'},
-      {name:'1학년 체험학습',startMonth:4,endMonth:null,deadline:'4월 25일',assignee:'교무부장',category:'c3',
+      {name:'1학년 체험학습',startMonth:4,endMonth:null,deadline:'4월 25일',assignee:S.deptName,category:'c3',
        desc:'1학년 봄 체험학습 인솔 및 행정 처리\n1. 장소·차량·인솔교사 확정\n2. 안전 계획서 교장 결재\n3. 학부모 안내 가정통신문 발송\n4. 결과 보고서 작성',
        fileLocation:'공유폴더/교무부/체험학습/2026',priority:'mid',repeat:true,done:false,pending:false},
     ],
     5:[
-      {name:'어울림운동회 운영',startMonth:5,endMonth:null,deadline:'5월 3~10일',assignee:'체육부장',category:'c3',
+      {name:'어울림운동회 운영',startMonth:5,endMonth:null,deadline:'5월 3~10일',assignee:S.deptName,category:'c3',
        desc:'학년별 어울림운동회 운영\n- 4학년: 5월 3일\n- 2·3학년: 5월 8일\n- 1학년: 5월 9일\n- 5·6학년: 5월 10일\n1. 종목 선정 및 진행 인원 배치\n2. 방송·음향 장비 확인\n3. 결과 보고',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'5·18민주화운동 기념주간 운영',startMonth:5,endMonth:null,deadline:'5월 15~18일',assignee:'연구부장',category:'c4',
+      {name:'5·18민주화운동 기념주간 운영',startMonth:5,endMonth:null,deadline:'5월 15~18일',assignee:S.deptName,category:'c4',
        desc:'5·18 기념주간 교육활동 운영\n1. 학급별 수업 자료 배부\n2. 게시물 제작 및 부착\n3. 실적 보고',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'지진 대피훈련',startMonth:5,endMonth:null,deadline:'5월 12일',assignee:'생활부장',category:'c4',
+      {name:'지진 대피훈련',startMonth:5,endMonth:null,deadline:'5월 12일',assignee:S.deptName,category:'c4',
        desc:'전교 지진 대피훈련 실시\n1. 훈련 계획 수립 및 안내\n2. 학급별 대피 동선 확인\n3. 훈련 실시 후 결과 보고\n4. 미흡 사항 개선 계획 수립',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'봄 현장체험학습 계획 및 공문',startMonth:5,endMonth:null,deadline:'5월 초',assignee:'교무부장',category:'c3',
+      {name:'봄 현장체험학습 계획 및 공문',startMonth:5,endMonth:null,deadline:'5월 초',assignee:S.deptName,category:'c3',
        desc:'봄 현장체험학습 계획 수립\n1. 장소·이동수단·안전계획 포함\n2. 교장 결재 후 교육청 보고\n3. 차량 계약 확인',
        note:'차량 계약 3월부터 시작',fileLocation:'공유폴더/교무부/체험학습',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     6:[
-      {name:'재량휴업일 가정통신문 발송',startMonth:6,endMonth:null,deadline:'6월 1일 전',assignee:'교무부장',category:'c1',
+      {name:'재량휴업일 가정통신문 발송',startMonth:6,endMonth:null,deadline:'6월 1일 전',assignee:S.deptName,category:'c1',
        desc:'재량휴업일(6월 5일) 안내 가정통신문 발송\n1. 휴업일 근거 및 날짜 명시\n2. 돌봄 교실 운영 여부 안내\n3. 교장 결재 후 발송',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'5학년 수련활동',startMonth:6,endMonth:null,deadline:'6월 28~30일',assignee:'교무부장',category:'c3',
+      {name:'5학년 수련활동',startMonth:6,endMonth:null,deadline:'6월 28~30일',assignee:S.deptName,category:'c3',
        desc:'5학년 수련활동 운영\n1. 수련관 예약 및 계약\n2. 안전 계획서 작성 및 결재\n3. 학부모 안내 및 비용 수납\n4. 인솔 교사 배치\n5. 결과 보고서 작성',
        note:'수련관 예약은 전년도 12월부터',fileLocation:'공유폴더/교무부/수련활동',
        priority:'high',repeat:true,done:false,pending:false,
        contacts:[{name:'수련관 담당자',tel:'062-000-0000'}]},
     ],
     7:[
-      {name:'수영체험 운영',startMonth:7,endMonth:null,deadline:'7월 5~11일',assignee:'체육부장',category:'c3',
+      {name:'수영체험 운영',startMonth:7,endMonth:null,deadline:'7월 5~11일',assignee:S.deptName,category:'c3',
        desc:'1·2학년 수영체험 실시\n- 1학년: 7월 5일\n- 2학년: 7월 11일\n1. 수영장 예약 및 계약\n2. 안전요원 배치 확인\n3. 학부모 동의서 수거\n4. 인솔 교사 배치',
        priority:'high',repeat:true,done:false,pending:false,
        contacts:[{name:'수영장 담당',tel:'062-000-0000'}]},
-      {name:'1학기 학교생활기록부 마감',startMonth:7,endMonth:null,deadline:'7월 말',assignee:'교무부장',category:'c2',
+      {name:'1학기 학교생활기록부 마감',startMonth:7,endMonth:null,deadline:'7월 말',assignee:S.deptName,category:'c2',
        desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n1. 담임교사별 입력 현황 점검\n2. 누락 항목 확인\n3. 교장 최종 결재',
        note:'관리자 계정 필요. 마감 후 수정 불가',
        system:'나이스(NEIS) → 학생생활 → 생활기록부',
        fileLocation:'나이스 생활기록부 시스템',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
-      {name:'여름방학식 준비',startMonth:7,endMonth:null,deadline:'7월 27일',assignee:'교무부장',category:'c3',
+      {name:'여름방학식 준비',startMonth:7,endMonth:null,deadline:'7월 27일',assignee:S.deptName,category:'c3',
        desc:'여름방학식 행사 준비\n1. 방학 중 생활 안내 가정통신문 작성\n2. 방학식 식순 작성\n3. 안전사고 예방 교육 실시',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     8:[
-      {name:'2학기 개학식 준비',startMonth:8,endMonth:null,deadline:'8월 22일',assignee:'교무부장',category:'c3',
+      {name:'2학기 개학식 준비',startMonth:8,endMonth:null,deadline:'8월 22일',assignee:S.deptName,category:'c3',
        desc:'2학기 개학식 준비\n1. 개학식 식순 작성\n2. 2학기 시작 안내 가정통신문 발송\n3. 교실 배치 및 환경 정비 확인',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'4학년 수영체험',startMonth:8,endMonth:null,deadline:'8월 30일',assignee:'체육부장',category:'c3',
+      {name:'4학년 수영체험',startMonth:8,endMonth:null,deadline:'8월 30일',assignee:S.deptName,category:'c3',
        desc:'4학년 수영체험 실시\n1. 수영장 예약 확인\n2. 학부모 동의서 수거\n3. 인솔 교사 배치\n4. 안전요원 배치 확인',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     9:[
-      {name:'화재 대피훈련',startMonth:9,endMonth:null,deadline:'9월 8일',assignee:'생활부장',category:'c4',
+      {name:'화재 대피훈련',startMonth:9,endMonth:null,deadline:'9월 8일',assignee:S.deptName,category:'c4',
        desc:'전교 화재 대피훈련 실시\n1. 소방서 협조 요청\n2. 훈련 계획 수립 및 학급 안내\n3. 대피 동선 확인\n4. 훈련 실시 및 결과 보고',
        priority:'high',repeat:true,done:false,pending:false,
        contacts:[{name:'광산소방서',tel:'119'}]},
-      {name:'학부모 상담주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 18~29일',assignee:'교무부장',category:'c8',
+      {name:'학부모 상담주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 18~29일',assignee:S.deptName,category:'c8',
        desc:'2학기 학부모 상담주간 운영\n1. 가정통신문 발송\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고',
        sensitive:true,priority:'mid',repeat:true,done:false,pending:false},
-      {name:'3·5학년 수영체험',startMonth:9,endMonth:null,deadline:'9월 4일',assignee:'체육부장',category:'c3',
+      {name:'3·5학년 수영체험',startMonth:9,endMonth:null,deadline:'9월 4일',assignee:S.deptName,category:'c3',
        desc:'3·5학년 수영체험 실시\n1. 수영장 예약 확인\n2. 학부모 동의서 수거\n3. 인솔 교사 배치',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'장애인식개선교육주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 25~27일',assignee:'연구부장',category:'c4',
+      {name:'장애인식개선교육주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 25~27일',assignee:S.deptName,category:'c4',
        desc:'장애인식개선교육 2차 운영\n1. 교육 자료 배부\n2. 학급별 수업 실시\n3. 실적 보고서 제출',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     10:[
-      {name:'운남축제 준비 및 운영',startMonth:10,endMonth:null,deadline:'10월 20일',assignee:'교무부장',category:'c3',
+      {name:'운남축제 준비 및 운영',startMonth:10,endMonth:null,deadline:'10월 20일',assignee:S.deptName,category:'c3',
        desc:'학교 축제 준비 및 운영\n1. 축제 기획안 작성 및 결재\n2. 학급별 프로그램 취합\n3. 장소·음향·방송 준비\n4. 안전 계획 수립\n5. 결과 보고서 작성',
        note:'학생자치회와 협력 필요',
        fileLocation:'공유폴더/교무부/행사/운남축제',
        priority:'high',repeat:true,done:false,pending:false},
-      {name:'개교기념일 행사',startMonth:10,endMonth:null,deadline:'10월 2일',assignee:'교무부장',category:'c3',
+      {name:'개교기념일 행사',startMonth:10,endMonth:null,deadline:'10월 2일',assignee:S.deptName,category:'c3',
        desc:'개교기념일 관련 행사 준비\n1. 기념식 식순 작성\n2. 학교 역사 전시 자료 준비\n3. 가정통신문 발송',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'2학기 학교생활기록부 중간 점검',startMonth:10,endMonth:null,deadline:'10월 말',assignee:'교무부장',category:'c2',
+      {name:'2학기 학교생활기록부 중간 점검',startMonth:10,endMonth:null,deadline:'10월 말',assignee:S.deptName,category:'c2',
        desc:'2학기 생활기록부 입력 중간 점검\n1. 담임별 입력 현황 확인\n2. 누락 항목 안내\n3. 마감 일정 재안내',
        system:'나이스(NEIS) → 생활기록부',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     11:[
-      {name:'수능일 등교 시간 조정',startMonth:11,endMonth:null,deadline:'11월 16일',assignee:'교무부장',category:'c1',
+      {name:'수능일 등교 시간 조정',startMonth:11,endMonth:null,deadline:'11월 16일',assignee:S.deptName,category:'c1',
        desc:'대학수학능력시험일 등교 시간 조정\n1. 교육청 공문 확인 (10시 등교)\n2. 가정통신문 발송\n3. 급식 시간 조정 안내',
        priority:'high',repeat:true,done:false,pending:false},
-      {name:'학교 공개 수업 준비',startMonth:11,endMonth:null,deadline:'11월 22일',assignee:'연구부장',category:'c8',
+      {name:'학교 공개 수업 준비',startMonth:11,endMonth:null,deadline:'11월 22일',assignee:S.deptName,category:'c8',
        desc:'학교 공개 수업 준비 및 운영\n1. 공개 수업 학급 및 교사 선정\n2. 수업 지도안 사전 검토\n3. 학부모 안내 가정통신문 발송\n4. 공개 수업 후 협의회 운영',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'1학년 체험학습 (11월)',startMonth:11,endMonth:null,deadline:'11월 3일',assignee:'교무부장',category:'c3',
+      {name:'1학년 체험학습 (11월)',startMonth:11,endMonth:null,deadline:'11월 3일',assignee:S.deptName,category:'c3',
        desc:'1학년 가을 체험학습 인솔\n1. 장소·차량·인솔교사 확정\n2. 안전 계획서 결재\n3. 학부모 안내 및 동의서 수거',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     12:[
-      {name:'졸업식 준비 및 졸업앨범 배부',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:'교무부장',category:'c3',
+      {name:'졸업식 준비 및 졸업앨범 배부',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:S.deptName,category:'c3',
        desc:'졸업식 행사 준비\n1. 졸업장·상장 인쇄 및 날인\n2. 졸업앨범 수령 및 배부\n3. 식순 작성 및 사회자 지정\n4. 강당 배치 확인',
        note:'졸업앨범 업체 11월부터 협의',
        fileLocation:'공유폴더/교무부/행사/졸업식',
        priority:'high',repeat:true,done:false,pending:false},
-      {name:'종업식 및 겨울방학식',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:'교무부장',category:'c3',
+      {name:'종업식 및 겨울방학식',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:S.deptName,category:'c3',
        desc:'종업식 및 겨울방학식 준비\n1. 식순 작성\n2. 방학 중 생활 안내 가정통신문\n3. 안전사고 예방 교육',
        note:'졸업식과 같은 날 진행',
        priority:'mid',repeat:true,done:false,pending:false},
-      {name:'2학기 학교생활기록부 마감',startMonth:12,endMonth:null,deadline:'12월 중',assignee:'교무부장',category:'c2',
+      {name:'2학기 학교생활기록부 마감',startMonth:12,endMonth:null,deadline:'12월 중',assignee:S.deptName,category:'c2',
        desc:'2학기 생활기록부 최종 마감\n1. 담임별 입력 현황 최종 점검\n2. 누락 항목 확인\n3. 교장 최종 결재\n4. 마감 후 출력 보관',
        system:'나이스(NEIS) → 생활기록부',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
     ],
     1:[
-      {name:'신학기 학급 편성 사전 준비',startMonth:1,endMonth:null,deadline:'1월 말',assignee:'교무부장',category:'c2',
+      {name:'신학기 학급 편성 사전 준비',startMonth:1,endMonth:null,deadline:'1월 말',assignee:S.deptName,category:'c2',
        desc:'새 학년도 학급 편성 사전 작업\n1. 학년별 학생 수 파악\n2. 학급 수 결정\n3. 전학 예정 학생 파악\n4. 담임 배정 초안 작성 (교장·교감 협의)',
        note:'개인정보 보안 유의',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
-      {name:'교육과정 편성 및 학사력 작성',startMonth:1,endMonth:2,deadline:'2월 초',assignee:'교무부장',category:'c8',
+      {name:'교육과정 편성 및 학사력 작성',startMonth:1,endMonth:2,deadline:'2월 초',assignee:S.deptName,category:'c8',
        desc:'새 학년도 교육과정 편성 및 학사력 작성\n1. 교육청 교육과정 편성 지침 확인\n2. 수업일수·행사일정 반영\n3. 학교운영위원회 심의\n4. 교육청 제출',
        fileLocation:'공유폴더/교무부/교육과정',
        priority:'high',repeat:true,done:false,pending:false},
     ],
     2:[
-      {name:'교직원 인사 이동 관련 공문',startMonth:2,endMonth:null,deadline:'2월 말',assignee:'행정실장',category:'c1',
+      {name:'교직원 인사 이동 관련 공문',startMonth:2,endMonth:null,deadline:'2월 말',assignee:S.deptName,category:'c1',
        desc:'전출·전입 교직원 관련 교육청 공문 처리\n1. 발령 통보 확인\n2. 업무 인계인수서 제출\n3. 전출 교원 환송 행사 준비',
        sensitive:true,priority:'high',repeat:true,done:false,pending:false},
-      {name:'입학식 준비 (신입생 안내)',startMonth:2,endMonth:null,deadline:'2월 말',assignee:'교무부장',category:'c3',
+      {name:'입학식 준비 (신입생 안내)',startMonth:2,endMonth:null,deadline:'2월 말',assignee:S.deptName,category:'c3',
        desc:'신입생 입학 사전 안내\n1. 취학통지서 발송 확인\n2. 예비소집 운영\n3. 입학 안내문 제작 및 발송\n4. 1학년 교실 환경 정비',
        fileLocation:'공유폴더/교무부/행사/입학식',
        priority:'high',repeat:true,done:false,pending:false},
-      {name:'새 학년도 업무 분장 수립',startMonth:2,endMonth:null,deadline:'2월 중',assignee:'교무부장',category:'c8',
+      {name:'새 학년도 업무 분장 수립',startMonth:2,endMonth:null,deadline:'2월 중',assignee:S.deptName,category:'c8',
        desc:'새 학년도 교직원 업무 분장 수립\n1. 전입 교원 파악\n2. 업무 분장 초안 작성\n3. 교장·교감 협의\n4. 최종 확정 및 공지',
        priority:'high',repeat:true,done:false,pending:false},
     ],
   };
-
-  // 전 학년도 2월 준비 업무 (y-1 학년도의 2월)
   const prevYearFeb=[
-    {name:'교직원 인사 이동 관련 공문',startMonth:2,endMonth:null,deadline:'2월 말',assignee:'행정실장',category:'c1',
+    {name:'교직원 인사 이동 관련 공문',startMonth:2,endMonth:null,deadline:'2월 말',assignee:S.deptName,category:'c1',
      desc:'전출·전입 교직원 관련 교육청 공문 처리\n1. 발령 통보 확인\n2. 업무 인계인수서 제출',
      sensitive:true,priority:'high',repeat:true,done:false,pending:false},
-    {name:'신입생 예비소집 및 입학 안내',startMonth:2,endMonth:null,deadline:'2월 중',assignee:'교무부장',category:'c3',
+    {name:'신입생 예비소집 및 입학 안내',startMonth:2,endMonth:null,deadline:'2월 중',assignee:S.deptName,category:'c3',
      desc:'신입생 입학 사전 안내\n1. 예비소집 운영\n2. 입학 안내문 발송\n3. 1학년 교실 환경 정비',
      fileLocation:'공유폴더/교무부/행사/입학식',
      priority:'high',repeat:true,done:false,pending:false},
-    {name:'새 학년도 업무 분장 수립',startMonth:2,endMonth:null,deadline:'2월 중',assignee:'교무부장',category:'c8',
+    {name:'새 학년도 업무 분장 수립',startMonth:2,endMonth:null,deadline:'2월 중',assignee:S.deptName,category:'c8',
      desc:'새 학년도 교직원 업무 분장 수립\n1. 전입 교원 파악\n2. 업무 분장 초안 → 교장·교감 협의\n3. 최종 확정 및 공지',
      priority:'high',repeat:true,done:false,pending:false},
   ];
