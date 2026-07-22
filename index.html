@@ -186,6 +186,7 @@ header{
 .tag-sensitive{background:var(--accent-l);color:var(--accent);}
 .tag-repeat{background:var(--sky);color:var(--navy-l);}
 .tag-todo{background:#FDECEA;color:var(--red);}
+.tag-span{background:#EAF4FB;color:#1a6b9a;font-weight:600;}  /* 기간 업무 배지 */
 .task-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px;}
 .task-meta-item{font-size:12px;color:var(--gray-m);}
 .task-meta-item.deadline{color:var(--accent);font-weight:500;}
@@ -453,12 +454,16 @@ header{
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">월</label>
-          <select class="form-select" id="taskMonth"></select>
+          <label class="form-label">시작 월 *</label>
+          <select class="form-select" id="taskMonthStart"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">종료 월</label>
+          <select class="form-select" id="taskMonthEnd"></select>
         </div>
         <div class="form-group">
           <label class="form-label">처리 기한</label>
-          <input class="form-input" id="taskDeadline" placeholder="예: 3월 첫째 주">
+          <input class="form-input" id="taskDeadline" placeholder="예: 매월 말일">
         </div>
       </div>
       <div class="form-row">
@@ -488,6 +493,12 @@ header{
       <div class="form-group">
         <label class="form-label">참고 메모</label>
         <input class="form-input" id="taskNote" placeholder="예: 교감선생님 결재 필요">
+      </div>
+      <div class="form-group">
+        <label class="form-label">📁 관련 파일 위치</label>
+        <input class="form-input" id="taskFileLocation"
+          placeholder="예: 공유폴더/교무부/학적서류  또는  USB/인계인수/2026양식.xlsx">
+        <p style="font-size:11px;color:var(--gray-m);margin-top:4px;">파일 자체가 아닌 보관 위치(경로)를 기록합니다.</p>
       </div>
       <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
         <label class="form-check"><input type="checkbox" id="taskSensitive"><span>🔒 개인정보 포함</span></label>
@@ -661,6 +672,7 @@ header{
         </div>
       </div>
       <label class="form-check"><input type="checkbox" id="pShowAssignee" checked><span>담당자 이름 출력에 포함</span></label>
+      <label class="form-check"><input type="checkbox" id="pShowFileList" checked><span>📁 파일 인계 체크리스트 출력에 포함</span></label>
       <div class="form-group">
         <label class="form-label">완료된 업무 처리</label>
         <div style="display:flex;flex-direction:column;gap:6px;">
@@ -789,8 +801,47 @@ function checkBackupOnLaunch(){
 }
 
 function getKey(year,month){return month<=2?`${year+1}-${month}`:`${year}-${month}`;}
-function getMonthTasks(year,month){return S.tasks[getKey(year,month)]||[];}
-function setMonthTasks(year,month,tasks){S.tasks[getKey(year,month)]=tasks;saveTasks();}
+
+/* 학년도 내 월 순서 인덱스 (3월=0 … 2월=11) */
+function monthIdx(m){ return MONTHS.indexOf(m); }
+
+/* 기간 업무인지 — startMonth와 endMonth가 다를 때 */
+function isSpan(t){ return t.endMonth && t.endMonth !== t.startMonth; }
+
+/* 해당 월에 보여야 할 업무 목록 반환
+   - 해당 월에 직접 저장된 업무 (startMonth === month)
+   - 다른 월에서 시작했지만 기간이 이 월을 포함하는 업무 */
+function getMonthTasks(year, month){
+  const direct = S.tasks[getKey(year,month)] || [];
+  const mIdx = monthIdx(month);
+
+  // 기간 업무: 다른 월에 저장된 업무 중 이 월을 포함하는 것 수집
+  const span = [];
+  MONTHS.forEach(startM => {
+    if(startM === month) return; // 직접 저장된 건 이미 위에서 처리
+    const stored = S.tasks[getKey(year,startM)] || [];
+    stored.forEach(t => {
+      if(!isSpan(t)) return;
+      const sIdx = monthIdx(t.startMonth||startM);
+      const eIdx = monthIdx(t.endMonth);
+      // 순환 포함 처리: sIdx <= eIdx (같은 학년도 내 3~2월 순서 기준)
+      if(mIdx > sIdx && mIdx <= eIdx){
+        span.push({...t, _spanRef:true, _spanStart:t.startMonth||startM});
+      }
+    });
+  });
+
+  return [...direct, ...span];
+}
+
+/* 직접 저장된 업무만 반환 (수정·삭제용) */
+function getDirectTasks(year, month){
+  return S.tasks[getKey(year,month)] || [];
+}
+
+function setMonthTasks(year,month,tasks){
+  S.tasks[getKey(year,month)]=tasks; saveTasks();
+}
 function getCat(id){return S.cats.find(c=>c.id===id)||null;}
 
 /* ════════════════════════════════
@@ -811,18 +862,19 @@ window.addEventListener('popstate',e=>{
   else showApp(false);
 });
 
-// 새로고침 시 해시로 복원
-window.addEventListener('load',()=>{
-  const hash=location.hash;
-  if(hash==='#app'&&S.deptName){
-    replaceState('app');
-    launchApp(false);
-  } else if(S.deptName){
-    replaceState('app');
-    launchApp(false);
-  } else {
-    replaceState('setup');
-    showSetup(false);
+// DOMContentLoaded 기준으로 초기화 (GitHub Pages 포함 모든 환경 호환)
+document.addEventListener('DOMContentLoaded',()=>{
+  try {
+    if(S.deptName){
+      replaceState('app');
+      launchApp(false);
+    } else {
+      replaceState('setup');
+      showSetup(false);
+    }
+  } catch(e){
+    // 최후 수단: 설정 화면 강제 표시
+    document.getElementById('setupScreen').style.display='flex';
   }
 });
 
@@ -976,6 +1028,8 @@ function renderTaskList(){
           <div class="task-title-row">
             <span class="task-title">${esc(t.name)}</span>
             ${!t.done?'<span class="tag tag-todo">🔴 미완료</span>':''}
+            ${isSpan(t)?`<span class="tag tag-span">📅 ${MN[t.startMonth]}~${MN[t.endMonth]}</span>`:''}
+            ${t._spanRef?'<span class="tag" style="background:#EAF4FB;color:#1a6b9a;font-size:10px;">↗ 연속업무</span>':''}
             ${cat?`<span class="tag" style="background:${cc}22;color:${cc}">${esc(cat.name)}</span>`:''}
             ${t.sensitive?'<span class="tag tag-sensitive">🔒 개인정보</span>':''}
             ${t.repeat?'<span class="tag tag-repeat">🔁 반복</span>':''}
@@ -986,6 +1040,7 @@ function renderTaskList(){
           </div>
           ${t.desc?`<div class="task-desc">${linkify(t.desc)}</div>`:''}
           ${t.note?`<div class="task-note">📌 ${linkify(t.note)}</div>`:''}
+          ${t.fileLocation?`<div class="task-note" style="color:var(--teal);margin-top:4px;">📁 ${esc(t.fileLocation)}</div>`:''}
         </div>
       </div>
       <div class="task-actions">
@@ -1020,9 +1075,14 @@ function setCatFilter(id){S.filter.cat=id;renderCatFilters();renderTabs();render
 /* ════════════════════════════════
    TASK MODAL
 ════════════════════════════════ */
-function populateMonthSel(sel){
-  document.getElementById('taskMonth').innerHTML=
-    MONTHS.map(m=>`<option value="${m}"${m===sel?' selected':''}>${MN[m]}</option>`).join('');
+function populateMonthSels(startSel, endSel){
+  const opts = MONTHS.map(m=>`<option value="${m}">${MN[m]}</option>`).join('');
+  const noneOpt = `<option value="">— 단일 월 —</option>`;
+  document.getElementById('taskMonthStart').innerHTML =
+    MONTHS.map(m=>`<option value="${m}"${m===startSel?' selected':''}>${MN[m]}</option>`).join('');
+  document.getElementById('taskMonthEnd').innerHTML =
+    noneOpt +
+    MONTHS.map(m=>`<option value="${m}"${m===endSel?' selected':''}>${MN[m]}</option>`).join('');
 }
 function populateCatSel(selId){
   document.getElementById('taskCategory').innerHTML=
@@ -1033,17 +1093,35 @@ function openAddModal(){
   S.editingIdx=null;
   document.getElementById('modalTitle').textContent='업무 추가';
   document.getElementById('modalSaveBtn').textContent='저장';
-  ['taskName','taskDeadline','taskAssignee','taskDesc','taskNote'].forEach(id=>document.getElementById(id).value='');
+  ['taskName','taskDeadline','taskAssignee','taskDesc','taskNote','taskFileLocation'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('taskSensitive').checked=false;
   document.getElementById('taskRepeat').checked=false;
-  document.getElementById('taskTodo').checked=false;   // 기본값: 완료
-  populateMonthSel(S.curMonth);
+  document.getElementById('taskTodo').checked=false;
+  populateMonthSels(S.curMonth, '');
   populateCatSel('');
   document.getElementById('taskModal').classList.add('open');
   setTimeout(()=>document.getElementById('taskName').focus(),80);
 }
 function openEditModal(idx){
-  const t=getMonthTasks(S.year,S.curMonth)[idx];
+  // 기간 업무의 참조 카드는 원본 월에서 수정
+  const allT = getMonthTasks(S.year, S.curMonth);
+  const t = allT[idx];
+  if(t._spanRef){
+    // 원본이 있는 월로 이동 후 수정
+    const origM = t._spanStart;
+    const origTasks = getDirectTasks(S.year, origM);
+    const origIdx = origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
+    if(origIdx>=0){
+      S.curMonth = origM;
+      renderTabs();
+      openEditModalDirect(origIdx);
+      return;
+    }
+  }
+  openEditModalDirect(idx);
+}
+function openEditModalDirect(idx){
+  const t = getDirectTasks(S.year, S.curMonth)[idx];
   S.editingIdx=idx;
   document.getElementById('modalTitle').textContent='업무 수정';
   document.getElementById('modalSaveBtn').textContent='수정 저장';
@@ -1052,10 +1130,11 @@ function openEditModal(idx){
   document.getElementById('taskAssignee').value=t.assignee||'';
   document.getElementById('taskDesc').value=t.desc||'';
   document.getElementById('taskNote').value=t.note||'';
+  document.getElementById('taskFileLocation').value=t.fileLocation||'';
   document.getElementById('taskSensitive').checked=!!t.sensitive;
   document.getElementById('taskRepeat').checked=!!t.repeat;
-  document.getElementById('taskTodo').checked=!t.done;  // done=false → 미완료 체크
-  populateMonthSel(S.curMonth);
+  document.getElementById('taskTodo').checked=!t.done;
+  populateMonthSels(t.startMonth||S.curMonth, t.endMonth||'');
   populateCatSel(t.category||'');
   document.getElementById('taskModal').classList.add('open');
 }
@@ -1063,27 +1142,54 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function saveTask(){
   const name=document.getElementById('taskName').value.trim();
   if(!name){showToast('업무명을 입력하세요.');return;}
-  const month=parseInt(document.getElementById('taskMonth').value);
+  const startMonth=parseInt(document.getElementById('taskMonthStart').value);
+  const endMonthVal=document.getElementById('taskMonthEnd').value;
+  const endMonth=endMonthVal?parseInt(endMonthVal):null;
+
+  // 종료월이 시작월보다 앞이면 경고
+  if(endMonth && monthIdx(endMonth) < monthIdx(startMonth)){
+    showToast('종료 월은 시작 월보다 뒤여야 합니다.');return;
+  }
+
   const task={
     name,
+    startMonth,
+    endMonth: endMonth||null,
     deadline:document.getElementById('taskDeadline').value.trim(),
     assignee:document.getElementById('taskAssignee').value.trim(),
     category:document.getElementById('taskCategory').value||'',
     desc:document.getElementById('taskDesc').value.trim(),
     note:document.getElementById('taskNote').value.trim(),
+    fileLocation:document.getElementById('taskFileLocation').value.trim(),
     sensitive:document.getElementById('taskSensitive').checked,
     repeat:document.getElementById('taskRepeat').checked,
-    done:!document.getElementById('taskTodo').checked,  // 미완료 체크 → done=false
+    done:!document.getElementById('taskTodo').checked,
   };
-  let tasks=getMonthTasks(S.year,month);
-  if(S.editingIdx!==null){tasks[S.editingIdx]=task;showToast('수정되었습니다.','green');}
-  else{tasks.push(task);showToast('업무가 추가되었습니다.','green');}
-  setMonthTasks(S.year,month,tasks);
-  if(month!==S.curMonth)S.curMonth=month;
+
+  // 항상 startMonth 기준으로 저장
+  let tasks=getDirectTasks(S.year,startMonth);
+  if(S.editingIdx!==null){
+    // 기존 업무가 다른 월에 있던 경우 → 그 월에서 삭제 후 새 월에 추가
+    const oldTask = getDirectTasks(S.year,S.curMonth)[S.editingIdx];
+    const oldStart = oldTask?.startMonth||S.curMonth;
+    if(oldStart !== startMonth){
+      const oldTasks=getDirectTasks(S.year,oldStart);
+      oldTasks.splice(S.editingIdx,1);
+      setMonthTasks(S.year,oldStart,oldTasks);
+      tasks.push(task);
+    } else {
+      tasks[S.editingIdx]=task;
+    }
+    showToast('수정되었습니다.','green');
+  } else {
+    tasks.push(task);
+    showToast('업무가 추가되었습니다.','green');
+  }
+  setMonthTasks(S.year,startMonth,tasks);
+  S.curMonth=startMonth;
   closeModal('taskModal');render();
 }
 function confirmDelete(btn,idx){
-  // 이미 다른 카드가 deleting 중이면 해제
   document.querySelectorAll('.task-card.deleting').forEach(c=>c.classList.remove('deleting'));
   btn.closest('.task-card').classList.add('deleting');
 }
@@ -1091,8 +1197,18 @@ function cancelDelete(btn){
   btn.closest('.task-card').classList.remove('deleting');
 }
 function deleteTask(idx){
-  const tasks=getMonthTasks(S.year,S.curMonth);
-  tasks.splice(idx,1);setMonthTasks(S.year,S.curMonth,tasks);
+  // 기간 업무 참조 카드인 경우 → 원본 월에서 삭제
+  const allT=getMonthTasks(S.year,S.curMonth);
+  const t=allT[idx];
+  if(t._spanRef){
+    const origM=t._spanStart;
+    const origTasks=getDirectTasks(S.year,origM);
+    const origIdx=origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
+    if(origIdx>=0){origTasks.splice(origIdx,1);setMonthTasks(S.year,origM,origTasks);}
+  } else {
+    const tasks=getDirectTasks(S.year,S.curMonth);
+    tasks.splice(idx,1);setMonthTasks(S.year,S.curMonth,tasks);
+  }
   render();showToast('삭제되었습니다.');
 }
 
@@ -1113,10 +1229,16 @@ function applyDescTpl(key){
   el.setSelectionRange(pos,pos);
 }
 function moveTask(idx,dir){
-  const tasks=getMonthTasks(S.year,S.curMonth);
-  const to=idx+dir;
+  // 참조 카드는 순서 변경 불가
+  const allT=getMonthTasks(S.year,S.curMonth);
+  if(allT[idx]?._spanRef){showToast('연속업무는 시작 월에서 순서를 변경하세요.');return;}
+  const tasks=getDirectTasks(S.year,S.curMonth);
+  // direct 인덱스로 변환
+  const directIdx=tasks.findIndex(t=>t===allT[idx]);
+  if(directIdx<0)return;
+  const to=directIdx+dir;
   if(to<0||to>=tasks.length)return;
-  [tasks[idx],tasks[to]]=[tasks[to],tasks[idx]];
+  [tasks[directIdx],tasks[to]]=[tasks[to],tasks[directIdx]];
   setMonthTasks(S.year,S.curMonth,tasks);render();
 }
 
@@ -1292,11 +1414,11 @@ function doPrint(){
   const range=document.querySelector('input[name=pRange]:checked').value;
   const privacy=document.querySelector('input[name=pPrivacy]:checked').value;
   const showAssignee=document.getElementById('pShowAssignee').checked;
+  const showFileList=document.getElementById('pShowFileList').checked;
   const doneMode=document.querySelector('input[name=pDone]:checked').value;
   closeModal('printModal');
   const months=range==='current'?[S.curMonth]:MONTHS;
 
-  // 완료/미완료 분류 헬퍼
   function splitTasks(tasks){
     if(doneMode==='all') return {main:tasks,done:[]};
     if(doneMode==='todoOnly') return {main:tasks.filter(t=>!t.done),done:[]};
@@ -1308,6 +1430,7 @@ function doPrint(){
     return `<div class="card${t.sensitive?' sensitive':''}${t.done?' card-done':''}">
       <div class="title">${t.done?'<span class="done-mark">✓</span> ':''}<span style="${t.done?'text-decoration:line-through;color:#aaa;':''}">${esc(t.name)}</span>
         <span class="tags">
+          ${isSpan(t)?`<span class="tag" style="background:#EAF4FB;color:#1a6b9a">📅 ${MN[t.startMonth]}~${MN[t.endMonth]}</span>`:''}
           ${cat?`<span class="tag" style="background:${cat.color}22;color:${cat.color}">${esc(cat.name)}</span>`:''}
           ${t.sensitive?'<span class="tag ts">🔒 개인정보</span>':''}
           ${t.repeat?'<span class="tag tr">🔁 반복</span>':''}
@@ -1319,6 +1442,7 @@ function doPrint(){
       </div>
       ${t.desc?`<div class="desc${hideDesc?' hidden':''}">${hideDesc?'[개인정보 포함 — 가림 처리]':linkify(t.desc)}</div>`:''}
       ${t.note?`<div class="note">📌 ${linkify(t.note)}</div>`:''}
+      ${t.fileLocation?`<div class="file-loc">📁 ${esc(t.fileLocation)}</div>`:''}
     </div>`;
   }
 
@@ -1326,9 +1450,10 @@ function doPrint(){
   <style>
     body{font-family:'Apple SD Gothic Neo','Malgun Gothic','맑은 고딕','Noto Sans CJK KR',돋움,sans-serif;color:#2c3e50;margin:28px;font-size:13px;}
     h1{font-size:19px;border-bottom:3px solid #1B3A6B;padding-bottom:7px;margin-bottom:3px;color:#1B3A6B;}
+    h1.checklist-title{border-color:#16A085;color:#16A085;margin-top:32px;}
     .meta{font-size:11px;color:#7f8c8d;margin-bottom:20px;}
     h2{font-size:14px;background:#E8F0FB;padding:6px 11px;border-left:4px solid #1B3A6B;margin:16px 0 7px;}
-    .section-done-title{font-size:12px;font-weight:700;color:#aaa;border-top:1px dashed #ddd;padding-top:10px;margin:10px 0 7px;letter-spacing:.5px;}
+    .section-done-title{font-size:12px;font-weight:700;color:#aaa;border-top:1px dashed #ddd;padding-top:10px;margin:10px 0 7px;}
     .card{border:1px solid #D5E0F0;border-radius:6px;padding:9px 13px;margin-bottom:7px;page-break-inside:avoid;}
     .card.sensitive{border-left:4px solid #E67E22;}
     .card.card-done{background:#fafafa;border-color:#e8e8e8;}
@@ -1339,31 +1464,91 @@ function doPrint(){
     .desc{font-size:12px;color:#555;white-space:pre-wrap;line-height:1.55;}
     .desc.hidden{background:#ccc;color:transparent;border-radius:3px;}
     .note{font-size:11px;color:#7f8c8d;margin-top:4px;}
+    .file-loc{font-size:11px;color:#16A085;font-weight:600;margin-top:4px;}
     .tags{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle;}
     .tag{font-size:10px;padding:1px 5px;border-radius:8px;}
     .ts{background:#FEF3E8;color:#E67E22;}.tr{background:#E8F0FB;color:#2A5298;}
     .none{color:#aaa;font-size:12px;}
     a{color:#2A5298;word-break:break-all;}
-    @media print{body{margin:12px;}a{color:#2A5298;}}
+    /* 파일 체크리스트 */
+    .checklist-intro{font-size:12px;color:#555;margin-bottom:12px;line-height:1.6;
+      background:#E8F8F5;border-radius:6px;padding:10px 14px;border-left:3px solid #16A085;}
+    .checklist-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .checklist-table th{background:#E8F8F5;color:#16A085;font-weight:700;
+      padding:7px 10px;border:1px solid #b2dfdb;text-align:left;}
+    .checklist-table td{padding:7px 10px;border:1px solid #d0ece7;vertical-align:top;}
+    .checklist-table tr:nth-child(even) td{background:#f7fdfc;}
+    .check-box{width:16px;height:16px;border:1.5px solid #aaa;display:inline-block;
+      border-radius:3px;vertical-align:middle;}
+    @media print{body{margin:12px;}a{color:#2A5298;}.checklist-title{page-break-before:always;}}
   </style></head><body>
   <h1>🏫 ${S.schoolName?esc(S.schoolName)+' — ':''}${esc(S.deptName)} 업무 인계인수</h1>
-  <div class="meta">${S.year}학년도 (${S.year}.3 ~ ${S.year+1}.2) &nbsp;|&nbsp; 출력일: ${new Date().toLocaleDateString('ko-KR')} &nbsp;|&nbsp; 개인정보: ${privacy==='hide'?'가림 처리':'표시'} &nbsp;|&nbsp; 완료 업무: ${{separate:'구분 표시',all:'전체 표시',todoOnly:'제외'}[doneMode]}</div>`;
+  <div class="meta">${S.year}학년도 (${S.year}.3 ~ ${S.year+1}.2) &nbsp;|&nbsp; 출력일: ${new Date().toLocaleDateString('ko-KR')} &nbsp;|&nbsp; 개인정보: ${privacy==='hide'?'가림 처리':'표시'}</div>`;
 
   months.forEach(m=>{
     const allTasks=getMonthTasks(S.year,m);
-    const {main,done}=splitTasks(allTasks);
-    const total=main.length+done.length;
-    if(total===0&&doneMode!=='all'){
+    // 기간 업무 참조 카드 제외 (원본만 출력)
+    const directOnly=allTasks.filter(t=>!t._spanRef);
+    const {main,done}=splitTasks(directOnly);
+    if(!main.length&&!done.length){
       html+=`<h2>${MN[m]} · ${ML[m]||''} (0건)</h2><p class="none">등록된 업무 없음</p>`;return;
     }
     html+=`<h2>${MN[m]} · ${ML[m]||''} (미완료 ${main.length}건${done.length?` / 완료 ${done.length}건`:''})</h2>`;
-    if(!main.length&&!done.length){html+=`<p class="none">등록된 업무 없음</p>`;return;}
     main.forEach(t=>{ html+=taskCard(t, privacy==='hide'&&t.sensitive); });
     if(done.length){
       html+=`<div class="section-done-title">✓ 완료된 업무 (${done.length}건)</div>`;
       done.forEach(t=>{ html+=taskCard(t, privacy==='hide'&&t.sensitive); });
     }
   });
+
+  /* ── 파일 인계 체크리스트 ── */
+  if(showFileList){
+    // 파일 위치가 있는 업무만 수집 (기간 업무 참조 제외, 중복 제외)
+    const fileItems=[];
+    const seen=new Set();
+    months.forEach(m=>{
+      getMonthTasks(S.year,m).filter(t=>!t._spanRef&&t.fileLocation).forEach(t=>{
+        const key=t.name+t.fileLocation;
+        if(!seen.has(key)){ seen.add(key); fileItems.push({t,m}); }
+      });
+    });
+
+    if(fileItems.length){
+      html+=`
+      <h1 class="checklist-title">📁 파일 인계 체크리스트</h1>
+      <div class="checklist-intro">
+        아래 목록의 파일·자료를 후임자에게 전달했는지 하나씩 확인하세요.<br>
+        전달 완료 시 □ 체크 후 서명란에 서명합니다.
+      </div>
+      <table class="checklist-table">
+        <thead>
+          <tr>
+            <th style="width:28px;">확인</th>
+            <th style="width:90px;">월</th>
+            <th>업무명</th>
+            <th>파일 위치 / 보관 경로</th>
+            ${showAssignee?'<th style="width:70px;">담당자</th>':''}
+          </tr>
+        </thead>
+        <tbody>
+          ${fileItems.map(({t,m})=>`
+          <tr>
+            <td style="text-align:center;"><span class="check-box"></span></td>
+            <td>${MN[t.startMonth||m]}${isSpan(t)?'~'+MN[t.endMonth]:''}</td>
+            <td>${esc(t.name)}</td>
+            <td style="color:#16A085;font-weight:500;">${esc(t.fileLocation)}</td>
+            ${showAssignee?`<td>${esc(t.assignee||'')}</td>`:''}
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:20px;display:flex;gap:40px;font-size:12px;">
+        <span>인계자 서명: ________________</span>
+        <span>인수자 서명: ________________</span>
+        <span>확인일자: ____ 년 ____ 월 ____ 일</span>
+      </div>`;
+    }
+  }
+
   html+='</body></html>';
   const w=window.open('','_blank');
   w.document.write(html);w.document.close();w.focus();
