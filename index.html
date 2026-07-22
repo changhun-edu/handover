@@ -402,6 +402,65 @@ header{
 <body>
 
 <!-- ══════════════════════════════
+     온보딩 모달 (첫 방문자 1회만)
+══════════════════════════════ -->
+<div class="modal-overlay" id="onboardingModal" style="z-index:9999;background:rgba(15,30,60,.75);">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header" style="background:var(--navy);">
+      <span>📋 이 앱은 어떤 도구인가요?</span>
+    </div>
+    <div class="modal-body" style="padding:24px;">
+
+      <!-- 오해 차단 -->
+      <div style="background:#FFF0EF;border:1.5px solid #f5c6c2;border-radius:10px;padding:13px 16px;margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:#c0392b;margin-bottom:6px;">❌ 이런 앱이 아닙니다</p>
+        <p style="font-size:13px;color:var(--gray-d);line-height:1.7;">
+          한글·엑셀·사진 등 <strong>업무 파일을 올리는 곳이 아닙니다.</strong><br>
+          파일은 지금처럼 USB·공유폴더로 따로 전달하면 됩니다.
+        </p>
+      </div>
+
+      <!-- 올바른 설명 -->
+      <div style="background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:13px 16px;margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">✅ 이런 도구입니다</p>
+        <p style="font-size:13px;color:var(--gray-d);line-height:1.7;">
+          새 담당자에게 <strong>말로 설명하던 내용</strong>을 미리 정리해두는 <strong>업무 설명서</strong>입니다.<br>
+          "이 업무는 언제, 어떻게, 어디서"를 텍스트로 남겨두면<br>
+          후임자가 물어볼 것 없이 스스로 처리할 수 있습니다.
+        </p>
+      </div>
+
+      <!-- 사용 흐름 -->
+      <div style="display:flex;gap:0;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;">
+        <div style="text-align:center;padding:10px 14px;background:var(--gray-l);border-radius:8px;font-size:12px;">
+          <div style="font-size:20px;margin-bottom:4px;">✏️</div>
+          <div style="font-weight:700;color:var(--navy);">내가 입력</div>
+          <div style="color:var(--gray-m);">업무 설명 작성</div>
+        </div>
+        <div style="color:var(--gray-m);font-size:18px;padding:0 4px;">→</div>
+        <div style="text-align:center;padding:10px 14px;background:var(--gray-l);border-radius:8px;font-size:12px;">
+          <div style="font-size:20px;margin-bottom:4px;">📤</div>
+          <div style="font-weight:700;color:var(--navy);">파일 내보내기</div>
+          <div style="color:var(--gray-m);">후임자에게 전달</div>
+        </div>
+        <div style="color:var(--gray-m);font-size:18px;padding:0 4px;">→</div>
+        <div style="text-align:center;padding:10px 14px;background:var(--gray-l);border-radius:8px;font-size:12px;">
+          <div style="font-size:20px;margin-bottom:4px;">📥</div>
+          <div style="font-weight:700;color:var(--navy);">후임자 시작</div>
+          <div style="color:var(--gray-m);">파일로 이어서</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" style="width:100%;justify-content:center;font-size:14px;" onclick="closeOnboarding()">
+        이해했습니다. 시작하기 →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
      첫 실행 설정 화면
 ══════════════════════════════ -->
 <div id="setupScreen">
@@ -410,6 +469,38 @@ header{
       <span class="emoji">🏫</span>
       <h1>학교 업무 인계인수 관리</h1>
       <p>처음 한 번만 설정하면 바로 시작할 수 있습니다</p>
+    </div>
+
+    <!-- 상시 안내 — 접기/펼치기 가능 -->
+    <div style="margin-bottom:16px;">
+      <button onclick="toggleGuide()" id="guideToggleBtn"
+        style="width:100%;background:none;border:none;cursor:pointer;
+               display:flex;align-items:center;justify-content:space-between;
+               padding:8px 12px;border-radius:8px;
+               background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);
+               font-size:12px;font-weight:600;">
+        <span>💡 이 앱은 업무 파일을 올리는 곳이 아닙니다</span>
+        <span id="guideToggleIcon">▼</span>
+      </button>
+      <div id="guideBox" style="display:none;margin-top:6px;background:rgba(255,255,255,.95);
+           border-radius:8px;padding:14px 16px;font-size:12px;color:var(--gray-d);line-height:1.8;">
+        <p style="margin-bottom:8px;">
+          <strong style="color:#c0392b;">❌ 한글·엑셀·사진 파일을 올리는 앱이 아닙니다.</strong><br>
+          파일은 USB·공유폴더로 따로 전달하세요.
+        </p>
+        <p style="margin-bottom:8px;">
+          <strong style="color:var(--navy);">✅ 말로 설명하던 내용을 텍스트로 남기는 업무 설명서입니다.</strong><br>
+          "이 업무는 언제·어떻게·어디서"를 미리 정리해두면<br>
+          후임자가 묻지 않아도 스스로 처리할 수 있습니다.
+        </p>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <span style="background:var(--sky);border-radius:6px;padding:4px 10px;color:var(--navy);font-weight:600;">✏️ 업무 입력</span>
+          <span style="color:var(--gray-m);">→</span>
+          <span style="background:var(--sky);border-radius:6px;padding:4px 10px;color:var(--navy);font-weight:600;">📤 파일 내보내기</span>
+          <span style="color:var(--gray-m);">→</span>
+          <span style="background:var(--sky);border-radius:6px;padding:4px 10px;color:var(--navy);font-weight:600;">📥 후임자가 파일로 시작</span>
+        </div>
+      </div>
     </div>
     <label class="setup-label">학교 이름</label>
     <input class="setup-input" id="setupSchoolInput" placeholder="예: 광주○○초등학교" maxlength="30"
@@ -969,6 +1060,26 @@ const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#
 function _ls(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
 function _lsJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')||fallback;}catch(e){return fallback;}}
 
+/* ── 온보딩 (첫 방문자 1회만) ── */
+function checkOnboarding(){
+  try{
+    if(!localStorage.getItem('si_onboarded')){
+      document.getElementById('onboardingModal').classList.add('open');
+    }
+  }catch(e){}
+}
+function closeOnboarding(){
+  document.getElementById('onboardingModal').classList.remove('open');
+  try{localStorage.setItem('si_onboarded','1');}catch(e){}
+}
+function toggleGuide(){
+  const box=document.getElementById('guideBox');
+  const icon=document.getElementById('guideToggleIcon');
+  const open=box.style.display==='none';
+  box.style.display=open?'block':'none';
+  icon.textContent=open?'▲':'▼';
+}
+
 /* ── 카테고리 프리셋 (S 초기화 전에 선언해야 함) ── */
 const PRESET_CATS=[
   {id:'c1', name:'공문·행정',    color:'#E67E22'},
@@ -1033,7 +1144,7 @@ function openResetModal(){
 function doReset(){
   // localStorage 전체 삭제
   const keys=['si_school','si_dept','si_handover_date','si_handover_to',
-               'si_tasks','si_done_by_year','si_cats','si_lastBackup','si_user_edited'];
+               'si_tasks','si_done_by_year','si_cats','si_lastBackup','si_user_edited','si_onboarded'];
   keys.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
   // 페이지 새로고침 → 처음 실행 화면으로
   location.reload();
@@ -1190,6 +1301,7 @@ window.addEventListener('popstate',e=>{
 
 // DOMContentLoaded 기준으로 초기화 (GitHub Pages 포함 모든 환경 호환)
 document.addEventListener('DOMContentLoaded',()=>{
+  checkOnboarding();
   try {
     if(S.deptName){
       replaceState('app');
