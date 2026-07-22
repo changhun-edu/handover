@@ -54,16 +54,38 @@ body{font-family:var(--font-sans);background:#F2F5FB;color:var(--gray-d);min-hei
   min-height:100vh;
   background:linear-gradient(160deg,#EEF3FB 0%,#E8F4F0 50%,#EDF2FB 100%);
   align-items:center; justify-content:center;
-  padding:30px 20px;
+  padding:24px 20px;
 }
 #setupScreen.show{display:flex;}
 
 .setup-card{
   background:#fff; border-radius:20px;
-  width:100%; max-width:460px;
-  padding:28px 32px;
+  width:100%; max-width:860px;
   box-shadow:0 8px 40px rgba(27,58,107,.12);
   border:1px solid rgba(27,58,107,.08);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+}
+/* 왼쪽 패널 */
+.setup-left{
+  padding:36px 36px;
+  background:var(--navy);
+  color:#fff;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+/* 오른쪽 패널 */
+.setup-right{
+  padding:32px 36px;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+  max-height:90vh;
+}
+/* 모바일: 1열로 */
+@media(max-width:640px){
+  .setup-card{grid-template-columns:1fr;}
+  .setup-left{padding:28px 24px;}
+  .setup-right{padding:24px 24px;max-height:none;}
 }
 .setup-logo{text-align:center; margin-bottom:24px;}
 .setup-logo .emoji{font-size:52px; display:block; margin-bottom:12px;}
@@ -620,61 +642,6 @@ header{
 <!-- ══════════════════════════════
      온보딩 모달 (첫 방문자 1회만)
 ══════════════════════════════ -->
-<div class="modal-overlay" id="onboardingModal" style="z-index:9999;background:rgba(15,30,60,.75);">
-  <div class="modal" style="max-width:460px;">
-    <div class="modal-header" style="background:var(--navy);">
-      <span>📋 이 앱은 어떤 도구인가요?</span>
-    </div>
-    <div class="modal-body" style="padding:24px;">
-
-      <!-- 오해 차단 -->
-      <div style="background:#FFF0EF;border:1.5px solid #f5c6c2;border-radius:10px;padding:13px 16px;margin-bottom:16px;">
-        <p style="font-size:13px;font-weight:700;color:#c0392b;margin-bottom:6px;">❌ 이런 앱이 아닙니다</p>
-        <p style="font-size:13px;color:var(--gray-d);line-height:1.7;">
-          한글·엑셀·사진 등 <strong>업무 파일을 올리는 곳이 아닙니다.</strong><br>
-          파일은 지금처럼 USB·공유폴더로 따로 전달하면 됩니다.
-        </p>
-      </div>
-
-      <!-- 올바른 설명 -->
-      <div style="background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:13px 16px;margin-bottom:16px;">
-        <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px;">✅ 이런 도구입니다</p>
-        <p style="font-size:13px;color:var(--gray-d);line-height:1.7;">
-          새 담당자에게 <strong>말로 설명하던 내용</strong>을 미리 정리해두는 <strong>업무 설명서</strong>입니다.<br>
-          "이 업무는 언제, 어떻게, 어디서"를 텍스트로 남겨두면<br>
-          후임자가 물어볼 것 없이 스스로 처리할 수 있습니다.
-        </p>
-      </div>
-
-      <!-- 사용 흐름 -->
-      <div style="display:flex;gap:0;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;">
-        <div style="text-align:center;padding:10px 14px;background:var(--gray-l);border-radius:8px;font-size:12px;">
-          <div style="font-size:20px;margin-bottom:4px;">✏️</div>
-          <div style="font-weight:700;color:var(--navy);">내가 입력</div>
-          <div style="color:var(--gray-m);">업무 설명 작성</div>
-        </div>
-        <div style="color:var(--gray-m);font-size:18px;padding:0 4px;">→</div>
-        <div style="text-align:center;padding:10px 14px;background:var(--gray-l);border-radius:8px;font-size:12px;">
-          <div style="font-size:20px;margin-bottom:4px;">📤</div>
-          <div style="font-weight:700;color:var(--navy);">파일 내보내기</div>
-          <div style="color:var(--gray-m);">후임자에게 전달</div>
-        </div>
-        <div style="color:var(--gray-m);font-size:18px;padding:0 4px;">→</div>
-        <div style="text-align:center;padding:10px 14px;background:var(--gray-l);border-radius:8px;font-size:12px;">
-          <div style="font-size:20px;margin-bottom:4px;">📥</div>
-          <div style="font-weight:700;color:var(--navy);">후임자 시작</div>
-          <div style="color:var(--gray-m);">파일로 이어서</div>
-        </div>
-      </div>
-
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" style="width:100%;justify-content:center;font-size:14px;" onclick="closeOnboarding()">
-        이해했습니다. 시작하기 →
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- ══════════════════════════════
      첫 실행 설정 화면
@@ -682,82 +649,114 @@ header{
 <div id="setupScreen">
   <div class="setup-card">
 
-    <!-- 로고 (축소) -->
-    <div class="setup-logo" style="margin-bottom:16px;">
-      <span class="emoji" style="font-size:36px;">🏫</span>
-      <h1 style="font-size:18px;">학교 업무 인계인수 관리</h1>
-      <p class="tagline" style="font-size:12px;">
-        말로 전달하던 업무 내용을 텍스트로 정리하고
-        <strong>파일 하나로 후임자에게 전달</strong>하세요
-      </p>
-    </div>
+    <!-- 왼쪽: 브랜드 + 안내 -->
+    <div class="setup-left">
+      <div>
+        <div style="font-size:44px;margin-bottom:14px;">🏫</div>
+        <h1 style="font-family:var(--font-serif);font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">학교 업무 인계인수 관리</h1>
+        <p style="font-size:13px;color:rgba(255,255,255,.75);line-height:1.75;margin-bottom:24px;">
+          말로 전달하던 업무 내용을<br>텍스트로 정리하고<br>
+          <strong style="color:#fff;">파일 하나로 후임자에게 전달</strong>하세요
+        </p>
 
-    <!-- 안내 한 줄 -->
-    <p style="font-size:12px;color:var(--gray-m);background:#f0f7ff;border-radius:8px;padding:8px 12px;margin-bottom:14px;line-height:1.6;">
-      💡 <strong style="color:#c0392b;">한글·엑셀 파일을 올리는 앱이 아닙니다.</strong>
-      업무 방법·절차를 텍스트로 남기는 설명서입니다.
-    </p>
-
-    <!-- 부서명 (필수) — 학교이름 제거, 설정 변경에서 입력 -->
-    <label class="setup-label">내 부서·직책 <span style="color:var(--red);">*</span></label>
-    <input class="setup-input" id="setupDeptInput" placeholder="예: 교무부장" maxlength="20"
-      onkeydown="if(event.key==='Enter')startApp(true)">
-    <p class="setup-hint">아래 버튼을 클릭하거나 직접 입력하세요</p>
-    <div class="setup-presets">
-      <div class="preset-chip" onclick="pickPreset('교무부장')">📚 교무부장</div>
-      <div class="preset-chip" onclick="pickPreset('연구부장')">🔬 연구부장</div>
-      <div class="preset-chip" onclick="pickPreset('생활부장')">🏃 생활부장</div>
-      <div class="preset-chip" onclick="pickPreset('체육부장')">⚽ 체육부장</div>
-      <div class="preset-chip" onclick="pickPreset('정보부장')">💻 정보부장</div>
-      <div class="preset-chip" onclick="pickPreset('문화예술부장')">🎨 문화예술부장</div>
-    </div>
-
-    <!-- 숨겨진 필드 -->
-    <input type="hidden" id="setupSchoolInput">
-    <input type="hidden" id="setupHandoverDate">
-    <input type="hidden" id="setupHandoverTo">
-
-    <!-- 시작 버튼 -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
-      <button class="btn btn-primary setup-btn" onclick="startApp(true)" style="position:relative;background:var(--navy-l);border-color:var(--navy-l);">
-        📋 예시 업무로 채워서 시작
-        <span class="recommend-badge">추천</span>
-      </button>
-      <p style="font-size:11px;color:var(--gray-m);text-align:center;margin:-2px 0 2px;">처음이라면 예시로 시작하세요. 언제든 삭제할 수 있습니다.</p>
-      <button class="btn setup-btn" style="background:#fff;color:var(--navy-l);font-size:14px;border:1.5px solid var(--navy-l);" onclick="startApp(false)">
-        ✏️ 내 업무 직접 입력하기
-      </button>
-
-      <div style="display:flex;align-items:center;gap:8px;margin:4px 0 2px;">
-        <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:11px;color:var(--gray-m);">전임자 파일 또는 내 백업 파일이 있다면</span>
-        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <!-- 오해 차단 -->
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:13px 15px;margin-bottom:12px;">
+          <p style="font-size:12px;font-weight:700;color:#ffaaaa;margin-bottom:4px;">❌ 이런 앱이 아닙니다</p>
+          <p style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.65;">한글·엑셀 파일을 올리는 곳이 아닙니다.<br>파일은 USB·공유폴더로 따로 전달하세요.</p>
+        </div>
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:13px 15px;">
+          <p style="font-size:12px;font-weight:700;color:#aaffcc;margin-bottom:4px;">✅ 이런 도구입니다</p>
+          <p style="font-size:12px;color:rgba(255,255,255,.75);line-height:1.65;">업무 방법·절차를 텍스트로 남기는<br>업무 설명서입니다.</p>
+        </div>
       </div>
 
-      <label class="btn setup-btn" id="fileStartBtn"
-        style="background:transparent;color:var(--navy-l);border:1.5px solid var(--navy-l);cursor:pointer;justify-content:center;gap:8px;font-size:13px;text-align:center;">
-        📥 파일로 시작
-        <input type="file" accept=".json" onchange="loadSetupFile(event)" style="display:none">
-      </label>
+      <!-- 사용 흐름 -->
+      <div style="display:flex;align-items:center;gap:6px;margin-top:24px;flex-wrap:wrap;">
+        <div style="text-align:center;flex:1;">
+          <div style="font-size:18px;">✏️</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;">업무 입력</div>
+        </div>
+        <div style="color:rgba(255,255,255,.35);font-size:14px;">→</div>
+        <div style="text-align:center;flex:1;">
+          <div style="font-size:18px;">📤</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;">내보내기</div>
+        </div>
+        <div style="color:rgba(255,255,255,.35);font-size:14px;">→</div>
+        <div style="text-align:center;flex:1;">
+          <div style="font-size:18px;">📥</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.7);margin-top:3px;">후임자 시작</div>
+        </div>
+      </div>
+    </div>
 
-      <!-- 파일 로드 후 미리보기 -->
-      <div id="filePreview" style="display:none;background:#f0f7ff;border:1.5px solid #c5d8f0;border-radius:10px;padding:14px 16px;">
-        <p id="previewTitle" style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;"></p>
-        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--gray-d);">
-          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학교</span> <strong id="previewSchool">—</strong></div>
-          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">부서</span> <strong id="previewDept">—</strong></div>
-          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학년도</span> <strong id="previewYear">—</strong></div>
-          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">업무 수</span> <strong id="previewTaskCount">—</strong></div>
-        </div>
-        <div id="fileNameSection" style="margin-top:12px;">
-          <label class="setup-label" style="font-size:12px;" id="fileNameLabel">내 이름 *</label>
-          <input class="setup-input" id="fileHandoverTo" placeholder="예: 홍길동" maxlength="20"
-            onkeydown="if(event.key==='Enter')startFromFile()" style="margin-bottom:8px;">
-        </div>
-        <button class="btn btn-primary setup-btn" onclick="startFromFile()" id="fileStartConfirmBtn">이 파일로 시작 →</button>
+    <!-- 오른쪽: 입력 폼 -->
+    <div class="setup-right">
+
+      <!-- 부서명 (필수) -->
+      <label class="setup-label">내 부서·직책 <span style="color:var(--red);">*</span></label>
+      <input class="setup-input" id="setupDeptInput" placeholder="예: 교무부장" maxlength="20"
+        onkeydown="if(event.key==='Enter')document.getElementById('setupSchoolInput').focus()">
+      <p class="setup-hint">아래 버튼을 클릭하거나 직접 입력하세요</p>
+      <div class="setup-presets">
+        <div class="preset-chip" onclick="pickPreset('교무부장')">📚 교무부장</div>
+        <div class="preset-chip" onclick="pickPreset('연구부장')">🔬 연구부장</div>
+        <div class="preset-chip" onclick="pickPreset('생활부장')">🏃 생활부장</div>
+        <div class="preset-chip" onclick="pickPreset('체육부장')">⚽ 체육부장</div>
+        <div class="preset-chip" onclick="pickPreset('정보부장')">💻 정보부장</div>
+        <div class="preset-chip" onclick="pickPreset('문화예술부장')">🎨 문화예술부장</div>
       </div>
 
-    </div>
+      <!-- 학교 이름 (선택) -->
+      <label class="setup-label" style="margin-top:4px;">학교 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
+      <input class="setup-input" id="setupSchoolInput" placeholder="예: 운남초등학교" maxlength="30"
+        onkeydown="if(event.key==='Enter')startApp(true)">
+
+      <!-- 숨겨진 필드 -->
+      <input type="hidden" id="setupHandoverDate">
+      <input type="hidden" id="setupHandoverTo">
+
+      <!-- 시작 버튼 -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+        <button class="btn btn-primary setup-btn" onclick="startApp(true)" style="position:relative;background:var(--navy-l);border-color:var(--navy-l);">
+          📋 예시 업무로 채워서 시작
+          <span class="recommend-badge">추천</span>
+        </button>
+        <p style="font-size:11px;color:var(--gray-m);text-align:center;margin:-2px 0 2px;">처음이라면 예시로 시작하세요. 언제든 삭제할 수 있습니다.</p>
+        <button class="btn setup-btn" style="background:#fff;color:var(--navy-l);font-size:14px;border:1.5px solid var(--navy-l);" onclick="startApp(false)">
+          ✏️ 내 업무 직접 입력하기
+        </button>
+
+        <div style="display:flex;align-items:center;gap:8px;margin:6px 0 2px;">
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+          <span style="font-size:11px;color:var(--gray-m);">전임자 파일이 있다면</span>
+          <div style="flex:1;height:1px;background:var(--border);"></div>
+        </div>
+
+        <label class="btn setup-btn" id="fileStartBtn"
+          style="background:transparent;color:var(--navy-l);border:1.5px solid var(--navy-l);cursor:pointer;justify-content:center;gap:8px;font-size:13px;text-align:center;">
+          📥 파일로 시작
+          <input type="file" accept=".json" onchange="loadSetupFile(event)" style="display:none">
+        </label>
+
+        <!-- 파일 로드 후 미리보기 -->
+        <div id="filePreview" style="display:none;background:#f0f7ff;border:1.5px solid #c5d8f0;border-radius:10px;padding:14px 16px;">
+          <p id="previewTitle" style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;"></p>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--gray-d);">
+            <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학교</span> <strong id="previewSchool">—</strong></div>
+            <div><span style="color:var(--gray-m);width:70px;display:inline-block;">부서</span> <strong id="previewDept">—</strong></div>
+            <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학년도</span> <strong id="previewYear">—</strong></div>
+            <div><span style="color:var(--gray-m);width:70px;display:inline-block;">업무 수</span> <strong id="previewTaskCount">—</strong></div>
+          </div>
+          <div id="fileNameSection" style="margin-top:12px;">
+            <label class="setup-label" style="font-size:12px;" id="fileNameLabel">내 이름 *</label>
+            <input class="setup-input" id="fileHandoverTo" placeholder="예: 홍길동" maxlength="20"
+              onkeydown="if(event.key==='Enter')startFromFile()" style="margin-bottom:8px;">
+          </div>
+          <button class="btn btn-primary setup-btn" onclick="startFromFile()" id="fileStartConfirmBtn">이 파일로 시작 →</button>
+        </div>
+
+      </div>
+    </div><!-- /setup-right -->
   </div>
 </div>
 
@@ -773,9 +772,12 @@ header{
           🏫 <span>업무 인계인수</span>
           <span class="logo-hint">⚙️ 설정 화면으로 돌아갑니다</span>
         </span>
-        <div class="dept-name-badge">
-          <span id="hdrDeptName"></span>
-          <span class="edit-icon" onclick="openDeptEditModal()" title="설정 변경">✏️</span>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div class="dept-name-badge">
+            <span id="hdrDeptName"></span>
+            <span class="edit-icon" onclick="openDeptEditModal()" title="설정 변경">✏️</span>
+          </div>
+          <span id="hdrSchoolName" style="font-size:11px;color:rgba(255,255,255,.55);padding-left:3px;display:none;"></span>
         </div>
       </div>
       <div class="header-actions">
@@ -1362,20 +1364,6 @@ function showSaveIndicator(){
   },1000);
 }
 
-
-/* ── 온보딩 (첫 방문자 1회만) ── */
-function checkOnboarding(){
-  try{
-    if(!localStorage.getItem('si_onboarded')){
-      document.getElementById('onboardingModal').classList.add('open');
-    }
-  }catch(e){}
-}
-function closeOnboarding(){
-  document.getElementById('onboardingModal').classList.remove('open');
-  try{localStorage.setItem('si_onboarded','1');}catch(e){}
-}
-
 /* ── 카테고리 프리셋 (S 초기화 전에 선언해야 함) ── */
 const PRESET_CATS=[
   {id:'c1', name:'공문·행정',    color:'#E67E22'},
@@ -1452,7 +1440,7 @@ function doReset(){
   // localStorage 전체 삭제
   const keys=['si_school','si_dept','si_handover_date','si_handover_to',
                'si_tasks','si_done_by_year','si_cats','si_lastBackup',
-               'si_user_edited','si_onboarded','si_last_month'];
+               'si_user_edited','si_last_month'];
   keys.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
   // 페이지 새로고침 → 처음 실행 화면으로
   location.reload();
@@ -1609,7 +1597,6 @@ window.addEventListener('popstate',e=>{
 
 // DOMContentLoaded 기준으로 초기화 (GitHub Pages 포함 모든 환경 호환)
 document.addEventListener('DOMContentLoaded',()=>{
-  checkOnboarding();
   try {
     if(S.deptName){
       replaceState('app');
@@ -1752,7 +1739,6 @@ function startFromFile(){
   saveHandover();
 
   _setupFileData=null;
-  try{localStorage.setItem('si_onboarded','1');}catch(e){}  // ③ 파일로 시작 시 온보딩 스킵
   launchApp(true);
   showToast(isContinue?'이어서 작업합니다.':'인수가 완료되었습니다. 환영합니다!','green');
 }
@@ -1767,14 +1753,20 @@ function startApp(withSample=false){
     S.tasks={}; saveTasks();
   }
   S.deptName=name; saveDept();
-  // 학교 이름은 설정 변경(✏️)에서 입력 — 기존값 유지
+  S.schoolName=document.getElementById('setupSchoolInput').value.trim(); saveSchool();
   S._loadSample=withSample;
   launchApp(true);
 }
 function launchApp(push=true){
   S.curYear=S.year;
   document.getElementById('hdrDeptName').textContent=S.deptName;
-  // ① 브라우저 탭 제목에 부서명 포함
+  // 학교 이름 헤더 표시
+  const schoolEl=document.getElementById('hdrSchoolName');
+  if(schoolEl){
+    schoolEl.textContent=S.schoolName||'';
+    schoolEl.style.display=S.schoolName?'block':'none';
+  }
+  // 브라우저 탭 제목
   document.title=`${S.deptName} · 업무 인계인수${S.schoolName?' · '+S.schoolName:''}`;
   loadSampleIfEmpty();
   render();
@@ -1788,6 +1780,7 @@ function launchApp(push=true){
 function goHome(){
   showSetup(true);
   document.getElementById('setupDeptInput').value=S.deptName;
+  document.getElementById('setupSchoolInput').value=S.schoolName||'';
   document.getElementById('filePreview').style.display='none';
   _setupFileData=null;
 }
@@ -1813,6 +1806,11 @@ function saveDeptName(){
   saveHandover();
   document.getElementById('hdrDeptName').textContent=name;
   document.title=`${name} · 업무 인계인수${S.schoolName?' · '+S.schoolName:''}`;
+  const schoolEl=document.getElementById('hdrSchoolName');
+  if(schoolEl){
+    schoolEl.textContent=S.schoolName||'';
+    schoolEl.style.display=S.schoolName?'block':'none';
+  }
   closeModal('deptEditModal');
   showToast('설정이 저장되었습니다.','green');
 }
@@ -1843,9 +1841,10 @@ function renderTabs(){
   const prevDiv=document.createElement('div');
   prevDiv.className='month-tab prev-year'+(isPrevActive?' active':'');
   prevDiv.title=`${prevYear}학년도 2월 — 새 학년도 준비 업무`;
-  prevDiv.innerHTML=`<span style="font-size:11px;">${prevYear-1}년 2월</span>
-    <span style="font-size:9px;color:inherit;opacity:.7;">전학년도</span>
-    <span class="tc${prevCnt===0?' zero':''}">
+  prevDiv.innerHTML=`<span>${MN[2]}</span>
+    <span class="tc${prevCnt===0?' zero':prevCnt>=5?' hot':''}"
+      style="${prevCnt>=5?'background:var(--accent);color:#fff;':''}"
+      title="${prevCnt}개 업무">
       ${isFiltered&&prevCnt>0?`${prevFiltCnt}/${prevCnt}`:prevCnt}
     </span>`;
   prevDiv.onclick=()=>{ S.curMonth=2; S.curYear=prevYear; try{localStorage.setItem('si_last_month','2');}catch(e){} render(); };
