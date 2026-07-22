@@ -18,9 +18,13 @@
   --gray-d:#2C3E50; --gray-m:#7F8C8D; --gray-l:#ECF0F1;
   --border:#D5E0F0;
   --shadow:0 2px 12px rgba(27,58,107,.10);
+  --container:960px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Noto Sans KR',sans-serif;background:#F2F5FB;color:var(--gray-d);min-height:100vh;}
+
+/* ── 공통 컨테이너 ── */
+.container{max-width:var(--container);margin:0 auto;padding:0 20px;}
 
 /* ── BUTTONS ── */
 .btn{padding:8px 16px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;transition:all .15s;display:inline-flex;align-items:center;gap:5px;}
@@ -54,7 +58,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F2F5FB;color:var(--gray-d
 .setup-logo .emoji{font-size:48px; display:block; margin-bottom:10px;}
 .setup-logo h1{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;}
 .setup-logo p{font-size:14px;color:var(--gray-m);}
-
 .setup-label{font-size:13px;font-weight:700;color:var(--gray-d);margin-bottom:6px;display:block;}
 .setup-input{
   width:100%; border:1.5px solid var(--border); border-radius:8px;
@@ -63,17 +66,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F2F5FB;color:var(--gray-d
 }
 .setup-input:focus{outline:none;border-color:var(--navy-l);}
 .setup-hint{font-size:12px;color:var(--gray-m);margin-bottom:20px;}
-
 .setup-presets{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
-.preset-chip{
-  padding:6px 13px; border-radius:20px;
-  border:1.5px solid var(--border);
-  font-size:13px; font-weight:500; cursor:pointer;
-  background:#fff; color:var(--gray-d);
-  transition:all .15s;
-}
+.preset-chip{padding:6px 13px;border-radius:20px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:var(--gray-d);transition:all .15s;}
 .preset-chip:hover{border-color:var(--navy-l);color:var(--navy);background:var(--sky);}
-
 .setup-btn{width:100%;padding:13px;font-size:15px;border-radius:9px;margin-top:4px;}
 
 /* ══════════════════════════════
@@ -85,17 +80,24 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F2F5FB;color:var(--gray-d
 /* ── HEADER ── */
 header{
   background:var(--navy);color:#fff;
-  padding:0 24px;
-  display:flex;align-items:center;justify-content:space-between;
-  height:58px;position:sticky;top:0;z-index:200;
+  position:sticky;top:0;z-index:200;
   box-shadow:0 2px 16px rgba(27,58,107,.2);
 }
+.header-inner{
+  max-width:var(--container);margin:0 auto;padding:0 20px;
+  height:58px;display:flex;align-items:center;justify-content:space-between;
+}
 .header-left{display:flex;align-items:center;gap:14px;}
-.header-title{font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;}
+.header-logo{
+  font-family:'Noto Serif KR',serif;font-size:17px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;gap:7px;
+  color:#fff;text-decoration:none;
+  transition:opacity .15s;
+}
+.header-logo:hover{opacity:.82;}
 .dept-name-badge{
   font-size:13px;font-weight:600;
-  background:rgba(255,255,255,.18);
-  border-radius:6px;padding:4px 11px;
+  background:rgba(255,255,255,.18);border-radius:6px;padding:4px 11px;
   display:flex;align-items:center;gap:6px;
 }
 .dept-name-badge .edit-icon{font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;}
@@ -103,13 +105,21 @@ header{
 .header-actions{display:flex;gap:7px;flex-wrap:wrap;}
 
 /* ── YEAR BAR ── */
-.year-bar{background:var(--navy-l);color:#fff;display:flex;align-items:center;justify-content:center;gap:14px;padding:8px;}
+.year-bar{background:var(--navy-l);color:#fff;}
+.year-bar-inner{
+  max-width:var(--container);margin:0 auto;padding:0 20px;
+  height:40px;display:flex;align-items:center;justify-content:center;gap:14px;
+}
 .year-display{font-size:14px;font-weight:700;}
 .year-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
 .year-btn:hover{background:rgba(255,255,255,.32);}
 
 /* ── FILTER BAR ── */
-.filter-bar{background:#fff;border-bottom:1px solid var(--border);padding:7px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.filter-bar{background:#fff;border-bottom:1px solid var(--border);}
+.filter-bar-inner{
+  max-width:var(--container);margin:0 auto;padding:7px 20px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
 .filter-label{font-size:11px;font-weight:700;color:var(--gray-m);}
 .filter-chip{padding:4px 11px;border-radius:20px;border:1.5px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:#fff;color:var(--gray-m);transition:all .15s;}
 .filter-chip:hover{border-color:var(--navy-l);color:var(--navy);}
@@ -118,7 +128,11 @@ header{
 .filter-sep{color:var(--border);user-select:none;font-size:18px;}
 
 /* ── MONTH TABS ── */
-.month-tabs{background:#fff;display:flex;overflow-x:auto;border-bottom:2px solid var(--border);padding:0 16px;scrollbar-width:none;}
+.month-tabs-wrap{background:#fff;border-bottom:2px solid var(--border);}
+.month-tabs{
+  max-width:var(--container);margin:0 auto;padding:0 20px;
+  display:flex;overflow-x:auto;scrollbar-width:none;
+}
 .month-tabs::-webkit-scrollbar{display:none;}
 .month-tab{padding:11px 17px;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray-m);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .month-tab:hover{color:var(--navy);}
@@ -128,7 +142,7 @@ header{
 .month-tab .tc.zero{background:var(--gray-l);color:var(--gray-m);}
 
 /* ── MAIN ── */
-.main{max-width:960px;margin:0 auto;padding:22px 18px;}
+.main{max-width:var(--container);margin:0 auto;padding:22px 20px 48px;}
 .month-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
 .month-title{font-family:'Noto Serif KR',serif;font-size:22px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
 .month-badge{font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:500;background:var(--sky);color:var(--navy-l);border-radius:20px;padding:3px 10px;}
@@ -141,7 +155,6 @@ header{
 .task-card.done{opacity:.55;}
 .task-card.done .task-title{text-decoration:line-through;}
 .cat-stripe{position:absolute;top:0;right:0;width:5px;height:100%;border-radius:0 10px 10px 0;}
-
 .task-top{display:flex;align-items:flex-start;gap:10px;}
 .task-check{width:20px;height:20px;border:2px solid var(--border);border-radius:4px;cursor:pointer;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff;font-size:12px;}
 .task-check.checked{background:var(--green);border-color:var(--green);color:#fff;}
@@ -163,6 +176,13 @@ header{
 /* ── EMPTY ── */
 .empty-state{text-align:center;padding:56px 20px;color:var(--gray-m);}
 .empty-icon{font-size:42px;margin-bottom:10px;}
+
+/* ── FOOTER ── */
+.app-footer{
+  max-width:var(--container);margin:0 auto;padding:0 20px 20px;
+  text-align:right;
+}
+.app-footer span{font-size:11px;color:#bcc8d8;letter-spacing:.3px;}
 
 /* ── COPY MONTH GRID ── */
 .copy-month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
@@ -198,7 +218,7 @@ header{
 .cat-swatch.sel{border-color:var(--gray-d);}
 .cat-swatch .ck{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;}
 
-/* ── PRINT OPTION ── */
+/* ── PRINT OPT ── */
 .print-option{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:border-color .15s;}
 .print-option:hover{border-color:var(--navy-l);}
 .print-option input{accent-color:var(--navy);margin-top:2px;}
@@ -211,17 +231,15 @@ header{
 .toast.green{background:var(--green);}
 
 @media(max-width:600px){
-  header{padding:0 12px;}
-  .header-title{font-size:14px;}
-  .main{padding:12px;}
-  .month-title{font-size:18px;}
+  .header-logo{font-size:14px;}
+  .main{padding:14px 14px 40px;}
+  .container,.header-inner,.year-bar-inner,.filter-bar-inner,.month-tabs,.app-footer{padding-left:14px;padding-right:14px;}
   .form-row{flex-direction:column;}
   .copy-month-grid{grid-template-columns:repeat(3,1fr);}
   .header-actions .btn{padding:5px 8px;font-size:12px;}
-  .setup-card{padding:28px 20px;}
 }
 @media print{
-  header,.year-bar,.filter-bar,.month-tabs,.task-actions,.month-header .btn-accent{display:none!important;}
+  header,.year-bar,.filter-bar,.month-tabs-wrap,.task-actions,.month-header .btn-accent,.app-footer{display:none!important;}
   body{background:#fff;}
   .main{max-width:100%;padding:10px;}
   .task-card{break-inside:avoid;box-shadow:none;border:1px solid #ccc;}
@@ -240,12 +258,10 @@ header{
       <h1>학교 업무 인계인수 관리</h1>
       <p>처음 한 번만 설정하면 바로 시작할 수 있습니다</p>
     </div>
-
     <label class="setup-label">내 부서(직책)를 입력하세요 *</label>
     <input class="setup-input" id="setupDeptInput" placeholder="예: 교무부장" maxlength="20"
       onkeydown="if(event.key==='Enter')startApp()">
     <p class="setup-hint">아래에서 선택하거나 직접 입력하세요</p>
-
     <div class="setup-presets">
       <div class="preset-chip" onclick="pickPreset('교무부장')">📚 교무부장</div>
       <div class="preset-chip" onclick="pickPreset('연구부장')">🔬 연구부장</div>
@@ -256,7 +272,6 @@ header{
       <div class="preset-chip" onclick="pickPreset('행정실장')">💼 행정실장</div>
       <div class="preset-chip" onclick="pickPreset('보건교사')">🩺 보건교사</div>
     </div>
-
     <button class="btn btn-primary setup-btn" onclick="startApp()">시작하기 →</button>
   </div>
 </div>
@@ -265,42 +280,53 @@ header{
      메인 앱
 ══════════════════════════════ -->
 <div id="appScreen">
+
   <header>
-    <div class="header-left">
-      <div class="header-title">🏫 업무 인계인수</div>
-      <div class="dept-name-badge">
-        <span id="hdrDeptName"></span>
-        <span class="edit-icon" onclick="openDeptEditModal()" title="부서명 변경">✏️</span>
+    <div class="header-inner">
+      <div class="header-left">
+        <span class="header-logo" onclick="goHome()" title="홈으로">
+          🏫 <span>업무 인계인수</span>
+        </span>
+        <div class="dept-name-badge">
+          <span id="hdrDeptName"></span>
+          <span class="edit-icon" onclick="openDeptEditModal()" title="부서명 변경">✏️</span>
+        </div>
       </div>
-    </div>
-    <div class="header-actions">
-      <button class="btn btn-outline btn-sm" onclick="openPrintModal()">🖨️ 출력</button>
-      <button class="btn btn-outline btn-sm" onclick="exportData()">📤 내보내기</button>
-      <label class="btn btn-outline btn-sm" style="cursor:pointer">
-        📥 불러오기
-        <input type="file" accept=".json" onchange="importData(event)" style="display:none">
-      </label>
+      <div class="header-actions">
+        <button class="btn btn-outline btn-sm" onclick="openPrintModal()">🖨️ 출력</button>
+        <button class="btn btn-outline btn-sm" onclick="exportData()">📤 내보내기</button>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer">
+          📥 불러오기
+          <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+        </label>
+      </div>
     </div>
   </header>
 
   <div class="year-bar">
-    <button class="year-btn" onclick="changeYear(-1)">◀</button>
-    <span class="year-display" id="yearDisplay"></span>
-    <button class="year-btn" onclick="changeYear(1)">▶</button>
+    <div class="year-bar-inner">
+      <button class="year-btn" onclick="changeYear(-1)">◀</button>
+      <span class="year-display" id="yearDisplay"></span>
+      <button class="year-btn" onclick="changeYear(1)">▶</button>
+    </div>
   </div>
 
   <div class="filter-bar">
-    <span class="filter-label">카테고리</span>
-    <div id="catFilters" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-    <span class="filter-sep">|</span>
-    <span class="filter-label">상태</span>
-    <button class="filter-chip active" id="fAll"  onclick="setStatusFilter('all')">전체</button>
-    <button class="filter-chip" id="fTodo" onclick="setStatusFilter('todo')">미완료</button>
-    <button class="filter-chip" id="fDone" onclick="setStatusFilter('done')">완료</button>
-    <button class="filter-chip" id="fSens" onclick="setStatusFilter('sensitive')">🔒 개인정보</button>
+    <div class="filter-bar-inner">
+      <span class="filter-label">카테고리</span>
+      <div id="catFilters" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      <span class="filter-sep">|</span>
+      <span class="filter-label">상태</span>
+      <button class="filter-chip active" id="fAll"  onclick="setStatusFilter('all')">전체</button>
+      <button class="filter-chip" id="fTodo" onclick="setStatusFilter('todo')">미완료</button>
+      <button class="filter-chip" id="fDone" onclick="setStatusFilter('done')">완료</button>
+      <button class="filter-chip" id="fSens" onclick="setStatusFilter('sensitive')">🔒 개인정보</button>
+    </div>
   </div>
 
-  <div class="month-tabs" id="monthTabs"></div>
+  <div class="month-tabs-wrap">
+    <div class="month-tabs" id="monthTabs"></div>
+  </div>
 
   <div class="main">
     <div class="month-header">
@@ -312,7 +338,12 @@ header{
     </div>
     <div class="task-list" id="taskList"></div>
   </div>
-</div>
+
+  <div class="app-footer">
+    <span>만든이 2026 최창훈</span>
+  </div>
+
+</div><!-- /#appScreen -->
 
 <!-- ── 업무 추가/수정 MODAL ── -->
 <div class="modal-overlay" id="taskModal">
@@ -489,21 +520,21 @@ const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#
 /* ════════════════════════════════
    STATE
 ════════════════════════════════ */
-const S = {
-  deptName:   localStorage.getItem('si_dept') || '',
-  tasks:      JSON.parse(localStorage.getItem('si_tasks') || '{}'),
-  cats:       JSON.parse(localStorage.getItem('si_cats')  || 'null') || defaultCats(),
-  year:       schoolYear(),
-  curMonth:   initMonth(),
-  filter:     {status:'all', cat:''},
-  editingIdx: null,
-  copyRef:    null,
-  copyMonths: new Set(),
-  newCatColor: CAT_COLORS[3],
+const S={
+  deptName:  localStorage.getItem('si_dept')||'',
+  tasks:     JSON.parse(localStorage.getItem('si_tasks')||'{}'),
+  cats:      JSON.parse(localStorage.getItem('si_cats')||'null')||defaultCats(),
+  year:      schoolYear(),
+  curMonth:  initMonth(),
+  filter:    {status:'all',cat:''},
+  editingIdx:null,
+  copyRef:   null,
+  copyMonths:new Set(),
+  newCatColor:CAT_COLORS[3],
 };
 
-function schoolYear(){ const m=new Date().getMonth(); return m>=2?new Date().getFullYear():new Date().getFullYear()-1; }
-function initMonth(){ const m=new Date().getMonth()+1; return MONTHS.includes(m)?m:3; }
+function schoolYear(){const m=new Date().getMonth();return m>=2?new Date().getFullYear():new Date().getFullYear()-1;}
+function initMonth(){const m=new Date().getMonth()+1;return MONTHS.includes(m)?m:3;}
 function defaultCats(){
   return [
     {id:'c1',name:'공문·행정',color:'#E67E22'},
@@ -514,14 +545,58 @@ function defaultCats(){
   ];
 }
 
-function saveTasks(){ localStorage.setItem('si_tasks', JSON.stringify(S.tasks)); }
-function saveCats(){  localStorage.setItem('si_cats',  JSON.stringify(S.cats));  }
-function saveDept(){  localStorage.setItem('si_dept',  S.deptName); }
+function saveTasks(){localStorage.setItem('si_tasks',JSON.stringify(S.tasks));}
+function saveCats() {localStorage.setItem('si_cats', JSON.stringify(S.cats));}
+function saveDept() {localStorage.setItem('si_dept', S.deptName);}
 
-function getKey(year,month){ return month<=2?`${year+1}-${month}`:`${year}-${month}`; }
-function getMonthTasks(year,month){ return S.tasks[getKey(year,month)]||[]; }
-function setMonthTasks(year,month,tasks){ S.tasks[getKey(year,month)]=tasks; saveTasks(); }
-function getCat(id){ return S.cats.find(c=>c.id===id)||null; }
+function getKey(year,month){return month<=2?`${year+1}-${month}`:`${year}-${month}`;}
+function getMonthTasks(year,month){return S.tasks[getKey(year,month)]||[];}
+function setMonthTasks(year,month,tasks){S.tasks[getKey(year,month)]=tasks;saveTasks();}
+function getCat(id){return S.cats.find(c=>c.id===id)||null;}
+
+/* ════════════════════════════════
+   SPA 라우팅 — 뒤로가기·새로고침 유지
+════════════════════════════════ */
+// 현재 화면을 history state 로 저장
+// state: 'setup' | 'app'
+function pushState(screen){
+  history.pushState({screen},'',(screen==='setup'?'#setup':'#app'));
+}
+function replaceState(screen){
+  history.replaceState({screen},'',(screen==='setup'?'#setup':'#app'));
+}
+
+window.addEventListener('popstate',e=>{
+  const screen=(e.state&&e.state.screen)||'setup';
+  if(screen==='setup') showSetup(false);
+  else showApp(false);
+});
+
+// 새로고침 시 해시로 복원
+window.addEventListener('load',()=>{
+  const hash=location.hash;
+  if(hash==='#app'&&S.deptName){
+    replaceState('app');
+    launchApp(false);
+  } else if(S.deptName){
+    replaceState('app');
+    launchApp(false);
+  } else {
+    replaceState('setup');
+    showSetup(false);
+  }
+});
+
+function showSetup(push=true){
+  document.getElementById('setupScreen').classList.add('show');
+  document.getElementById('appScreen').classList.remove('show');
+  if(push) pushState('setup');
+}
+function showApp(push=true){
+  document.getElementById('setupScreen').classList.remove('show');
+  document.getElementById('appScreen').classList.add('show');
+  if(push) pushState('app');
+}
 
 /* ════════════════════════════════
    SETUP
@@ -530,20 +605,26 @@ function pickPreset(name){
   document.getElementById('setupDeptInput').value=name;
   document.getElementById('setupDeptInput').focus();
 }
-
 function startApp(){
   const name=document.getElementById('setupDeptInput').value.trim();
   if(!name){showToast('부서명을 입력하세요.');return;}
-  S.deptName=name; saveDept();
-  launchApp();
+  S.deptName=name;saveDept();
+  launchApp(true);
 }
-
-function launchApp(){
-  document.getElementById('setupScreen').classList.remove('show');
-  document.getElementById('appScreen').classList.add('show');
+function launchApp(push=true){
   document.getElementById('hdrDeptName').textContent=S.deptName;
   loadSampleIfEmpty();
   render();
+  showApp(push);
+}
+
+/* ════════════════════════════════
+   홈으로 (로고 클릭)
+════════════════════════════════ */
+function goHome(){
+  // 설정 화면으로 이동 — 부서명·데이터는 유지
+  showSetup(true);
+  document.getElementById('setupDeptInput').value=S.deptName;
 }
 
 /* ════════════════════════════════
@@ -557,7 +638,7 @@ function openDeptEditModal(){
 function saveDeptName(){
   const name=document.getElementById('deptEditInput').value.trim();
   if(!name){showToast('부서명을 입력하세요.');return;}
-  S.deptName=name; saveDept();
+  S.deptName=name;saveDept();
   document.getElementById('hdrDeptName').textContent=name;
   closeModal('deptEditModal');
   showToast('부서명이 변경되었습니다.','green');
@@ -572,11 +653,9 @@ function render(){
   renderCatFilters();
   renderTaskList();
 }
-
 function renderYearDisplay(){
   document.getElementById('yearDisplay').textContent=`${S.year}년 3월 ~ ${S.year+1}년 2월`;
 }
-
 function renderTabs(){
   const el=document.getElementById('monthTabs');
   el.innerHTML='';
@@ -589,7 +668,6 @@ function renderTabs(){
     el.appendChild(div);
   });
 }
-
 function renderCatFilters(){
   const el=document.getElementById('catFilters');
   let html=`<button class="filter-chip${S.filter.cat===''?' cat-active':''}"
@@ -604,7 +682,6 @@ function renderCatFilters(){
   html+=`<button class="filter-chip" style="border-style:dashed;" onclick="openCatModal()">⚙ 관리</button>`;
   el.innerHTML=html;
 }
-
 function filteredTasks(tasks){
   return tasks.filter(t=>{
     const s=S.filter.status;
@@ -613,7 +690,6 @@ function filteredTasks(tasks){
     return sok&&cok;
   });
 }
-
 function renderTaskList(){
   const m=S.curMonth;
   document.getElementById('curMonthTitle').textContent=MN[m];
@@ -621,7 +697,6 @@ function renderTaskList(){
   const allT=getMonthTasks(S.year,m);
   const tasks=filteredTasks(allT);
   const el=document.getElementById('taskList');
-
   if(!allT.length){
     el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>이 달에 등록된 업무가 없습니다.<br><strong>+ 업무 추가</strong>로 등록하세요.</p></div>`;
     return;
@@ -630,7 +705,6 @@ function renderTaskList(){
     el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><p>선택한 필터에 해당하는 업무가 없습니다.</p></div>`;
     return;
   }
-
   el.innerHTML=tasks.map(t=>{
     const ri=allT.indexOf(t);
     const cat=t.category?getCat(t.category):null;
@@ -688,7 +762,6 @@ function populateCatSel(selId){
     `<option value="">— 선택 안 함 —</option>`+
     S.cats.map(c=>`<option value="${c.id}"${c.id===selId?' selected':''}>${esc(c.name)}</option>`).join('');
 }
-
 function openAddModal(){
   S.editingIdx=null;
   document.getElementById('modalTitle').textContent='업무 추가';
@@ -701,7 +774,6 @@ function openAddModal(){
   document.getElementById('taskModal').classList.add('open');
   setTimeout(()=>document.getElementById('taskName').focus(),80);
 }
-
 function openEditModal(idx){
   const t=getMonthTasks(S.year,S.curMonth)[idx];
   S.editingIdx=idx;
@@ -718,9 +790,7 @@ function openEditModal(idx){
   populateCatSel(t.category||'');
   document.getElementById('taskModal').classList.add('open');
 }
-
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-
+function closeModal(id){document.getElementById(id).classList.remove('open');}
 function saveTask(){
   const name=document.getElementById('taskName').value.trim();
   if(!name){showToast('업무명을 입력하세요.');return;}
@@ -737,33 +807,21 @@ function saveTask(){
     done:false,
   };
   let tasks=getMonthTasks(S.year,month);
-  if(S.editingIdx!==null){
-    task.done=tasks[S.editingIdx].done;
-    tasks[S.editingIdx]=task;
-    showToast('수정되었습니다.','green');
-  } else {
-    tasks.push(task);
-    showToast('업무가 추가되었습니다.','green');
-  }
+  if(S.editingIdx!==null){task.done=tasks[S.editingIdx].done;tasks[S.editingIdx]=task;showToast('수정되었습니다.','green');}
+  else{tasks.push(task);showToast('업무가 추가되었습니다.','green');}
   setMonthTasks(S.year,month,tasks);
-  if(month!==S.curMonth) S.curMonth=month;
-  closeModal('taskModal');
-  render();
+  if(month!==S.curMonth)S.curMonth=month;
+  closeModal('taskModal');render();
 }
-
 function deleteTask(idx){
   if(!confirm('이 업무를 삭제하시겠습니까?'))return;
   const tasks=getMonthTasks(S.year,S.curMonth);
-  tasks.splice(idx,1);
-  setMonthTasks(S.year,S.curMonth,tasks);
-  render(); showToast('삭제되었습니다.');
+  tasks.splice(idx,1);setMonthTasks(S.year,S.curMonth,tasks);
+  render();showToast('삭제되었습니다.');
 }
-
 function toggleDone(idx){
   const tasks=getMonthTasks(S.year,S.curMonth);
-  tasks[idx].done=!tasks[idx].done;
-  setMonthTasks(S.year,S.curMonth,tasks);
-  render();
+  tasks[idx].done=!tasks[idx].done;setMonthTasks(S.year,S.curMonth,tasks);render();
 }
 
 /* ════════════════════════════════
@@ -771,57 +829,37 @@ function toggleDone(idx){
 ════════════════════════════════ */
 function openCopyModal(idx){
   const t=getMonthTasks(S.year,S.curMonth)[idx];
-  S.copyRef={year:S.year,month:S.curMonth,idx};
-  S.copyMonths=new Set();
+  S.copyRef={year:S.year,month:S.curMonth,idx};S.copyMonths=new Set();
   document.getElementById('copyTaskName').textContent=t.name;
-  const ys=document.getElementById('copyYear');
-  ys.innerHTML='';
+  const ys=document.getElementById('copyYear');ys.innerHTML='';
   for(let y=S.year-1;y<=S.year+2;y++)
     ys.innerHTML+=`<option value="${y}"${y===S.year?' selected':''}>${y}~${y+1}학년도</option>`;
-  renderCopyGrid();
-  document.getElementById('copyModal').classList.add('open');
+  renderCopyGrid();document.getElementById('copyModal').classList.add('open');
 }
-
 function renderCopyGrid(){
   const selYear=parseInt(document.getElementById('copyYear').value);
-  const isSameYear=selYear===S.copyRef.year;
+  const same=selYear===S.copyRef.year;
   document.getElementById('copyMonthGrid').innerHTML=MONTHS.map(m=>{
-    const isSrc=isSameYear&&m===S.copyRef.month;
+    const isSrc=same&&m===S.copyRef.month;
     const sel=S.copyMonths.has(m);
     return `<button class="copy-month-btn${sel?' selected':''}"${isSrc?' disabled':''}
       onclick="toggleCopyMonth(${m})">${MN[m]}${isSrc?' ✦':''}</button>`;
   }).join('');
 }
-
 document.getElementById('copyYear').addEventListener('change',renderCopyGrid);
-
-function toggleCopyMonth(m){
-  S.copyMonths.has(m)?S.copyMonths.delete(m):S.copyMonths.add(m);
-  renderCopyGrid();
-}
-
+function toggleCopyMonth(m){S.copyMonths.has(m)?S.copyMonths.delete(m):S.copyMonths.add(m);renderCopyGrid();}
 function doCopy(){
   if(!S.copyMonths.size){showToast('복사할 월을 선택하세요.');return;}
   const destYear=parseInt(document.getElementById('copyYear').value);
   const src={...getMonthTasks(S.copyRef.year,S.copyRef.month)[S.copyRef.idx],done:false};
-  S.copyMonths.forEach(m=>{
-    const tasks=getMonthTasks(destYear,m);
-    tasks.push({...src});
-    setMonthTasks(destYear,m,tasks);
-  });
-  closeModal('copyModal');
-  render();
-  showToast(`${S.copyMonths.size}개 월에 복사되었습니다.`,'green');
+  S.copyMonths.forEach(m=>{const t=getMonthTasks(destYear,m);t.push({...src});setMonthTasks(destYear,m,t);});
+  closeModal('copyModal');render();showToast(`${S.copyMonths.size}개 월에 복사되었습니다.`,'green');
 }
 
 /* ════════════════════════════════
    CATEGORY MODAL
 ════════════════════════════════ */
-function openCatModal(){
-  renderCatManageList();
-  renderCatColorPalette();
-  document.getElementById('catModal').classList.add('open');
-}
+function openCatModal(){renderCatManageList();renderCatColorPalette();document.getElementById('catModal').classList.add('open');}
 function renderCatManageList(){
   document.getElementById('catManageList').innerHTML=S.cats.map((c,i)=>
     `<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;">
@@ -842,43 +880,30 @@ function selectCatColor(c){S.newCatColor=c;renderCatColorPalette();}
 function addCategory(){
   const name=document.getElementById('newCatName').value.trim();
   if(!name){showToast('카테고리 이름을 입력하세요.');return;}
-  S.cats.push({id:'c'+Date.now(),name,color:S.newCatColor});
-  saveCats();
+  S.cats.push({id:'c'+Date.now(),name,color:S.newCatColor});saveCats();
   document.getElementById('newCatName').value='';
-  renderCatManageList(); renderCatFilters(); populateCatSel('');
-  showToast('추가되었습니다.','green');
+  renderCatManageList();renderCatFilters();populateCatSel('');showToast('추가되었습니다.','green');
 }
 function deleteCat(i){
   const c=S.cats[i];
   if(!confirm(`"${c.name}" 카테고리를 삭제하시겠습니까?`))return;
-  Object.keys(S.tasks).forEach(k=>{
-    S.tasks[k]=S.tasks[k].map(t=>t.category===c.id?{...t,category:''}:t);
-  });
-  saveTasks();
-  S.cats.splice(i,1); saveCats();
-  if(S.filter.cat===c.id) S.filter.cat='';
-  renderCatManageList(); render();
-  showToast('삭제되었습니다.');
+  Object.keys(S.tasks).forEach(k=>{S.tasks[k]=S.tasks[k].map(t=>t.category===c.id?{...t,category:''}:t);});
+  saveTasks();S.cats.splice(i,1);saveCats();
+  if(S.filter.cat===c.id)S.filter.cat='';
+  renderCatManageList();render();showToast('삭제되었습니다.');
 }
 
 /* ════════════════════════════════
    IMPORT / EXPORT
 ════════════════════════════════ */
 function exportData(){
-  const blob=new Blob([JSON.stringify({
-    version:4, exportedAt:new Date().toISOString(),
-    dept:S.deptName, year:S.year,
-    tasks:S.tasks, cats:S.cats,
-  },null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`인계인수_${S.deptName}_${S.year}-${S.year+1}.json`;
-  a.click();
+  const blob=new Blob([JSON.stringify({version:4,exportedAt:new Date().toISOString(),dept:S.deptName,year:S.year,tasks:S.tasks,cats:S.cats},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`인계인수_${S.deptName}_${S.year}-${S.year+1}.json`;a.click();
   showToast('내보내기 완료!','green');
 }
-
 function importData(e){
-  const file=e.target.files[0]; if(!file)return;
+  const file=e.target.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=ev=>{
     try{
@@ -886,31 +911,23 @@ function importData(e){
       if(!data.tasks)throw new Error();
       if(!confirm(`"${data.dept||'?'}" 부서의 데이터를 불러옵니다.\n기존 데이터에 합쳐집니다. (같은 키는 덮어씀)\n계속하시겠습니까?`))return;
       Object.assign(S.tasks,data.tasks);
-      if(data.cats){
-        data.cats.forEach(nc=>{ if(!S.cats.find(c=>c.id===nc.id)) S.cats.push(nc); });
-        saveCats();
-      }
-      saveTasks();
-      render();
-      showToast('불러오기 완료!','green');
-    } catch{ showToast('올바른 파일이 아닙니다.'); }
+      if(data.cats){data.cats.forEach(nc=>{if(!S.cats.find(c=>c.id===nc.id))S.cats.push(nc);});saveCats();}
+      saveTasks();render();showToast('불러오기 완료!','green');
+    }catch{showToast('올바른 파일이 아닙니다.');}
   };
-  reader.readAsText(file);
-  e.target.value='';
+  reader.readAsText(file);e.target.value='';
 }
 
 /* ════════════════════════════════
    PRINT
 ════════════════════════════════ */
-function openPrintModal(){ document.getElementById('printModal').classList.add('open'); }
-
+function openPrintModal(){document.getElementById('printModal').classList.add('open');}
 function doPrint(){
   const range=document.querySelector('input[name=pRange]:checked').value;
   const privacy=document.querySelector('input[name=pPrivacy]:checked').value;
   const showAssignee=document.getElementById('pShowAssignee').checked;
   closeModal('printModal');
   const months=range==='current'?[S.curMonth]:MONTHS;
-
   let html=`<html><head><meta charset="UTF-8">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -922,19 +939,18 @@ function doPrint(){
     .card.sensitive{border-left:4px solid #E67E22;}
     .title{font-weight:700;font-size:13px;margin-bottom:3px;}
     .m2{font-size:11px;color:#7f8c8d;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:3px;}
-    .dl{color:#E67E22;font-weight:600;} .as{color:#8E44AD;font-weight:600;}
+    .dl{color:#E67E22;font-weight:600;}.as{color:#8E44AD;font-weight:600;}
     .desc{font-size:12px;color:#555;white-space:pre-wrap;line-height:1.55;}
     .desc.hidden{background:#ccc;color:transparent;border-radius:3px;}
     .note{font-size:11px;color:#7f8c8d;margin-top:4px;}
     .tags{display:inline-flex;gap:4px;margin-left:7px;vertical-align:middle;}
     .tag{font-size:10px;padding:1px 5px;border-radius:8px;}
-    .ts{background:#FEF3E8;color:#E67E22;} .tr{background:#E8F0FB;color:#2A5298;}
+    .ts{background:#FEF3E8;color:#E67E22;}.tr{background:#E8F0FB;color:#2A5298;}
     .none{color:#aaa;font-size:12px;}
     @media print{body{margin:12px;}}
   </style></head><body>
   <h1>🏫 ${esc(S.deptName)} — 업무 인계인수</h1>
   <div class="meta">${S.year}년 3월 ~ ${S.year+1}년 2월 &nbsp;|&nbsp; 출력일: ${new Date().toLocaleDateString('ko-KR')} &nbsp;|&nbsp; 개인정보: ${privacy==='hide'?'가림 처리':'표시'}</div>`;
-
   months.forEach(m=>{
     const tasks=getMonthTasks(S.year,m);
     html+=`<h2>${MN[m]} · ${ML[m]||''} (${tasks.length}건)</h2>`;
@@ -961,18 +977,17 @@ function doPrint(){
   });
   html+='</body></html>';
   const w=window.open('','_blank');
-  w.document.write(html); w.document.close(); w.focus();
+  w.document.write(html);w.document.close();w.focus();
   setTimeout(()=>w.print(),500);
 }
 
 /* ════════════════════════════════
    UTILS
 ════════════════════════════════ */
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(msg,type=''){
   const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast show'+(type?' '+type:'');
+  t.textContent=msg;t.className='toast show'+(type?' '+type:'');
   setTimeout(()=>t.className='toast'+(type?' '+type:''),2600);
 }
 
@@ -987,15 +1002,9 @@ function loadSampleIfEmpty(){
       {name:'학급 편성 및 담임 배정 공문',deadline:'3월 2일',assignee:'교무부장',category:'c1',desc:'학급 편성 결과를 교육청에 공문으로 제출\n공문 시스템(에듀파인) 사용',note:'전년도 양식 참고',sensitive:false,repeat:true,done:false},
       {name:'학교운영위원회 위원 선출 공고',deadline:'3월 중',assignee:'행정실장',category:'c1',desc:'운영위원회 학부모위원 및 지역위원 선출 공고\n학교 홈페이지 및 가정통신문 배부',note:'',sensitive:false,repeat:true,done:false},
     ],
-    4:[
-      {name:'학교폭력 실태조사',deadline:'4월 중',assignee:'생활부장',category:'c4',desc:'온라인 학교폭력 실태조사 실시\n- 학생 대상 설문 링크 배포\n- 학급별 참여율 관리 및 독려',note:'교육청 지침 공문 확인',sensitive:true,repeat:true,done:false},
-    ],
-    5:[
-      {name:'봄 현장체험학습 계획 및 공문',deadline:'5월 초',assignee:'교무부장',category:'c3',desc:'봄 현장체험학습 계획 수립\n- 장소, 이동수단, 안전계획 포함\n- 교장 결재 후 교육청 보고',note:'차량 계약 3월부터 시작',sensitive:false,repeat:true,done:false},
-    ],
-    7:[
-      {name:'1학기 학교생활기록부 마감',deadline:'7월 말',assignee:'교무부장',category:'c2',desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n- 담임교사별 입력 현황 점검\n- 누락 항목 확인 후 교장 최종 결재',note:'관리자 계정 필요',sensitive:true,repeat:true,done:false},
-    ],
+    4:[{name:'학교폭력 실태조사',deadline:'4월 중',assignee:'생활부장',category:'c4',desc:'온라인 학교폭력 실태조사 실시\n- 학생 대상 설문 링크 배포\n- 학급별 참여율 관리 및 독려',note:'교육청 지침 공문 확인',sensitive:true,repeat:true,done:false}],
+    5:[{name:'봄 현장체험학습 계획 및 공문',deadline:'5월 초',assignee:'교무부장',category:'c3',desc:'봄 현장체험학습 계획 수립\n- 장소, 이동수단, 안전계획 포함\n- 교장 결재 후 교육청 보고',note:'차량 계약 3월부터 시작',sensitive:false,repeat:true,done:false}],
+    7:[{name:'1학기 학교생활기록부 마감',deadline:'7월 말',assignee:'교무부장',category:'c2',desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n- 담임교사별 입력 현황 점검\n- 누락 항목 확인 후 교장 최종 결재',note:'관리자 계정 필요',sensitive:true,repeat:true,done:false}],
     2:[
       {name:'졸업식 준비 및 졸업앨범 배부',deadline:'2월 중',assignee:'교무부장',category:'c3',desc:'졸업식 행사 준비\n- 졸업장·상장 인쇄 및 날인\n- 졸업앨범 수령 및 배부',note:'졸업앨범 업체 11월부터 협의',sensitive:false,repeat:true,done:false},
       {name:'교직원 인사 이동 관련 공문',deadline:'2월 말',assignee:'행정실장',category:'c1',desc:'전출·전입 교직원 관련 교육청 공문 처리\n- 발령 통보 확인\n- 업무 인계인수서 제출',note:'',sensitive:true,repeat:true,done:false},
@@ -1005,15 +1014,9 @@ function loadSampleIfEmpty(){
 }
 
 /* ════════════════════════════════
-   INIT
+   INIT — load 이벤트에서 처리
 ════════════════════════════════ */
-if(S.deptName){
-  // 이미 설정된 경우 바로 앱 실행
-  launchApp();
-} else {
-  // 첫 실행 — 설정 화면 표시
-  document.getElementById('setupScreen').classList.add('show');
-}
+// (window load 이벤트 핸들러가 위에서 등록됨)
 </script>
 </body>
 </html>
