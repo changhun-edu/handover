@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>학교 업무 인계인수 관리</title>
+<title>교육 업무 인수인계 노트</title>
 <style>
 /* ── 시스템 폰트 스택 (인터넷 불필요, 망분리 환경 완전 대응) ──
    Windows : 맑은 고딕
@@ -661,7 +661,7 @@ header{
     <div class="setup-left">
       <div>
         <div style="font-size:44px;margin-bottom:14px;">🏫</div>
-        <h1 style="font-family:var(--font-serif);font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">학교 업무 인계인수 관리</h1>
+        <h1 style="font-family:var(--font-serif);font-size:20px;font-weight:700;color:#fff;margin-bottom:8px;">교육 업무 인수인계 노트</h1>
         <p style="font-size:13px;color:rgba(255,255,255,.8);line-height:1.8;margin-bottom:24px;">
           말로 전달하던 업무 내용을 텍스트로 정리하고<br>
           <strong style="color:#fff;">파일 하나로 후임자에게 전달</strong>하세요
@@ -725,10 +725,11 @@ header{
         <div class="preset-chip" onclick="pickPreset('체육부장')">⚽ 체육부장</div>
         <div class="preset-chip" onclick="pickPreset('정보부장')">💻 정보부장</div>
         <div class="preset-chip" onclick="pickPreset('문화예술부장')">🎨 문화예술부장</div>
+        <div class="preset-chip" onclick="pickPreset('늘봄연구사')">🌱 늘봄연구사</div>
       </div>
 
-      <!-- ③ 선택 항목 나중에 — 학교 이름 -->
-      <label class="setup-label" style="margin-top:4px;">학교 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
+      <!-- ③ 선택 항목 나중에 — 기관 이름 -->
+      <label class="setup-label" style="margin-top:4px;">기관(학교) 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
       <input class="setup-input" id="setupSchoolInput" placeholder="예: 운남초등학교" maxlength="30"
         onkeydown="if(event.key==='Enter')startApp(false)">
 
@@ -766,7 +767,7 @@ header{
         <div id="filePreview" style="display:none;background:#f0f7ff;border:1.5px solid #c5d8f0;border-radius:10px;padding:14px 16px;">
           <p id="previewTitle" style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;"></p>
           <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--gray-d);">
-            <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학교</span> <strong id="previewSchool">—</strong></div>
+            <div><span style="color:var(--gray-m);width:70px;display:inline-block;">기관</span> <strong id="previewSchool">—</strong></div>
             <div><span style="color:var(--gray-m);width:70px;display:inline-block;">부서</span> <strong id="previewDept">—</strong></div>
             <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학년도</span> <strong id="previewYear">—</strong></div>
             <div><span style="color:var(--gray-m);width:70px;display:inline-block;">업무 수</span> <strong id="previewTaskCount">—</strong></div>
@@ -793,7 +794,7 @@ header{
     <div class="header-inner">
       <div class="header-left">
         <span class="header-logo" onclick="goHome()" title="설정 화면으로">
-          🏫 <span>업무 인계인수</span>
+          🏫 <span>업무 인수인계 노트</span>
           <span class="logo-hint">⚙️ 설정 화면으로 돌아갑니다</span>
         </span>
         <div style="display:flex;flex-direction:column;gap:2px;">
@@ -1101,8 +1102,8 @@ header{
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">학교 이름</label>
-        <input class="form-input" id="deptEditSchool" placeholder="예: 광주○○초등학교" maxlength="30">
+        <label class="form-label">기관(학교) 이름</label>
+        <input class="form-input" id="deptEditSchool" placeholder="예: 운남초등학교" maxlength="30">
       </div>
       <div class="form-group">
         <label class="form-label">부서명 *</label>
@@ -1828,7 +1829,7 @@ function startApp(withSample=false){
 function launchApp(push=true){
   S.curYear=S.year;
   document.getElementById('hdrDeptName').textContent=S.deptName;
-  // 학교 이름 헤더 표시
+  // 기관 이름 헤더 표시
   const schoolEl=document.getElementById('hdrSchoolName');
   if(schoolEl){
     schoolEl.textContent=S.schoolName||'';
@@ -2103,8 +2104,8 @@ function renderTaskList(){
           </div>
           ${done?'':`${t.desc?`<div class="task-desc">${q?highlightText(t.desc,q):linkify(t.desc)}</div>`:''}`}
           ${done?'':`${t.note?`<div class="task-note">📌 ${q?highlightText(t.note,q):linkify(t.note)}</div>`:''}`}
-          ${done?'':`${t.fileLocation?`<div class="task-note" style="color:var(--teal);">📁 ${esc(t.fileLocation)}</div>`:''}`}
-          ${done?'':`${t.system?`<div class="task-note" style="color:#2980b9;">💻 ${esc(t.system)}</div>`:''}`}
+          ${done?'':`${t.fileLocation?`<div class="task-note" style="color:var(--teal);">📁 ${q?highlightText(t.fileLocation,q):linkify(t.fileLocation)}</div>`:''}`}
+          ${done?'':`${t.system?`<div class="task-note" style="color:#2980b9;">💻 ${q?highlightText(t.system,q):linkify(t.system)}</div>`:''}`}
           ${done?'':`${(t.contacts&&t.contacts.length)?`<div class="task-note" style="color:#8e44ad;">📞 ${t.contacts.map(c=>`${esc(c.name)} ${esc(c.tel)}`).join(' · ')}</div>`:''}`}
           ${done?'':`${(t.budgetTotal||t.budgetUsed||t.budgetStorage)?`<div class="task-note" style="color:#d35400;">💰 ${[t.budgetTotal?'배정:'+esc(t.budgetTotal):'',t.budgetUsed?'집행:'+esc(t.budgetUsed):'',t.budgetStorage?'보관:'+esc(t.budgetStorage):''].filter(Boolean).join(' | ')}</div>`:''}`}
         </div>
@@ -2114,6 +2115,9 @@ function renderTaskList(){
         <div class="card-more-wrap">
           <button class="card-more-btn" onclick="toggleCardMore(this)" title="더 보기">⋯</button>
           <div class="card-more-menu">
+            <button class="card-more-item" onclick="moveTask(${ri},-1);closeCardMore(this)">▲ 위로 이동</button>
+            <button class="card-more-item" onclick="moveTask(${ri},1);closeCardMore(this)">▼ 아래로 이동</button>
+            <div class="more-menu-divider"></div>
             <button class="card-more-item" onclick="openCopyModal(${ri});closeCardMore(this)">📋 다른 월로 복사</button>
             <button class="card-more-item danger" onclick="confirmDelete(this.closest('.task-card').querySelector('.btn.btn-danger'),${ri});closeCardMore(this)">🗑 삭제</button>
           </div>
@@ -2630,7 +2634,15 @@ function addCategory(){
 }
 function deleteCat(i){
   const c=S.cats[i];
-  if(!confirm(`"${c.name}" 카테고리를 삭제하시겠습니까?\n(이 카테고리로 지정된 업무는 카테고리가 해제됩니다.)`))return;
+  // ③ 이 카테고리를 사용 중인 업무 수 계산
+  let usedCount=0;
+  Object.keys(S.tasks).forEach(k=>{
+    S.tasks[k].forEach(t=>{ if(t.category===c.id) usedCount++; });
+  });
+  const msg=usedCount>0
+    ? `"${c.name}" 카테고리를 삭제하시겠습니까?\n\n이 카테고리를 사용 중인 업무가 ${usedCount}건 있습니다.\n삭제하면 해당 업무의 카테고리가 해제됩니다. (업무 자체는 유지됩니다.)`
+    : `"${c.name}" 카테고리를 삭제하시겠습니까?`;
+  if(!confirm(msg))return;
   Object.keys(S.tasks).forEach(k=>{S.tasks[k]=S.tasks[k].map(t=>t.category===c.id?{...t,category:''}:t);});
   saveTasks();S.cats.splice(i,1);saveCats();
   if(S.filter.cat===c.id)S.filter.cat='';
@@ -2889,6 +2901,14 @@ function doPrint(){
         <td style="padding:14px 12px;border:1px solid #C5D8F5;"></td>
       </tr>
     </table>
+  </div>`;
+
+  // ⑤ 인쇄물 하단 — 후임자를 위한 앱 안내
+  html+=`<div style="margin-top:28px;padding:16px 18px;background:#f0f7ff;border:1px solid #c5d8f0;border-radius:8px;font-size:12px;color:#1B3A6B;line-height:1.7;page-break-inside:avoid;">
+    <strong>💻 이어서 디지털로 관리하려면</strong><br>
+    이 인계서는 웹앱으로도 관리할 수 있습니다. 전임자에게 <strong>내보내기 파일(.json)</strong>을 받아
+    아래 주소에서 <strong>"파일로 시작"</strong>으로 불러오면 화면에서 바로 이어서 작업할 수 있습니다.<br>
+    <span style="color:#555;">주소: ${esc(location.origin+location.pathname)}</span>
   </div>`;
 
   html+='</body></html>';
