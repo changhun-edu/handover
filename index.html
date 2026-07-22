@@ -1000,6 +1000,7 @@ const S={
   doneByYear:   _lsJson('si_done_by_year',{}),  // { 'taskId_key': { '2025': true } }
   cats:         _lsJson('si_cats',null)||defaultCats(),
   lastBackup:   _ls('si_lastBackup',null)||null,
+  userEdited:   _ls('si_user_edited')==='1',  // 직접 업무 추가/수정한 적 있으면 true
   year:         schoolYear(),
   curMonth:     initMonth(),
   filter:       {status:'all',cat:''},
@@ -1020,6 +1021,7 @@ function saveHandover(){
   try{localStorage.setItem('si_handover_to',S.handoverTo);}catch(e){}
 }
 function saveBackupDate(iso){S.lastBackup=iso;try{localStorage.setItem('si_lastBackup',iso);}catch(e){}}
+function saveUserEdited(){S.userEdited=true;try{localStorage.setItem('si_user_edited','1');}catch(e){}}
 
 /* ── 전체 초기화 ── */
 function openResetModal(){
@@ -1031,7 +1033,7 @@ function openResetModal(){
 function doReset(){
   // localStorage 전체 삭제
   const keys=['si_school','si_dept','si_handover_date','si_handover_to',
-               'si_tasks','si_done_by_year','si_cats','si_lastBackup'];
+               'si_tasks','si_done_by_year','si_cats','si_lastBackup','si_user_edited'];
   keys.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
   // 페이지 새로고침 → 처음 실행 화면으로
   location.reload();
@@ -1039,7 +1041,8 @@ function doReset(){
 
 /* ── 백업 경고 시스템 ── */
 function hasAnyTask(){
-  return Object.values(S.tasks).some(arr=>arr&&arr.length>0);
+  // 직접 추가/수정한 업무가 있을 때만 true — 샘플 데이터만 있는 경우 제외
+  return S.userEdited && Object.values(S.tasks).some(arr=>arr&&arr.length>0);
 }
 function backupDaysSince(){
   if(!S.lastBackup) return Infinity;
@@ -1309,6 +1312,7 @@ function startFromFile(){
 
   // 데이터 적용
   S.tasks=data.tasks||{}; saveTasks();
+  saveUserEdited();  // 파일로 시작 = 실제 데이터 있음
   if(data.doneByYear){ Object.assign(S.doneByYear,data.doneByYear); saveDoneByYear(); }
   if(data.cats){ S.cats=data.cats; saveCats(); }
   S.schoolName=data.school||''; saveSchool();
@@ -1769,6 +1773,7 @@ function saveTask(){
     showToast('업무가 추가되었습니다.','green');
   }
   setMonthTasks(S.year,startMonth,tasks);
+  saveUserEdited();  // 직접 저장한 적 있음을 기록
   S.curMonth=startMonth;
   // 수정 시 스크롤 위치 보존
   const scrollY=window.scrollY;
