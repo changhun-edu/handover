@@ -52,34 +52,60 @@ body{font-family:var(--font-sans);background:#F2F5FB;color:var(--gray-d);min-hei
 #setupScreen{
   display:none;
   min-height:100vh;
-  background:linear-gradient(145deg,#1B3A6B 0%,#2A5298 55%,#1a6b5a 100%);
+  background:linear-gradient(160deg,#EEF3FB 0%,#E8F4F0 50%,#EDF2FB 100%);
   align-items:center; justify-content:center;
   padding:30px 20px;
 }
 #setupScreen.show{display:flex;}
 
 .setup-card{
-  background:#fff; border-radius:18px;
+  background:#fff; border-radius:20px;
   width:100%; max-width:460px;
   padding:40px 36px;
-  box-shadow:0 16px 56px rgba(0,0,0,.24);
+  box-shadow:0 8px 40px rgba(27,58,107,.12);
+  border:1px solid rgba(27,58,107,.08);
 }
-.setup-logo{text-align:center; margin-bottom:28px;}
-.setup-logo .emoji{font-size:48px; display:block; margin-bottom:10px;}
-.setup-logo h1{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px;}
-.setup-logo p{font-size:14px;color:var(--gray-m);}
-.setup-label{font-size:13px;font-weight:700;color:var(--gray-d);margin-bottom:6px;display:block;}
+.setup-logo{text-align:center; margin-bottom:24px;}
+.setup-logo .emoji{font-size:52px; display:block; margin-bottom:12px;}
+.setup-logo h1{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.setup-logo .tagline{font-size:13px;color:var(--gray-m);line-height:1.6;}
+.setup-logo .tagline strong{color:var(--navy-l);}
+.setup-label{font-size:12px;font-weight:700;color:var(--gray-m);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px;}
 .setup-input{
   width:100%; border:1.5px solid var(--border); border-radius:8px;
   padding:11px 14px; font-family:inherit; font-size:15px;
   color:var(--gray-d); transition:border-color .15s; margin-bottom:6px;
+  background:#fafbfd;
 }
-.setup-input:focus{outline:none;border-color:var(--navy-l);}
-.setup-hint{font-size:12px;color:var(--gray-m);margin-bottom:20px;}
+.setup-input:focus{outline:none;border-color:var(--navy-l);background:#fff;}
+.setup-hint{font-size:12px;color:var(--gray-m);margin-bottom:10px;}
 .setup-presets{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;}
-.preset-chip{padding:6px 13px;border-radius:20px;border:1.5px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:#fff;color:var(--gray-d);transition:all .15s;}
-.preset-chip:hover{border-color:var(--navy-l);color:var(--navy);background:var(--sky);}
-.setup-btn{width:100%;padding:13px;font-size:15px;border-radius:9px;margin-top:4px;}
+.preset-chip{
+  padding:7px 14px;border-radius:20px;
+  border:1.5px solid var(--navy-l);
+  font-size:13px;font-weight:600;cursor:pointer;
+  background:var(--sky);color:var(--navy);
+  transition:all .15s;
+  box-shadow:0 1px 4px rgba(27,58,107,.08);
+}
+.preset-chip:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.setup-btn{width:100%;padding:14px;font-size:15px;border-radius:10px;margin-top:4px;}
+
+/* 추천 배지 */
+.recommend-badge{
+  display:inline-block;font-size:10px;font-weight:700;
+  background:#f39c12;color:#fff;border-radius:4px;
+  padding:1px 6px;margin-left:7px;vertical-align:middle;
+  letter-spacing:.3px;
+}
+/* 안내 박스 (상시 표시) */
+.guide-box-wrap{
+  background:#f0f7ff;border:1.5px solid #c5d8f0;
+  border-radius:10px;padding:14px 16px;margin-bottom:20px;
+  font-size:12px;color:var(--gray-d);line-height:1.8;
+}
+.guide-box-wrap .guide-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;}
+.guide-box-wrap .guide-chip{background:#fff;border:1px solid var(--border);border-radius:6px;padding:3px 10px;color:var(--navy);font-weight:600;font-size:11px;}
 
 /* ══════════════════════════════
    메인 앱
@@ -101,10 +127,18 @@ header{
 .header-logo{
   font-family:var(--font-serif);font-size:17px;font-weight:700;
   cursor:pointer;display:flex;align-items:center;gap:7px;
-  color:#fff;text-decoration:none;
-  transition:opacity .15s;
+  color:#fff;text-decoration:none;transition:opacity .15s;
+  position:relative;
 }
 .header-logo:hover{opacity:.82;}
+.header-logo .logo-hint{
+  position:absolute;top:calc(100% + 8px);left:0;
+  background:rgba(0,0,0,.75);color:#fff;font-size:11px;font-weight:400;
+  padding:5px 10px;border-radius:6px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .2s;z-index:99;
+  font-family:var(--font-sans);
+}
+.header-logo:hover .logo-hint{opacity:1;}
 .dept-name-badge{
   font-size:13px;font-weight:600;
   background:rgba(255,255,255,.18);border-radius:6px;padding:4px 11px;
@@ -112,7 +146,34 @@ header{
 }
 .dept-name-badge .edit-icon{font-size:12px;color:rgba(255,255,255,.6);cursor:pointer;}
 .dept-name-badge .edit-icon:hover{color:#fff;}
-.header-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;}
+.header-actions{display:flex;gap:7px;align-items:center;}
+
+/* ① 더보기 메뉴 */
+.more-menu-wrap{position:relative;}
+.more-menu-btn{
+  background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);
+  color:#fff;border-radius:7px;padding:5px 10px;cursor:pointer;font-size:16px;
+  line-height:1;transition:background .15s;
+}
+.more-menu-btn:hover{background:rgba(255,255,255,.28);}
+.more-menu{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:#fff;border-radius:10px;box-shadow:0 8px 32px rgba(27,58,107,.2);
+  border:1px solid var(--border);min-width:160px;z-index:500;overflow:hidden;
+}
+.more-menu.open{display:block;}
+.more-menu-item{
+  display:flex;align-items:center;gap:10px;padding:11px 16px;
+  font-size:13px;font-weight:500;color:var(--gray-d);cursor:pointer;
+  border:none;background:none;width:100%;text-align:left;
+  transition:background .1s;
+}
+.more-menu-item:hover{background:var(--sky);}
+.more-menu-item.danger{color:var(--red);}
+.more-menu-item.danger:hover{background:#FFF0EF;}
+.more-menu-divider{height:1px;background:var(--border);margin:3px 0;}
+.more-menu-file{position:relative;overflow:hidden;}
+.more-menu-file input{position:absolute;inset:0;opacity:0;cursor:pointer;}
 
 /* ── 백업 경고 배지 ── */
 .backup-badge{
@@ -137,7 +198,7 @@ header{
 .year-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
 .year-btn:hover{background:rgba(255,255,255,.32);}
 
-/* ── FILTER BAR ── */
+/* ③ 필터+검색 통합 한 줄 */
 .filter-bar{background:#fff;border-bottom:1px solid var(--border);}
 .filter-bar-inner{
   max-width:var(--container);margin:0 auto;padding:7px 20px;
@@ -149,9 +210,36 @@ header{
 .filter-chip.active{background:var(--navy);border-color:var(--navy);color:#fff;}
 .filter-chip.cat-active{color:#fff;border-color:transparent;}
 .filter-sep{color:var(--border);user-select:none;font-size:18px;}
+/* 검색 인라인 */
+.filter-search-wrap{
+  margin-left:auto;position:relative;min-width:180px;max-width:280px;flex:1;
+}
+.filter-search-wrap input{
+  width:100%;padding:5px 28px 5px 10px;
+  border:1.5px solid var(--border);border-radius:20px;
+  font-size:12px;font-family:inherit;background:#fff;
+  transition:border-color .15s;
+}
+.filter-search-wrap input:focus{outline:none;border-color:var(--navy-l);}
+.filter-search-wrap .search-clear{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--gray-m);
+  font-size:14px;padding:2px;line-height:1;
+}
+
 
 /* ── MONTH TABS ── */
-.month-tabs-wrap{background:#fff;border-bottom:2px solid var(--border);}
+.month-tabs-wrap{
+  background:#fff;border-bottom:2px solid var(--border);
+  position:relative;
+}
+/* ② 탭 스크롤 힌트 그라디언트 */
+.month-tabs-wrap::after{
+  content:'';
+  position:absolute;top:0;right:0;bottom:2px;width:40px;
+  background:linear-gradient(to right,transparent,#fff);
+  pointer-events:none;z-index:1;
+}
 .month-tabs{
   max-width:var(--container);margin:0 auto;padding:0 20px;
   display:flex;overflow-x:auto;scrollbar-width:none;
@@ -163,6 +251,17 @@ header{
 .month-tab .tc{font-size:11px;background:var(--sky-m);color:var(--navy);border-radius:10px;padding:1px 6px;font-weight:700;min-width:20px;text-align:center;}
 .month-tab.active .tc{background:var(--navy);color:#fff;}
 .month-tab .tc.zero{background:var(--gray-l);color:var(--gray-m);}
+/* 전 학년도 2월 탭 */
+.month-tab.prev-year{color:#8e44ad;opacity:.85;}
+.month-tab.prev-year:hover{color:#6c3483;}
+.month-tab.prev-year.active{color:#6c3483;border-bottom-color:#8e44ad;}
+.month-tab.prev-year .tc{background:#f4ecf7;color:#8e44ad;}
+.month-tab.prev-year.active .tc{background:#8e44ad;color:#fff;}
+/* 탭 구분선 */
+.month-tab-divider{
+  display:flex;align-items:center;padding:0 4px;color:#ccc;
+  font-size:18px;cursor:default;user-select:none;
+}
 
 /* ── MAIN ── */
 .main{max-width:var(--container);margin:0 auto;padding:22px 20px 48px;}
@@ -224,19 +323,26 @@ header{
 .detail-toggle:hover{background:var(--sky);border-color:var(--sky-m);color:var(--navy);}
 .detail-toggle.open{background:var(--sky);border-color:var(--sky-m);color:var(--navy);border-style:solid;}
 
-/* ② 카드 체크박스 완료 토글 */
+/* ⑥ 체크박스 크게 */
 .task-check-wrap{
-  flex-shrink:0;margin-top:2px;
+  flex-shrink:0;margin-top:1px;
 }
 .task-checkbox{
-  width:22px;height:22px;border:2px solid var(--border);border-radius:6px;
+  width:28px;height:28px;border:2px solid var(--border);border-radius:7px;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:14px;transition:all .15s;background:#fff;
+  font-size:16px;transition:all .15s;background:#fff;min-width:28px;
 }
 .task-checkbox.checked{background:var(--green);border-color:var(--green);color:#fff;}
 .task-checkbox:hover{border-color:var(--green);background:var(--green-l);}
 
-/* ⑧ cat-stripe 제거 — 태그로 충분 */
+/* ④ 드래그 핸들 */
+.drag-handle{
+  flex-shrink:0;color:#ccc;font-size:16px;cursor:grab;
+  padding:4px 2px;margin-top:2px;line-height:1;
+  transition:color .15s;user-select:none;
+}
+.drag-handle:hover{color:var(--gray-m);}
+.drag-handle:active{cursor:grabbing;}
 .cat-stripe{display:none;}
 
 /* ⑨ 검색 바 */
@@ -269,7 +375,53 @@ header{
 .task-desc a:hover,.task-note a:hover{color:var(--accent);}
 .task-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
 
-/* ── 순서 이동 버튼 ── */
+/* ⑥ 플로팅 업무 추가 버튼 (모바일) */
+.fab{
+  display:none;
+  position:fixed;bottom:24px;right:20px;z-index:250;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  border:none;font-size:26px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+  align-items:center;justify-content:center;
+  transition:transform .15s,box-shadow .15s;
+}
+.fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(0,0,0,.3);}
+@media(max-width:600px){.fab{display:flex;}}
+
+/* ① 예시 업무 배너 */
+.sample-banner{
+  background:#FFF8E8;border:1.5px solid #f5d6b0;border-radius:10px;
+  padding:11px 16px;margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:13px;color:#a04000;
+}
+.sample-banner strong{font-weight:700;}
+.sample-banner-close{
+  background:none;border:none;cursor:pointer;
+  color:#a04000;font-size:16px;padding:2px 6px;border-radius:4px;
+  opacity:.6;transition:opacity .15s;flex-shrink:0;
+}
+.sample-banner-close:hover{opacity:1;}
+
+/* ② 전체검색 결과 패널 */
+.global-search-panel{
+  position:absolute;top:calc(100% + 4px);right:0;left:0;
+  background:#fff;border:1.5px solid var(--border);border-radius:10px;
+  box-shadow:0 8px 32px rgba(27,58,107,.15);
+  max-height:360px;overflow-y:auto;z-index:400;
+}
+.gs-item{
+  padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--gray-l);
+  display:flex;flex-direction:column;gap:3px;
+  transition:background .1s;
+}
+.gs-item:last-child{border-bottom:none;}
+.gs-item:hover{background:var(--sky);}
+.gs-item-title{font-size:13px;font-weight:600;color:var(--gray-d);}
+.gs-item-meta{font-size:11px;color:var(--gray-m);}
+.gs-empty{padding:20px;text-align:center;color:var(--gray-m);font-size:13px;}
+
 .btn-order{
   background:#fff;color:var(--gray-m);
   border:1.5px solid var(--border);
@@ -336,7 +488,33 @@ header{
 .form-label{font-size:12px;font-weight:700;color:var(--gray-d);}
 .form-input,.form-textarea,.form-select{border:1.5px solid var(--border);border-radius:7px;padding:8px 11px;font-family:inherit;font-size:14px;color:var(--gray-d);transition:border-color .15s;background:#fff;width:100%;}
 .form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:var(--navy-l);}
-.form-textarea{resize:vertical;min-height:200px;line-height:1.6;}
+/* ② textarea 자동 높이 — min만 두고 auto-resize JS로 늘어남 */
+.form-textarea{resize:vertical;min-height:80px;line-height:1.6;overflow:hidden;}
+
+/* ③ 완료 카드 배경 구분 */
+.task-card.done-card{background:#f7f8fa;border-color:#e0e4ea;}
+.task-card.done-card:hover{border-color:#c8d0dc;}
+/* ⑤ 완료 카드 — 상세 내용 기본 숨김, 펼치면 표시 */
+.task-card.done-card .task-desc,
+.task-card.done-card .task-note,
+.task-card.done-card .task-meta{display:none;}
+.task-card.done-card.card-expanded .task-desc,
+.task-card.done-card.card-expanded .task-note,
+.task-card.done-card.card-expanded .task-meta{display:flex;}
+.task-card.done-card.card-expanded .task-meta{display:flex;}
+.task-card.done-card .task-title-row .tag,
+.task-card.done-card.card-expanded .task-title-row .tag{display:inline-flex;}
+/* 펼치기 힌트 숨기기 */
+.task-card.done-card.card-expanded .task-title-row span[style*="▶"]{display:none;}
+
+/* ⑦ 저장 상태 표시 */
+.save-indicator{
+  font-size:11px;color:rgba(255,255,255,.5);
+  display:flex;align-items:center;gap:4px;
+  transition:opacity .3s;white-space:nowrap;
+}
+.save-indicator.saved{color:rgba(255,255,255,.6);}
+.save-indicator.saving{color:rgba(255,200,100,.8);}
 .form-row{display:flex;gap:10px;}
 .form-row .form-group{flex:1;}
 .form-check{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;}
@@ -465,96 +643,81 @@ header{
 ══════════════════════════════ -->
 <div id="setupScreen">
   <div class="setup-card">
+
+    <!-- 로고 + 가치 설명 -->
     <div class="setup-logo">
       <span class="emoji">🏫</span>
       <h1>학교 업무 인계인수 관리</h1>
-      <p>처음 한 번만 설정하면 바로 시작할 수 있습니다</p>
+      <p class="tagline">
+        말로 전달하던 업무 내용을 텍스트로 정리하고<br>
+        <strong>파일 하나로 후임자에게 전달</strong>하세요
+      </p>
     </div>
 
-    <!-- 상시 안내 — 접기/펼치기 가능 -->
-    <div style="margin-bottom:16px;">
-      <button onclick="toggleGuide()" id="guideToggleBtn"
-        style="width:100%;background:none;border:none;cursor:pointer;
-               display:flex;align-items:center;justify-content:space-between;
-               padding:8px 12px;border-radius:8px;
-               background:rgba(255,255,255,.12);color:rgba(255,255,255,.9);
-               font-size:12px;font-weight:600;">
-        <span>💡 이 앱은 업무 파일을 올리는 곳이 아닙니다</span>
-        <span id="guideToggleIcon">▼</span>
-      </button>
-      <div id="guideBox" style="display:none;margin-top:6px;background:rgba(255,255,255,.95);
-           border-radius:8px;padding:14px 16px;font-size:12px;color:var(--gray-d);line-height:1.8;">
-        <p style="margin-bottom:8px;">
-          <strong style="color:#c0392b;">❌ 한글·엑셀·사진 파일을 올리는 앱이 아닙니다.</strong><br>
-          파일은 USB·공유폴더로 따로 전달하세요.
-        </p>
-        <p style="margin-bottom:8px;">
-          <strong style="color:var(--navy);">✅ 말로 설명하던 내용을 텍스트로 남기는 업무 설명서입니다.</strong><br>
-          "이 업무는 언제·어떻게·어디서"를 미리 정리해두면<br>
-          후임자가 묻지 않아도 스스로 처리할 수 있습니다.
-        </p>
-        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
-          <span style="background:var(--sky);border-radius:6px;padding:4px 10px;color:var(--navy);font-weight:600;">✏️ 업무 입력</span>
-          <span style="color:var(--gray-m);">→</span>
-          <span style="background:var(--sky);border-radius:6px;padding:4px 10px;color:var(--navy);font-weight:600;">📤 파일 내보내기</span>
-          <span style="color:var(--gray-m);">→</span>
-          <span style="background:var(--sky);border-radius:6px;padding:4px 10px;color:var(--navy);font-weight:600;">📥 후임자가 파일로 시작</span>
-        </div>
+    <!-- 상시 안내 박스 (기본 펼침) -->
+    <div class="guide-box-wrap">
+      <p style="margin-bottom:6px;">
+        <strong style="color:#c0392b;">❌ 한글·엑셀 파일을 올리는 앱이 아닙니다.</strong><br>
+        업무 파일은 지금처럼 USB·공유폴더로 따로 전달하세요.
+      </p>
+      <p><strong style="color:var(--navy);">✅ 업무 방법·절차를 텍스트로 남기는 설명서입니다.</strong></p>
+      <div class="guide-row">
+        <span class="guide-chip">✏️ 업무 입력</span>
+        <span style="color:var(--gray-m);">→</span>
+        <span class="guide-chip">📤 파일 내보내기</span>
+        <span style="color:var(--gray-m);">→</span>
+        <span class="guide-chip">📥 후임자가 파일로 시작</span>
       </div>
     </div>
-    <label class="setup-label">학교 이름</label>
+
+    <!-- 학교 이름 (선택) -->
+    <label class="setup-label">학교 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
     <input class="setup-input" id="setupSchoolInput" placeholder="예: 광주○○초등학교" maxlength="30"
-      onkeydown="if(event.key==='Enter')document.getElementById('setupDeptInput').focus()" style="margin-bottom:16px;">
-    <label class="setup-label">내 부서(직책)를 입력하세요 *</label>
+      onkeydown="if(event.key==='Enter')document.getElementById('setupDeptInput').focus()">
+
+    <!-- 부서명 (필수) -->
+    <label class="setup-label">내 부서·직책 <span style="color:var(--red);">*</span></label>
     <input class="setup-input" id="setupDeptInput" placeholder="예: 교무부장" maxlength="20"
-      onkeydown="if(event.key==='Enter')document.getElementById('setupHandoverDate').focus()">
-    <p class="setup-hint">아래에서 선택하거나 직접 입력하세요</p>
+      onkeydown="if(event.key==='Enter')startApp(true)">
+    <p class="setup-hint">아래 버튼을 클릭하거나 직접 입력하세요</p>
     <div class="setup-presets">
       <div class="preset-chip" onclick="pickPreset('교무부장')">📚 교무부장</div>
       <div class="preset-chip" onclick="pickPreset('연구부장')">🔬 연구부장</div>
       <div class="preset-chip" onclick="pickPreset('생활부장')">🏃 생활부장</div>
       <div class="preset-chip" onclick="pickPreset('체육부장')">⚽ 체육부장</div>
-      <div class="preset-chip" onclick="pickPreset('영양교사')">🍱 영양교사</div>
-      <div class="preset-chip" onclick="pickPreset('사서교사')">📖 사서교사</div>
-      <div class="preset-chip" onclick="pickPreset('행정실장')">💼 행정실장</div>
-      <div class="preset-chip" onclick="pickPreset('보건교사')">🩺 보건교사</div>
+      <div class="preset-chip" onclick="pickPreset('정보부장')">💻 정보부장</div>
+      <div class="preset-chip" onclick="pickPreset('문화예술부장')">🎨 문화예술부장</div>
     </div>
-    <div style="display:flex;gap:10px;margin-bottom:6px;">
-      <div style="flex:1;">
-        <label class="setup-label">인계일</label>
-        <input class="setup-input" id="setupHandoverDate" type="date" style="margin-bottom:0;">
-      </div>
-      <div style="flex:1;">
-        <label class="setup-label">인수자 이름</label>
-        <input class="setup-input" id="setupHandoverTo" placeholder="예: 홍길동" maxlength="20"
-          onkeydown="if(event.key==='Enter')startApp()" style="margin-bottom:0;">
-      </div>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
 
-      <button class="btn btn-primary setup-btn" onclick="startApp(true)">
-        📋 샘플 업무와 함께 시작
-      </button>
-      <button class="btn setup-btn" style="background:var(--gray-l);color:var(--gray-d);font-size:14px;" onclick="startApp(false)">
-        빈 화면으로 시작
-      </button>
-      <p style="font-size:11px;color:var(--gray-m);text-align:center;margin-top:2px;">샘플 업무는 참고용입니다. 언제든 삭제할 수 있습니다.</p>
+    <!-- 숨겨진 인계일·인수자 (설정 화면에서는 제거, 설정 변경 모달에서 입력) -->
+    <input type="hidden" id="setupHandoverDate">
+    <input type="hidden" id="setupHandoverTo">
 
-      <div style="display:flex;align-items:center;gap:8px;margin:4px 0 2px;">
+    <!-- 시작 버튼 -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+      <button class="btn btn-primary setup-btn" onclick="startApp(true)" style="position:relative;background:var(--navy-l);border-color:var(--navy-l);">
+        📋 예시 업무로 채워서 시작
+        <span class="recommend-badge">추천</span>
+      </button>
+      <p style="font-size:11px;color:var(--gray-m);text-align:center;margin:-2px 0 2px;">처음이라면 예시로 시작하세요. 언제든 삭제할 수 있습니다.</p>
+      <button class="btn setup-btn" style="background:#fff;color:var(--navy-l);font-size:14px;border:1.5px solid var(--navy-l);" onclick="startApp(false)">
+        ✏️ 내 업무 직접 입력하기
+      </button>
+
+      <div style="display:flex;align-items:center;gap:8px;margin:6px 0 2px;">
         <div style="flex:1;height:1px;background:var(--border);"></div>
-        <span style="font-size:11px;color:var(--gray-m);">이미 파일이 있으신가요?</span>
+        <span style="font-size:11px;color:var(--gray-m);">전임자 파일 또는 내 백업 파일이 있다면</span>
         <div style="flex:1;height:1px;background:var(--border);"></div>
       </div>
 
-      <!-- 파일로 시작 — 보조 버튼 -->
       <label class="btn setup-btn" id="fileStartBtn"
-        style="background:transparent;color:var(--navy-l);border:1.5px solid var(--navy-l);cursor:pointer;justify-content:center;gap:8px;font-size:13px;">
-        📥 파일로 시작 (이어서 작업 또는 인수)
+        style="background:transparent;color:var(--navy-l);border:1.5px solid var(--navy-l);cursor:pointer;justify-content:center;gap:8px;font-size:13px;text-align:center;">
+        📥 파일로 시작
         <input type="file" accept=".json" onchange="loadSetupFile(event)" style="display:none">
       </label>
 
       <!-- 파일 로드 후 미리보기 -->
-      <div id="filePreview" style="display:none;background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:14px 16px;">
+      <div id="filePreview" style="display:none;background:#f0f7ff;border:1.5px solid #c5d8f0;border-radius:10px;padding:14px 16px;">
         <p id="previewTitle" style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;"></p>
         <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--gray-d);">
           <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학교</span> <strong id="previewSchool">—</strong></div>
@@ -582,29 +745,32 @@ header{
   <header>
     <div class="header-inner">
       <div class="header-left">
-        <span class="header-logo" onclick="goHome()" title="홈으로">
+        <span class="header-logo" onclick="goHome()" title="설정 화면으로">
           🏫 <span>업무 인계인수</span>
+          <span class="logo-hint">⚙️ 설정 화면으로 돌아갑니다</span>
         </span>
-        <div style="display:flex;flex-direction:column;gap:2px;">
-          <div class="dept-name-badge">
-            <span id="hdrDeptName"></span>
-            <span class="edit-icon" onclick="openDeptEditModal()" title="설정 변경">✏️</span>
-          </div>
-          <span id="hdrSchoolName" style="font-size:11px;color:rgba(255,255,255,.55);padding-left:2px;"></span>
+        <div class="dept-name-badge">
+          <span id="hdrDeptName"></span>
+          <span class="edit-icon" onclick="openDeptEditModal()" title="설정 변경">✏️</span>
         </div>
       </div>
       <div class="header-actions">
         <div class="backup-badge" id="backupBadge" onclick="openBackupModal()"></div>
+        <span class="save-indicator" id="saveIndicator">✓ 저장됨</span>
         <button class="btn btn-outline btn-sm" onclick="openPrintModal()">🖨️ 출력</button>
         <button class="btn btn-outline btn-sm" onclick="openExportModal()">📤 내보내기</button>
-        <label class="btn btn-outline btn-sm" style="cursor:pointer">
-          📥 불러오기
-          <input type="file" accept=".json" onchange="importData(event)" style="display:none">
-        </label>
-        <button class="btn btn-sm" onclick="openResetModal()"
-          style="background:rgba(231,76,60,.25);border:1.5px solid rgba(231,76,60,.5);color:#ffaaaa;">
-          🗑 초기화
-        </button>
+        <!-- ① 더보기 메뉴 -->
+        <div class="more-menu-wrap" id="moreMenuWrap">
+          <button class="more-menu-btn" onclick="toggleMoreMenu()" title="더 보기">⋯</button>
+          <div class="more-menu" id="moreMenu">
+            <label class="more-menu-item more-menu-file">
+              📥 불러오기
+              <input type="file" accept=".json" onchange="importData(event);closeMoreMenu()">
+            </label>
+            <div class="more-menu-divider"></div>
+            <button class="more-menu-item danger" onclick="openResetModal();closeMoreMenu()">🗑 초기화</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -622,19 +788,17 @@ header{
       <span class="filter-label">카테고리</span>
       <div id="catFilters" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <span class="filter-sep">|</span>
-      <span class="filter-label">상태</span>
       <button class="filter-chip active" id="fAll"  onclick="setStatusFilter('all')">전체</button>
       <button class="filter-chip" id="fTodo" onclick="setStatusFilter('todo')">미결</button>
       <button class="filter-chip" id="fDone" onclick="setStatusFilter('done')">완료</button>
-      <button class="filter-chip" id="fSens" onclick="setStatusFilter('sensitive')">🔒 개인정보</button>
-    </div>
-  </div>
-
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <input type="text" id="searchInput" placeholder="🔍 업무명, 설명, 메모 검색..."
-        oninput="onSearch()" onkeydown="if(event.key==='Escape'){clearSearch();}">
-      <button class="search-clear" id="searchClearBtn" style="display:none;" onclick="clearSearch()">×</button>
+      <button class="filter-chip" id="fSens" onclick="setStatusFilter('sensitive')">🔒</button>
+      <!-- ③ 검색 인라인 -->
+      <div class="filter-search-wrap" style="position:relative;">
+        <input type="text" id="searchInput" placeholder="🔍 업무 검색 (전체 탭)..."
+          oninput="onSearch()" onkeydown="if(event.key==='Escape')clearSearch()">
+        <button class="search-clear" id="searchClearBtn" style="display:none;" onclick="clearSearch()">×</button>
+        <div class="global-search-panel" id="globalSearchPanel" style="display:none;"></div>
+      </div>
     </div>
   </div>
 
@@ -643,6 +807,11 @@ header{
   </div>
 
   <div class="main">
+    <!-- ① 예시 업무 안내 배너 -->
+    <div class="sample-banner" id="sampleBanner" style="display:none;">
+      <span>💡 <strong>아래는 예시 업무입니다.</strong> 참고 후 삭제하고 내 업무를 직접 입력하세요.</span>
+      <button class="sample-banner-close" onclick="dismissSampleBanner()" title="닫기">×</button>
+    </div>
     <div class="month-header">
       <div class="month-title">
         <span id="curMonthTitle"></span>
@@ -657,6 +826,9 @@ header{
   <div class="app-footer">
     <span>만든이 2026 최창훈</span>
   </div>
+
+  <!-- ⑥ 모바일 플로팅 버튼 -->
+  <button class="fab" onclick="openAddModal()" title="업무 추가">＋</button>
 
 </div><!-- /#appScreen -->
 
@@ -894,39 +1066,41 @@ header{
 
 <!-- ── 내보내기 MODAL ── -->
 <div class="modal-overlay" id="exportModal">
-  <div class="modal" style="max-width:440px;">
+  <div class="modal" style="max-width:420px;">
     <div class="modal-header">
       <span>📤 내보내기</span>
       <button class="modal-close" onclick="closeModal('exportModal')">×</button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">내보내기 방식</label>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <label class="print-option">
-            <input type="radio" name="exportMode" value="backup" checked>
-            <div>
-              <div class="pol">💾 백업용 내보내기</div>
-              <div class="pod">완료 상태를 그대로 저장합니다. 내 데이터 백업 용도.</div>
-            </div>
-          </label>
-          <label class="print-option" style="border-color:#27ae60;">
-            <input type="radio" name="exportMode" value="handover">
-            <div>
-              <div class="pol" style="color:#27ae60;">🤝 인계용 내보내기 (완료 상태 초기화)</div>
-              <div class="pod">업무 내용은 그대로, <strong>이번 학년도 완료 상태만 모두 미처리로 초기화</strong>하여 내보냅니다.<br>후임자가 처음부터 다시 체크할 수 있습니다.</div>
-            </div>
-          </label>
+      <div style="background:#FFF8E8;border:1.5px solid #f5d6b0;border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:24px;flex-shrink:0;">⚠️</span>
+        <div style="font-size:13px;color:var(--gray-d);line-height:1.75;">
+          <strong style="color:#a04000;">이 파일은 직접 열어서 내용을 볼 수 없습니다.</strong><br>
+          후임자가 이 사이트에서 <strong>"파일로 시작"</strong>을 눌러 불러올 때 사용합니다.
         </div>
       </div>
-      <div id="handoverWarning" style="display:none;background:#E8F8F1;border:1.5px solid #a8ddd5;border-radius:8px;padding:10px 14px;font-size:12px;color:#16a085;line-height:1.6;">
-        💡 <strong>내 앱의 완료 상태는 변경되지 않습니다.</strong><br>
-        초기화된 상태는 내보낸 파일에만 적용됩니다.
+      <!-- ⑥ 인계일·인수자 — 내보내기 직전에 입력 -->
+      <div style="background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:13px 16px;">
+        <p style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;">📋 인계 정보 (선택사항)</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">인계일</label>
+            <input class="form-input" type="date" id="exportHandoverDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">인수자 이름</label>
+            <input class="form-input" id="exportHandoverTo" placeholder="예: 홍길동" maxlength="20">
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--gray-m);margin-top:4px;">출력물 상단에 표시됩니다. 비워두면 기존 설정값 사용.</p>
+      </div>
+      <div style="font-size:12px;color:var(--gray-m);">
+        📄 내용을 문서로 보려면 <strong>🖨️ 출력</strong> 버튼을 이용하세요.
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('exportModal')">취소</button>
-      <button class="btn btn-primary" onclick="doExport()">📤 내보내기</button>
+      <button class="btn btn-primary" onclick="doExport()">💾 파일 저장하기</button>
     </div>
   </div>
 </div>
@@ -1006,38 +1180,57 @@ header{
 <div class="modal-overlay" id="printModal">
   <div class="modal" style="max-width:460px;">
     <div class="modal-header">
-      <span>🖨️ 인계서 출력 설정</span>
+      <span>🖨️ 출력</span>
       <button class="modal-close" onclick="closeModal('printModal')">×</button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">출력 범위</label>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="print-option"><input type="radio" name="pRange" value="current" checked><div><div class="pol">현재 월만</div><div class="pod">현재 보고 있는 월만 출력</div></div></label>
-          <label class="print-option"><input type="radio" name="pRange" value="all"><div><div class="pol">전체 (3월~다음해 2월)</div><div class="pod">1년 전체 업무 출력</div></div></label>
+      <!-- 빠른 인쇄 -->
+      <div style="background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:14px 16px;">
+        <p style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">⚡ 빠른 인쇄</p>
+        <p style="font-size:12px;color:var(--gray-m);margin-bottom:12px;">현재 월 · 미결 포함 전체 · 개인정보 표시</p>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary" style="flex:1;" onclick="doPrintQuick('current')">현재 월만</button>
+          <button class="btn btn-primary" style="flex:1;" onclick="doPrintQuick('all')">전체 학년도</button>
         </div>
       </div>
-      <div class="form-group">
-        <label class="form-label">개인정보 처리</label>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="print-option"><input type="radio" name="pPrivacy" value="show" checked><div><div class="pol">그대로 출력</div><div class="pod">내용 전체 출력 (보안 환경에서만)</div></div></label>
-          <label class="print-option"><input type="radio" name="pPrivacy" value="hide"><div><div class="pol">개인정보 내용 가림</div><div class="pod">🔒 항목 설명란을 가리고 출력</div></div></label>
+      <!-- 상세 설정 토글 -->
+      <button type="button" class="detail-toggle" id="printDetailToggle" onclick="togglePrintDetail()">
+        <span id="printDetailLabel">＋ 상세 출력 설정</span>
+      </button>
+      <div id="printDetailFields" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">출력 범위</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label class="print-option"><input type="radio" name="pRange" value="current" checked><div><div class="pol">현재 월만</div></div></label>
+            <label class="print-option"><input type="radio" name="pRange" value="all"><div><div class="pol">전체 (3월~다음해 2월)</div></div></label>
+          </div>
         </div>
-      </div>
-      <label class="form-check"><input type="checkbox" id="pShowAssignee" checked><span>담당자 이름 출력에 포함</span></label>
-      <label class="form-check"><input type="checkbox" id="pShowFileList" checked><span>📁 파일 인계 체크리스트 출력에 포함</span></label>
-      <div class="form-group">
-        <label class="form-label">완료된 업무 처리</label>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <label class="print-option"><input type="radio" name="pDone" value="separate" checked><div><div class="pol">완료·미결 구분하여 출력</div><div class="pod">미결 업무를 위에, 완료 업무를 아래에 분리 표시</div></div></label>
-          <label class="print-option"><input type="radio" name="pDone" value="all"><div><div class="pol">모두 함께 출력</div><div class="pod">등록 순서대로 전체 출력</div></div></label>
-          <label class="print-option"><input type="radio" name="pDone" value="todoOnly"><div><div class="pol">미결만 출력</div><div class="pod">완료된 업무는 제외하고 출력</div></div></label>
+        <div class="form-group">
+          <label class="form-label">개인정보 처리</label>
+          <div style="display:flex;gap:8px;">
+            <label class="print-option" style="flex:1;"><input type="radio" name="pPrivacy" value="show" checked><div><div class="pol">그대로</div></div></label>
+            <label class="print-option" style="flex:1;"><input type="radio" name="pPrivacy" value="hide"><div><div class="pol">🔒 가림</div></div></label>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <label class="form-check"><input type="checkbox" id="pShowAssignee" checked><span>담당자 포함</span></label>
+          <label class="form-check"><input type="checkbox" id="pShowFileList" checked><span>📁 파일 체크리스트</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">완료 업무</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <label class="print-option" style="flex:1;"><input type="radio" name="pDone" value="separate" checked><div><div class="pol">구분 표시</div></div></label>
+            <label class="print-option" style="flex:1;"><input type="radio" name="pDone" value="all"><div><div class="pol">함께</div></div></label>
+            <label class="print-option" style="flex:1;"><input type="radio" name="pDone" value="todoOnly"><div><div class="pol">미결만</div></div></label>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding:0;border:none;margin-top:4px;">
+          <button class="btn btn-primary" onclick="doPrint()">🖨️ 설정대로 인쇄</button>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('printModal')">취소</button>
-      <button class="btn btn-primary" onclick="doPrint()">🖨️ 인쇄하기</button>
+      <button class="btn btn-ghost" onclick="closeModal('printModal')">닫기</button>
     </div>
   </div>
 </div>
@@ -1050,7 +1243,7 @@ header{
 ════════════════════════════════ */
 const MONTHS=[3,4,5,6,7,8,9,10,11,12,1,2];
 const MN={1:'1월',2:'2월',3:'3월',4:'4월',5:'5월',6:'6월',7:'7월',8:'8월',9:'9월',10:'10월',11:'11월',12:'12월'};
-const ML={3:'입학·새학기',4:'4월',5:'어린이날·체험학습',6:'6월',7:'방학준비',8:'개학',9:'9월',10:'10월',11:'11월',12:'학년말준비',1:'1월',2:'졸업·마무리'};
+const ML={3:'입학·새학기',4:'상담·조사',5:'행사·체험',6:'수련·현충',7:'방학준비',8:'개학',9:'화재·상담',10:'축제·기념',11:'수능·공개',12:'졸업·마감',1:'신학기준비',2:'졸업·마무리'};
 const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#8E44AD','#2C3E50','#D35400','#1ABC9C','#3498DB','#95A5A6'];
 
 /* ════════════════════════════════
@@ -1059,6 +1252,76 @@ const CAT_COLORS=['#E74C3C','#E67E22','#F1C40F','#27AE60','#16A085','#2980B9','#
 /* localStorage 접근 실패 대비 (샌드박스·시크릿 모드 등) */
 function _ls(key,fallback=''){try{return localStorage.getItem(key)||fallback;}catch(e){return fallback;}}
 function _lsJson(key,fallback){try{return JSON.parse(localStorage.getItem(key)||'null')||fallback;}catch(e){return fallback;}}
+
+/* ── 더보기 메뉴 ── */
+function toggleMoreMenu(){
+  document.getElementById('moreMenu').classList.toggle('open');
+}
+function closeMoreMenu(){
+  document.getElementById('moreMenu').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('moreMenuWrap');
+  if(wrap&&!wrap.contains(e.target)) closeMoreMenu();
+  const panel=document.getElementById('globalSearchPanel');
+  const searchWrap=document.querySelector('.filter-search-wrap');
+  if(panel&&searchWrap&&!searchWrap.contains(e.target)) panel.style.display='none';
+});
+
+/* ④ ESC 키로 모달 닫기 */
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  const open=document.querySelector('.modal-overlay.open');
+  if(open) open.classList.remove('open');
+});
+
+/* ① 인쇄 상세 토글 */
+function togglePrintDetail(){
+  const el=document.getElementById('printDetailFields');
+  const btn=document.getElementById('printDetailLabel');
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  btn.textContent=open?'－ 상세 출력 설정 접기':'＋ 상세 출력 설정';
+}
+
+/* ① 빠른 인쇄 (기본값으로 즉시 출력) */
+function doPrintQuick(range){
+  // 기본값 세팅
+  document.querySelector(`input[name=pRange][value=${range}]`).checked=true;
+  document.querySelector('input[name=pPrivacy][value=show]').checked=true;
+  document.querySelector('input[name=pDone][value=separate]').checked=true;
+  document.getElementById('pShowAssignee').checked=true;
+  document.getElementById('pShowFileList').checked=true;
+  closeModal('printModal');
+  doPrint();
+}
+
+/* ② textarea 자동 높이 */
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.max(80, el.scrollHeight)+'px';
+}
+function initAutoResize(){
+  const ta=document.getElementById('taskDesc');
+  if(!ta) return;
+  ta.addEventListener('input',()=>autoResize(ta));
+  autoResize(ta);
+}
+
+/* ⑦ 저장 상태 표시 */
+let _saveTimer=null;
+function showSaveIndicator(){
+  const el=document.getElementById('saveIndicator');
+  if(!el) return;
+  el.textContent='저장 중...';
+  el.className='save-indicator saving';
+  clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    el.textContent='✓ 저장됨';
+    el.className='save-indicator saved';
+  },400);
+}
+
 
 /* ── 온보딩 (첫 방문자 1회만) ── */
 function checkOnboarding(){
@@ -1071,13 +1334,6 @@ function checkOnboarding(){
 function closeOnboarding(){
   document.getElementById('onboardingModal').classList.remove('open');
   try{localStorage.setItem('si_onboarded','1');}catch(e){}
-}
-function toggleGuide(){
-  const box=document.getElementById('guideBox');
-  const icon=document.getElementById('guideToggleIcon');
-  const open=box.style.display==='none';
-  box.style.display=open?'block':'none';
-  icon.textContent=open?'▲':'▼';
 }
 
 /* ── 카테고리 프리셋 (S 초기화 전에 선언해야 함) ── */
@@ -1100,7 +1356,13 @@ const PRESET_CATS=[
 ];
 function defaultCats(){ return PRESET_CATS.slice(0,5).map(c=>({...c})); }
 function schoolYear(){ const m=new Date().getMonth(); return m>=2?new Date().getFullYear():new Date().getFullYear()-1; }
-function initMonth(){ const m=new Date().getMonth()+1; return MONTHS.includes(m)?m:3; }
+function initMonth(){
+  // ⑤ 마지막 탭 기억
+  const saved=parseInt(_ls('si_last_month','0'));
+  if(saved&&MONTHS.includes(saved)) return saved;
+  const m=new Date().getMonth()+1;
+  return MONTHS.includes(m)?m:3;
+}
 
 const S={
   schoolName:   _ls('si_school'),
@@ -1114,6 +1376,7 @@ const S={
   userEdited:   _ls('si_user_edited')==='1',  // 직접 업무 추가/수정한 적 있으면 true
   year:         schoolYear(),
   curMonth:     initMonth(),
+  curYear:      schoolYear(),  // 탭 선택 시 실제 연도 (전 학년도 2월은 year-1)
   filter:       {status:'all',cat:''},
   searchQuery:  '',
   editingIdx:   null,
@@ -1122,7 +1385,7 @@ const S={
   newCatColor:  CAT_COLORS[3],
 };
 
-function saveTasks(){try{localStorage.setItem('si_tasks',JSON.stringify(S.tasks));}catch(e){}}
+function saveTasks(){try{localStorage.setItem('si_tasks',JSON.stringify(S.tasks));showSaveIndicator();}catch(e){}}
 function saveDoneByYear(){try{localStorage.setItem('si_done_by_year',JSON.stringify(S.doneByYear));}catch(e){}}
 function saveCats() {try{localStorage.setItem('si_cats', JSON.stringify(S.cats));}catch(e){}}
 function saveDept() {try{localStorage.setItem('si_dept', S.deptName);}catch(e){}}
@@ -1133,6 +1396,10 @@ function saveHandover(){
 }
 function saveBackupDate(iso){S.lastBackup=iso;try{localStorage.setItem('si_lastBackup',iso);}catch(e){}}
 function saveUserEdited(){S.userEdited=true;try{localStorage.setItem('si_user_edited','1');}catch(e){}}
+function dismissSampleBanner(){
+  document.getElementById('sampleBanner').style.display='none';
+  S.userEdited=true; saveUserEdited();
+}
 
 /* ── 전체 초기화 ── */
 function openResetModal(){
@@ -1144,7 +1411,8 @@ function openResetModal(){
 function doReset(){
   // localStorage 전체 삭제
   const keys=['si_school','si_dept','si_handover_date','si_handover_to',
-               'si_tasks','si_done_by_year','si_cats','si_lastBackup','si_user_edited','si_onboarded'];
+               'si_tasks','si_done_by_year','si_cats','si_lastBackup',
+               'si_user_edited','si_onboarded','si_last_month'];
   keys.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
   // 페이지 새로고침 → 처음 실행 화면으로
   location.reload();
@@ -1444,6 +1712,7 @@ function startFromFile(){
   saveHandover();
 
   _setupFileData=null;
+  try{localStorage.setItem('si_onboarded','1');}catch(e){}  // ③ 파일로 시작 시 온보딩 스킵
   launchApp(true);
   showToast(isContinue?'이어서 작업합니다.':'인수가 완료되었습니다. 환영합니다!','green');
 }
@@ -1451,31 +1720,23 @@ function startFromFile(){
 function startApp(withSample=false){
   const name=document.getElementById('setupDeptInput').value.trim();
   if(!name){showToast('부서명을 입력하세요.');return;}
-
-  // 이미 데이터가 있는 상태에서 다시 시작하는 경우 → 경고
   const hasData=Object.keys(S.tasks).length>0;
   if(hasData){
-    const msg=withSample
-      ? '기존 업무 데이터를 모두 지우고 샘플 업무로 다시 시작하시겠습니까?'
-      : '기존 업무 데이터를 모두 지우고 빈 화면으로 다시 시작하시겠습니까?';
+    const msg=withSample?'기존 업무 데이터를 모두 지우고 샘플 업무로 다시 시작하시겠습니까?':'기존 업무 데이터를 모두 지우고 빈 화면으로 다시 시작하시겠습니까?';
     if(!confirm(msg+'\n\n※ 삭제된 데이터는 복구할 수 없습니다.')) return;
-    // 업무 데이터만 초기화 (설정은 유지)
-    S.tasks={};
-    saveTasks();
+    S.tasks={}; saveTasks();
   }
-
   S.deptName=name; saveDept();
   S.schoolName=document.getElementById('setupSchoolInput').value.trim(); saveSchool();
-  S.handoverDate=document.getElementById('setupHandoverDate').value;
-  S.handoverTo=document.getElementById('setupHandoverTo').value.trim();
-  saveHandover();
+  // 인계일·인수자는 설정 변경 모달(✏️)에서 입력
   S._loadSample=withSample;
   launchApp(true);
 }
 function launchApp(push=true){
+  S.curYear=S.year;
   document.getElementById('hdrDeptName').textContent=S.deptName;
-  const schoolEl=document.getElementById('hdrSchoolName');
-  schoolEl.textContent=S.schoolName||'';
+  // ① 브라우저 탭 제목에 부서명 포함
+  document.title=`${S.deptName} · 업무 인계인수${S.schoolName?' · '+S.schoolName:''}`;
   loadSampleIfEmpty();
   render();
   showApp(push);
@@ -1489,9 +1750,6 @@ function goHome(){
   showSetup(true);
   document.getElementById('setupSchoolInput').value=S.schoolName;
   document.getElementById('setupDeptInput').value=S.deptName;
-  document.getElementById('setupHandoverDate').value=S.handoverDate||'';
-  document.getElementById('setupHandoverTo').value=S.handoverTo||'';
-  // 파일 미리보기 초기화
   document.getElementById('filePreview').style.display='none';
   _setupFileData=null;
 }
@@ -1516,7 +1774,7 @@ function saveDeptName(){
   S.handoverTo=document.getElementById('deptEditHandoverTo').value.trim();
   saveHandover();
   document.getElementById('hdrDeptName').textContent=name;
-  document.getElementById('hdrSchoolName').textContent=S.schoolName||'';
+  document.title=`${name} · 업무 인계인수${S.schoolName?' · '+S.schoolName:''}`;
   closeModal('deptEditModal');
   showToast('설정이 저장되었습니다.','green');
 }
@@ -1537,18 +1795,47 @@ function renderTabs(){
   const el=document.getElementById('monthTabs');
   el.innerHTML='';
   const isFiltered=S.filter.status!=='all'||S.filter.cat!=='';
+
+  // ── 전 학년도 2월 탭 (준비 업무)
+  const prevYear=S.year-1;
+  const prevAllT=getMonthTasks(prevYear,2);
+  const prevCnt=prevAllT.length;
+  const prevFiltCnt=filteredTasksFor(prevAllT,prevYear,2).length;
+  const isPrevActive=S.curMonth===2&&S.curYear===prevYear;
+  const prevDiv=document.createElement('div');
+  prevDiv.className='month-tab prev-year'+(isPrevActive?' active':'');
+  prevDiv.title=`${prevYear}학년도 2월 — 새 학년도 준비 업무`;
+  prevDiv.innerHTML=`<span style="font-size:11px;">${prevYear-1}년 2월</span>
+    <span style="font-size:9px;color:inherit;opacity:.7;">전학년도</span>
+    <span class="tc${prevCnt===0?' zero':''}">
+      ${isFiltered&&prevCnt>0?`${prevFiltCnt}/${prevCnt}`:prevCnt}
+    </span>`;
+  prevDiv.onclick=()=>{ S.curMonth=2; S.curYear=prevYear; try{localStorage.setItem('si_last_month','2');}catch(e){} render(); };
+  el.appendChild(prevDiv);
+
+  // ── 구분선
+  const divider=document.createElement('div');
+  divider.className='month-tab-divider';
+  divider.innerHTML='┃';
+  divider.title='← 전 학년도  /  현 학년도 →';
+  el.appendChild(divider);
+
+  // ── 현 학년도 탭 (3월~2월)
   MONTHS.forEach(m=>{
     const allT=getMonthTasks(S.year,m);
     const cnt=allT.length;
-    const filtCnt=filteredTasks(allT).length;
+    const filtCnt=filteredTasksFor(allT,S.year,m).length;
     const showFilter=isFiltered&&cnt>0;
+    const isActive=S.curMonth===m&&S.curYear===S.year;
     const div=document.createElement('div');
-    div.className='month-tab'+(m===S.curMonth?' active':'');
+    div.className='month-tab'+(isActive?' active':'');
     div.innerHTML=`<span>${MN[m]}</span>
-      <span class="tc${cnt===0?' zero':''}">
+      <span class="tc${cnt===0?' zero':cnt>=5?' hot':''}"
+        style="${cnt>=5?'background:var(--accent);color:#fff;':''}"
+        title="${cnt}개 업무">
         ${showFilter?`<span style="color:${filtCnt<cnt?'var(--accent)':'inherit'}">${filtCnt}</span><span style="color:rgba(255,255,255,.5);font-weight:400">/${cnt}</span>`:cnt}
       </span>`;
-    div.onclick=()=>{S.curMonth=m;render();};
+    div.onclick=()=>{ S.curMonth=m; S.curYear=S.year; try{localStorage.setItem('si_last_month',m);}catch(e){} render(); };
     el.appendChild(div);
   });
 }
@@ -1566,31 +1853,37 @@ function renderCatFilters(){
   html+=`<button class="filter-chip" style="border-style:dashed;" onclick="openCatModal()">⚙ 관리</button>`;
   el.innerHTML=html;
 }
-function filteredTasks(tasks){
-  const mKey=getKey(S.year,S.curMonth);
-  const allT=getMonthTasks(S.year,S.curMonth);
+function filteredTasksFor(tasks, year, month){
+  const mKey=getKey(year,month);
+  const allT=getMonthTasks(year,month);
   const q=S.searchQuery.toLowerCase();
   return tasks.filter(t=>{
     const ri=allT.indexOf(t);
-    const origKey=t._spanRef?getKey(S.year,t._spanStart):mKey;
+    const origKey=t._spanRef?getKey(year,t._spanStart):mKey;
     const origIdx=t._spanRef
-      ? getDirectTasks(S.year,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth)
+      ? getDirectTasks(year,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth)
       : ri;
-    const done=isDone(S.year,origKey,origIdx);
+    const done=isDone(year,origKey,origIdx);
     const s=S.filter.status;
     const sok=s==='all'||(s==='done'?done:s==='todo'?!done:s==='sensitive'?t.sensitive:true);
     const cok=S.filter.cat===''||t.category===S.filter.cat;
-    // 검색 필터
     const sqok=!q||[t.name,t.desc,t.note,t.assignee,t.fileLocation,t.system]
       .some(f=>f&&f.toLowerCase().includes(q));
     return sok&&cok&&sqok;
   });
 }
+function filteredTasks(tasks){
+  return filteredTasksFor(tasks, S.curYear, S.curMonth);
+}
 function renderTaskList(){
   const m=S.curMonth;
-  document.getElementById('curMonthTitle').textContent=MN[m];
-  document.getElementById('curMonthBadge').textContent=ML[m]||'';
-  const allT=getMonthTasks(S.year,m);
+  const y=S.curYear;
+  const isPrevYear=y===S.year-1;
+  document.getElementById('curMonthTitle').textContent=
+    isPrevYear?`${y-1}년 2월`:MN[m];
+  document.getElementById('curMonthBadge').textContent=
+    isPrevYear?'전 학년도 준비':(ML[m]||'');
+  const allT=getMonthTasks(y,m);
   const tasks=filteredTasks(allT);
   const el=document.getElementById('taskList');
 
@@ -1601,9 +1894,9 @@ function renderTaskList(){
     const totalDirect=allT.filter(t=>!t._spanRef).length;
     const doneCnt=allT.filter(t=>{
       const ri=allT.indexOf(t);
-      const oKey=t._spanRef?getKey(S.year,t._spanStart):mKey;
-      const oIdx=t._spanRef?getDirectTasks(S.year,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth):ri;
-      return isDone(S.year,oKey,oIdx);
+      const oKey=t._spanRef?getKey(y,t._spanStart):mKey;
+      const oIdx=t._spanRef?getDirectTasks(y,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth):ri;
+      return isDone(y,oKey,oIdx);
     }).length;
     const pct=allT.length?Math.round(doneCnt/allT.length*100):0;
     summaryEl.innerHTML=`<span style="color:var(--green);font-weight:700;">✅ ${doneCnt}</span>
@@ -1616,6 +1909,10 @@ function renderTaskList(){
     el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>이 달에 등록된 업무가 없습니다.<br><strong>+ 업무 추가</strong>로 등록하세요.</p></div>`;
     return;
   }
+
+  // ① 예시 업무 안내 배너 — userEdited=false이면 표시
+  const bannerEl=document.getElementById('sampleBanner');
+  if(bannerEl) bannerEl.style.display=S.userEdited?'none':'flex';
   if(!tasks.length){
     el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><p>검색 결과가 없습니다.</p></div>`;
     return;
@@ -1623,18 +1920,18 @@ function renderTaskList(){
   const q=S.searchQuery;
   el.innerHTML=tasks.map(t=>{
     const ri=allT.indexOf(t);
-    const mKey=getKey(S.year,S.curMonth);
-    const origKey=t._spanRef?getKey(S.year,t._spanStart):mKey;
+    const mKey=getKey(y,S.curMonth);
+    const origKey=t._spanRef?getKey(y,t._spanStart):mKey;
     const origIdx=t._spanRef
-      ? getDirectTasks(S.year,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth)
+      ? getDirectTasks(y,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth)
       : ri;
-    const done=isDone(S.year, origKey, origIdx);
+    const done=isDone(y, origKey, origIdx);
     const cat=t.category?getCat(t.category):null;
     const cc=cat?cat.color:'transparent';
     const prioMap={high:{label:'⭐상',color:'#e74c3c',bg:'#fdecea'},mid:{label:'⭐중',color:'#e67e22',bg:'#fef3e8'},low:{label:'⭐하',color:'#7f8c8d',bg:'#f4f4f4'}};
     const prio=prioMap[t.priority||'mid'];
-    const displayNum=tasks.indexOf(t)+1;
-    return `<div class="task-card${t.sensitive?' sensitive':''}${done?'':' todo'}${t.pending?' pending':''}"
+    const displayNum=allT.indexOf(t)+1;  // ③ 필터 무관 전체 순서 고정
+    return `<div class="task-card${t.sensitive?' sensitive':''}${done?' done-card':' todo'}${t.pending?' pending':''}"
       draggable="true" data-idx="${ri}"
       ondragstart="onDragStart(event,${ri})"
       ondragover="onDragOver(event)"
@@ -1643,22 +1940,25 @@ function renderTaskList(){
       ondragend="onDragEnd(event)">
       <div class="task-num">${displayNum}</div>
       <div class="task-top">
-        <!-- ② 큰 체크박스 완료 토글 -->
+        <!-- ④ 드래그 핸들 -->
+        <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
+        <!-- ⑥ 큰 체크박스 완료 토글 -->
         <div class="task-check-wrap">
           <div class="task-checkbox${done?' checked':''}" onclick="toggleDoneByYear('${origKey}',${origIdx})" title="${done?'미처리로 되돌리기':'완료 처리'}">
             ${done?'✓':''}
           </div>
         </div>
         <div class="task-info">
-          <div class="task-title-row" style="${done?'opacity:.55;':''}">
+          <div class="task-title-row" style="${done?'opacity:.55;':''}" ${done?`onclick="this.closest('.task-card').classList.toggle('card-expanded')" style="cursor:pointer;"`:''}>
             <span class="task-title" style="${done?'text-decoration:line-through;color:var(--gray-m);':''}">${highlightText(t.name,q)}</span>
-            <span class="tag" style="background:${prio.bg};color:${prio.color};font-size:11px;">${prio.label}</span>
+            ${done?'<span style="font-size:10px;color:var(--gray-m);margin-left:4px;">▶ 펼치기</span>':''}
+            ${(t.priority||'mid')==='high'?`<span class="tag" style="background:#fdecea;color:#e74c3c;font-size:11px;">⭐ 상</span>`:''}
             ${t.pending?'<span class="tag" style="background:#f4ecf7;color:#8e44ad;font-weight:600;">🚨 미결</span>':''}
             ${isSpan(t)?`<span class="tag tag-span">📅 ${MN[t.startMonth]}~${MN[t.endMonth]}</span>`:''}
-            ${t._spanRef?'<span class="tag" style="background:#EAF4FB;color:#1a6b9a;font-size:10px;">↗ 연속업무</span>':''}
-            ${cat?`<span class="tag" style="background:${cc}22;color:${cc}">${esc(cat.name)}</span>`:''}
-            ${t.sensitive?'<span class="tag tag-sensitive">🔒 개인정보</span>':''}
-            ${t.repeat?'<span class="tag tag-repeat">🔁 반복</span>':''}
+            ${t._spanRef?'<span class="tag" style="background:#EAF4FB;color:#1a6b9a;font-size:10px;">↗ 연속</span>':''}
+            ${cat?`<span class="tag" style="background:${cc}44;color:${cc};border:1px solid ${cc}66;">${esc(cat.name)}</span>`:''}
+            ${t.sensitive?'<span class="tag tag-sensitive">🔒</span>':''}
+            ${t.repeat?'<span class="tag tag-repeat">🔁</span>':''}
           </div>
           <div class="task-meta">
             ${t.deadline?`<span class="task-meta-item deadline">📅 ${esc(t.deadline)}</span>`:''}
@@ -1674,7 +1974,7 @@ function renderTaskList(){
       </div>
       <div class="task-actions">
         <button class="btn btn-ghost btn-sm" onclick="openEditModal(${ri})">✏️ 수정</button>
-        <button class="btn btn-copy btn-sm" onclick="openCopyModal(${ri})">📋 복사</button>
+        <button class="btn btn-copy btn-sm" onclick="openCopyModal(${ri})">📋 다른 월로 복사</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete(this,${ri})">🗑 삭제</button>
       </div>
       <div class="delete-confirm">
@@ -1689,7 +1989,7 @@ function renderTaskList(){
 /* ════════════════════════════════
    YEAR / FILTER
 ════════════════════════════════ */
-function changeYear(d){S.year+=d;render();}
+function changeYear(d){S.year+=d;S.curMonth=3;S.curYear=S.year;render();}
 function setStatusFilter(v){
   S.filter.status=v;
   ['fAll','fTodo','fDone','fSens'].forEach(id=>document.getElementById(id).classList.remove('active'));
@@ -1731,12 +2031,61 @@ function toggleDetailFields(forceOpen){
 function onSearch(){
   S.searchQuery=document.getElementById('searchInput').value.trim();
   document.getElementById('searchClearBtn').style.display=S.searchQuery?'block':'none';
-  renderTabs();renderTaskList();
+
+  // ② 전체 탭 검색 패널
+  const panel=document.getElementById('globalSearchPanel');
+  if(!S.searchQuery){ panel.style.display='none'; renderTabs(); renderTaskList(); return; }
+
+  const q=S.searchQuery.toLowerCase();
+  const results=[];
+  const allMonths=[{y:S.year-1,m:2},...MONTHS.map(m=>({y:S.year,m}))];
+  allMonths.forEach(({y,m})=>{
+    getMonthTasks(y,m).filter(t=>!t._spanRef).forEach(t=>{
+      if([t.name,t.desc,t.note,t.assignee,t.fileLocation,t.system]
+        .some(f=>f&&f.toLowerCase().includes(q))){
+        results.push({t,y,m});
+      }
+    });
+  });
+
+  if(!results.length){
+    panel.innerHTML=`<div class="gs-empty">검색 결과가 없습니다.</div>`;
+  } else {
+    panel.innerHTML=results.slice(0,20).map(({t,y,m})=>{
+      const monthLabel=y===S.year-1?`${y-1}년 2월(준비)`:MN[m];
+      const snippet=[t.desc,t.note].filter(Boolean).map(s=>s.slice(0,40)).join(' · ');
+      return `<div class="gs-item" onclick="goToTask(${y},${m},'${esc(t.name)}')">
+        <div class="gs-item-title">${highlightText(t.name,S.searchQuery)}</div>
+        <div class="gs-item-meta">${monthLabel}${snippet?' · '+esc(snippet.slice(0,50)):''}</div>
+      </div>`;
+    }).join('');
+  }
+  panel.style.display='block';
+  renderTabs(); renderTaskList();
+}
+function goToTask(y,m,name){
+  S.curYear=y; S.curMonth=m;
+  try{localStorage.setItem('si_last_month',m);}catch(e){}
+  document.getElementById('globalSearchPanel').style.display='none';
+  render();
+  // 해당 카드로 스크롤
+  setTimeout(()=>{
+    const cards=document.querySelectorAll('.task-card');
+    for(const c of cards){
+      if(c.querySelector('.task-title')?.textContent.includes(name)){
+        c.scrollIntoView({behavior:'smooth',block:'center'});
+        c.style.outline='2px solid var(--accent)';
+        setTimeout(()=>c.style.outline='',1500);
+        break;
+      }
+    }
+  },100);
 }
 function clearSearch(){
   document.getElementById('searchInput').value='';
   S.searchQuery='';
   document.getElementById('searchClearBtn').style.display='none';
+  document.getElementById('globalSearchPanel').style.display='none';
   renderTabs();renderTaskList();
 }
 function highlightText(text,q){
@@ -1760,10 +2109,10 @@ function openAddModal(){
   document.querySelector('input[name=taskPriority][value=mid]').checked=true;
   document.getElementById('taskContactList').innerHTML='';
   toggleDetailFields(false);  // 추가 시 상세 접기
-  populateMonthSels(S.curMonth, '');
+  populateMonthSels(S.curMonth, '');  // 전 학년도 2월일 때도 그대로 사용
   populateCatSel('');
   document.getElementById('taskModal').classList.add('open');
-  setTimeout(()=>document.getElementById('taskName').focus(),80);
+  setTimeout(()=>{document.getElementById('taskName').focus();initAutoResize();},80);
 }
 function openEditModal(idx){
   const allT = getMonthTasks(S.year, S.curMonth);
@@ -1811,8 +2160,8 @@ function openEditModalDirect(idx){
   populateMonthSels(t.startMonth||S.curMonth, t.endMonth||'');
   populateCatSel(t.category||'');
   document.getElementById('taskModal').classList.add('open');
+  setTimeout(()=>initAutoResize(),80);
 }
-/* ── 연락처 행 관리 ── */
 function addContactRow(c={}){
   const row=document.createElement('div');
   row.className='contact-row';
@@ -1865,16 +2214,16 @@ function saveTask(){
     done:!document.getElementById('taskPending').checked,  // 미결이면 미완료, 아니면 완료
   };
 
-  // 항상 startMonth 기준으로 저장
-  let tasks=getDirectTasks(S.year,startMonth);
+  // 항상 startMonth 기준으로 저장 (전 학년도 2월이면 curYear=year-1)
+  const saveYear=S.curYear;
+  let tasks=getDirectTasks(saveYear,startMonth);
   if(S.editingIdx!==null){
-    // 기존 업무가 다른 월에 있던 경우 → 그 월에서 삭제 후 새 월에 추가
-    const oldTask = getDirectTasks(S.year,S.curMonth)[S.editingIdx];
+    const oldTask = getDirectTasks(saveYear,S.curMonth)[S.editingIdx];
     const oldStart = oldTask?.startMonth||S.curMonth;
     if(oldStart !== startMonth){
-      const oldTasks=getDirectTasks(S.year,oldStart);
+      const oldTasks=getDirectTasks(saveYear,oldStart);
       oldTasks.splice(S.editingIdx,1);
-      setMonthTasks(S.year,oldStart,oldTasks);
+      setMonthTasks(saveYear,oldStart,oldTasks);
       tasks.push(task);
     } else {
       tasks[S.editingIdx]=task;
@@ -1882,11 +2231,13 @@ function saveTask(){
     showToast('수정되었습니다.','green');
   } else {
     tasks.push(task);
-    showToast('업무가 추가되었습니다.','green');
+    const movedMonth=startMonth!==S.curMonth;
+    showToast(movedMonth?`${MN[startMonth]} 탭에 업무가 추가되었습니다.`:'업무가 추가되었습니다.','green');
   }
-  setMonthTasks(S.year,startMonth,tasks);
-  saveUserEdited();  // 직접 저장한 적 있음을 기록
+  setMonthTasks(saveYear,startMonth,tasks);
+  saveUserEdited();
   S.curMonth=startMonth;
+  S.curYear=saveYear;
   // 수정 시 스크롤 위치 보존
   const scrollY=window.scrollY;
   closeModal('taskModal');
@@ -1996,6 +2347,10 @@ function openCopyModal(idx){
   const ys=document.getElementById('copyYear');ys.innerHTML='';
   for(let y=S.year-1;y<=S.year+2;y++)
     ys.innerHTML+=`<option value="${y}"${y===S.year?' selected':''}>${y}학년도 (${y}.3 ~ ${y+1}.2)</option>`;
+  // ④ 다음 달 기본 선택
+  const curIdx=MONTHS.indexOf(S.curMonth);
+  const nextM=MONTHS[(curIdx+1)%MONTHS.length];
+  if(nextM!==S.curMonth) S.copyMonths.add(nextM);
   renderCopyGrid();document.getElementById('copyModal').classList.add('open');
 }
 function renderCopyGrid(){
@@ -2119,51 +2474,36 @@ function deleteCat(i){
    IMPORT / EXPORT
 ════════════════════════════════ */
 function openExportModal(){
-  document.querySelector('input[name=exportMode][value=backup]').checked=true;
-  document.getElementById('handoverWarning').style.display='none';
+  // ⑥ 기존 설정값을 기본값으로 채우기
+  document.getElementById('exportHandoverDate').value=S.handoverDate||'';
+  document.getElementById('exportHandoverTo').value=S.handoverTo||'';
   document.getElementById('exportModal').classList.add('open');
-  // 모드 변경 시 안내 표시
-  document.querySelectorAll('input[name=exportMode]').forEach(r=>{
-    r.onchange=()=>{
-      document.getElementById('handoverWarning').style.display=
-        r.value==='handover'?'block':'none';
-    };
-  });
 }
 function doExport(){
-  const mode=document.querySelector('input[name=exportMode]:checked').value;
+  // ⑥ 내보내기 직전 인계일·인수자 임시 반영
+  const hDate=document.getElementById('exportHandoverDate').value;
+  const hTo=document.getElementById('exportHandoverTo').value.trim();
+  if(hDate){ S.handoverDate=hDate; saveHandover(); }
+  if(hTo){ S.handoverTo=hTo; saveHandover(); }
   closeModal('exportModal');
-  exportData(mode==='handover');
+  exportData();
 }
-function exportData(resetDone=false){
+function exportData(){
   const now=new Date().toISOString();
-  // 인계용: 이번 학년도 완료 상태를 초기화한 doneByYear 복사본 생성
-  let doneByYear=S.doneByYear;
-  if(resetDone){
-    doneByYear={};
-    Object.entries(S.doneByYear).forEach(([k,v])=>{
-      const cleaned={...v};
-      delete cleaned[S.year];
-      if(Object.keys(cleaned).length>0) doneByYear[k]=cleaned;
-    });
-  }
   const blob=new Blob([JSON.stringify({
     version:6, exportedAt:now,
     school:S.schoolName, dept:S.deptName,
     year:S.year, tasks:S.tasks, cats:S.cats,
-    doneByYear,
+    doneByYear:S.doneByYear,
   },null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
   const prefix=S.schoolName?`${S.schoolName}_`:'';
-  const suffix=resetDone?'_인계용':'';
-  a.download=`인계인수_${prefix}${S.deptName}_${S.year}학년도${suffix}.json`;
+  a.download=`인계인수_${prefix}${S.deptName}_${S.year}학년도.json`;
   a.click();
   saveBackupDate(now);
   updateBackupBadge();
-  const msg=resetDone
-    ? '인계용 파일로 내보냈습니다. (완료 상태 초기화됨)'
-    : '내보내기 완료! 파일을 안전한 곳에 보관하세요.';
-  showToast(msg,'green');
+  showToast('파일이 저장되었습니다. 후임자에게 전달하거나 안전한 곳에 보관하세요.','green');
 }
 function importData(e){
   const file=e.target.files[0];if(!file)return;
@@ -2416,22 +2756,188 @@ function showToast(msg,type=''){
 ════════════════════════════════ */
 function loadSampleIfEmpty(){
   if(Object.keys(S.tasks).length>0)return;
-  if(!S._loadSample)return;   // 사용자가 "빈 화면으로 시작" 선택 시 건너뜀
+  if(!S._loadSample)return;
+  const y=S.year;
   const samples={
     3:[
-      {name:'신입생 학적 등록',deadline:'3월 첫째 주',assignee:'교무부장',category:'c2',desc:'입학생 기본정보 나이스 등록\n- 학생 이름, 생년월일, 주소 입력\n- 학부모 연락처 등록',note:'교감선생님 확인 필요',sensitive:true,repeat:true,done:false},
-      {name:'학급 편성 및 담임 배정 공문',deadline:'3월 2일',assignee:'교무부장',category:'c1',desc:'학급 편성 결과를 교육청에 공문으로 제출\n공문 시스템(에듀파인) 사용',note:'전년도 양식 참고',sensitive:false,repeat:true,done:false},
-      {name:'학교운영위원회 위원 선출 공고',deadline:'3월 중',assignee:'행정실장',category:'c1',desc:'운영위원회 학부모위원 및 지역위원 선출 공고\n학교 홈페이지 및 가정통신문 배부',note:'',sensitive:false,repeat:true,done:false},
+      {name:'입학식 및 시업식 준비',startMonth:3,endMonth:null,deadline:'3월 2일',assignee:'교무부장',category:'c3',
+       desc:'1학년 입학식, 2~6학년 시업식 준비\n1. 식순 작성 및 사회자 지정\n2. 입학 통지서 및 학용품 준비\n3. 학부모 안내 가정통신문 발송\n4. 강당(또는 운동장) 배치 확인',
+       note:'교장·교감 결재 필수. 전년도 식순 파일 참고',fileLocation:'공유폴더/교무부/행사/입학식',
+       priority:'high',repeat:true,done:false,pending:false,contacts:[{name:'행정실 담당',tel:'958-5702'}]},
+      {name:'학급 편성 및 담임 배정 공문',startMonth:3,endMonth:null,deadline:'3월 초',assignee:'교무부장',category:'c1',
+       desc:'학급 편성 결과를 교육청에 공문으로 제출\n1. 에듀파인 접속 → 공문 → 새 공문 작성\n2. 학급 수·학생 수 기재\n3. 교장 결재 후 발송',
+       note:'전년도 공문 양식 참고',fileLocation:'에듀파인 공문 시스템',
+       priority:'high',repeat:true,done:false,pending:false},
+      {name:'신입생 학적 등록 (나이스)',startMonth:3,endMonth:null,deadline:'3월 첫째 주',assignee:'교무부장',category:'c2',
+       desc:'입학생 기본정보 나이스 등록\n1. 나이스 접속 → 학적 → 신입생 등록\n2. 이름·생년월일·주소·학부모 연락처 입력\n3. 입력 완료 후 교감 확인',
+       note:'개인정보 포함. 출력물 보안 유의',fileLocation:'나이스 → 학적관리',
+       system:'나이스(NEIS) → 학적 → 학생 등록',
+       priority:'high',sensitive:true,repeat:true,done:false,pending:false},
+      {name:'진단평가 실시 및 결과 처리',startMonth:3,endMonth:null,deadline:'3월 말',assignee:'교무부장',category:'c8',
+       desc:'2~6학년 진단활동 실시 및 결과 취합\n1. 교육청 진단평가 계획 공문 확인\n2. 학급별 실시 일정 안내\n3. 결과 취합 후 교육청 보고',
+       note:'기초학력 대상 학생 별도 관리',priority:'mid',repeat:true,done:false,pending:false},
+      {name:'인성·생명존중·친구사랑주간 운영',startMonth:3,endMonth:null,deadline:'3월 27~31일',assignee:'생활부장',category:'c4',
+       desc:'주간 운영 계획 수립 및 가정통신문 발송\n1. 학급별 활동 계획 안내\n2. 복도 게시물 부착\n3. 결과 보고서 작성',
+       priority:'mid',repeat:true,done:false,pending:false},
     ],
-    4:[{name:'학교폭력 실태조사',deadline:'4월 중',assignee:'생활부장',category:'c4',desc:'온라인 학교폭력 실태조사 실시\n- 학생 대상 설문 링크 배포\n- 학급별 참여율 관리 및 독려',note:'교육청 지침 공문 확인',sensitive:true,repeat:true,done:false}],
-    5:[{name:'봄 현장체험학습 계획 및 공문',deadline:'5월 초',assignee:'교무부장',category:'c3',desc:'봄 현장체험학습 계획 수립\n- 장소, 이동수단, 안전계획 포함\n- 교장 결재 후 교육청 보고',note:'차량 계약 3월부터 시작',sensitive:false,repeat:true,done:false}],
-    7:[{name:'1학기 학교생활기록부 마감',deadline:'7월 말',assignee:'교무부장',category:'c2',desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n- 담임교사별 입력 현황 점검\n- 누락 항목 확인 후 교장 최종 결재',note:'관리자 계정 필요',sensitive:true,repeat:true,done:false}],
+    4:[
+      {name:'학부모 상담주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 3~14일',assignee:'교무부장',category:'c8',
+       desc:'학부모 상담주간 운영\n1. 가정통신문 발송 (상담 신청서 포함)\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고',
+       note:'상담 내용 개인정보 관리 유의',priority:'mid',sensitive:true,repeat:true,done:false,pending:false},
+      {name:'장애인식개선교육주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 10~14일',assignee:'연구부장',category:'c4',
+       desc:'장애인식개선교육 실시\n1. 교육청 지침 공문 확인\n2. 학급별 수업 자료 배부\n3. 실적 보고서 제출',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'학교폭력 실태조사',startMonth:4,endMonth:null,deadline:'4월 중',assignee:'생활부장',category:'c4',
+       desc:'온라인 학교폭력 실태조사 실시\n1. 교육청 안내 공문 확인\n2. 학생 대상 설문 링크 학급 배포\n3. 학급별 참여율 독려 및 결과 보고',
+       note:'교육청 지침 공문 확인 필수',sensitive:true,repeat:true,done:false,pending:false,
+       system:'학교폭력 실태조사 온라인 시스템',priority:'high'},
+      {name:'1학년 체험학습',startMonth:4,endMonth:null,deadline:'4월 25일',assignee:'교무부장',category:'c3',
+       desc:'1학년 봄 체험학습 인솔 및 행정 처리\n1. 장소·차량·인솔교사 확정\n2. 안전 계획서 교장 결재\n3. 학부모 안내 가정통신문 발송\n4. 결과 보고서 작성',
+       fileLocation:'공유폴더/교무부/체험학습/2026',priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    5:[
+      {name:'어울림운동회 운영',startMonth:5,endMonth:null,deadline:'5월 3~10일',assignee:'체육부장',category:'c3',
+       desc:'학년별 어울림운동회 운영\n- 4학년: 5월 3일\n- 2·3학년: 5월 8일\n- 1학년: 5월 9일\n- 5·6학년: 5월 10일\n1. 종목 선정 및 진행 인원 배치\n2. 방송·음향 장비 확인\n3. 결과 보고',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'5·18민주화운동 기념주간 운영',startMonth:5,endMonth:null,deadline:'5월 15~18일',assignee:'연구부장',category:'c4',
+       desc:'5·18 기념주간 교육활동 운영\n1. 학급별 수업 자료 배부\n2. 게시물 제작 및 부착\n3. 실적 보고',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'지진 대피훈련',startMonth:5,endMonth:null,deadline:'5월 12일',assignee:'생활부장',category:'c4',
+       desc:'전교 지진 대피훈련 실시\n1. 훈련 계획 수립 및 안내\n2. 학급별 대피 동선 확인\n3. 훈련 실시 후 결과 보고\n4. 미흡 사항 개선 계획 수립',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'봄 현장체험학습 계획 및 공문',startMonth:5,endMonth:null,deadline:'5월 초',assignee:'교무부장',category:'c3',
+       desc:'봄 현장체험학습 계획 수립\n1. 장소·이동수단·안전계획 포함\n2. 교장 결재 후 교육청 보고\n3. 차량 계약 확인',
+       note:'차량 계약 3월부터 시작',fileLocation:'공유폴더/교무부/체험학습',
+       priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    6:[
+      {name:'재량휴업일 가정통신문 발송',startMonth:6,endMonth:null,deadline:'6월 1일 전',assignee:'교무부장',category:'c1',
+       desc:'재량휴업일(6월 5일) 안내 가정통신문 발송\n1. 휴업일 근거 및 날짜 명시\n2. 돌봄 교실 운영 여부 안내\n3. 교장 결재 후 발송',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'5학년 수련활동',startMonth:6,endMonth:null,deadline:'6월 28~30일',assignee:'교무부장',category:'c3',
+       desc:'5학년 수련활동 운영\n1. 수련관 예약 및 계약\n2. 안전 계획서 작성 및 결재\n3. 학부모 안내 및 비용 수납\n4. 인솔 교사 배치\n5. 결과 보고서 작성',
+       note:'수련관 예약은 전년도 12월부터',fileLocation:'공유폴더/교무부/수련활동',
+       priority:'high',repeat:true,done:false,pending:false,
+       contacts:[{name:'수련관 담당자',tel:'062-000-0000'}]},
+    ],
+    7:[
+      {name:'수영체험 운영',startMonth:7,endMonth:null,deadline:'7월 5~11일',assignee:'체육부장',category:'c3',
+       desc:'1·2학년 수영체험 실시\n- 1학년: 7월 5일\n- 2학년: 7월 11일\n1. 수영장 예약 및 계약\n2. 안전요원 배치 확인\n3. 학부모 동의서 수거\n4. 인솔 교사 배치',
+       priority:'high',repeat:true,done:false,pending:false,
+       contacts:[{name:'수영장 담당',tel:'062-000-0000'}]},
+      {name:'1학기 학교생활기록부 마감',startMonth:7,endMonth:null,deadline:'7월 말',assignee:'교무부장',category:'c2',
+       desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n1. 담임교사별 입력 현황 점검\n2. 누락 항목 확인\n3. 교장 최종 결재',
+       note:'관리자 계정 필요. 마감 후 수정 불가',
+       system:'나이스(NEIS) → 학생생활 → 생활기록부',
+       fileLocation:'나이스 생활기록부 시스템',
+       priority:'high',sensitive:true,repeat:true,done:false,pending:false},
+      {name:'여름방학식 준비',startMonth:7,endMonth:null,deadline:'7월 27일',assignee:'교무부장',category:'c3',
+       desc:'여름방학식 행사 준비\n1. 방학 중 생활 안내 가정통신문 작성\n2. 방학식 식순 작성\n3. 안전사고 예방 교육 실시',
+       priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    8:[
+      {name:'2학기 개학식 준비',startMonth:8,endMonth:null,deadline:'8월 22일',assignee:'교무부장',category:'c3',
+       desc:'2학기 개학식 준비\n1. 개학식 식순 작성\n2. 2학기 시작 안내 가정통신문 발송\n3. 교실 배치 및 환경 정비 확인',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'4학년 수영체험',startMonth:8,endMonth:null,deadline:'8월 30일',assignee:'체육부장',category:'c3',
+       desc:'4학년 수영체험 실시\n1. 수영장 예약 확인\n2. 학부모 동의서 수거\n3. 인솔 교사 배치\n4. 안전요원 배치 확인',
+       priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    9:[
+      {name:'화재 대피훈련',startMonth:9,endMonth:null,deadline:'9월 8일',assignee:'생활부장',category:'c4',
+       desc:'전교 화재 대피훈련 실시\n1. 소방서 협조 요청\n2. 훈련 계획 수립 및 학급 안내\n3. 대피 동선 확인\n4. 훈련 실시 및 결과 보고',
+       priority:'high',repeat:true,done:false,pending:false,
+       contacts:[{name:'광산소방서',tel:'119'}]},
+      {name:'학부모 상담주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 18~29일',assignee:'교무부장',category:'c8',
+       desc:'2학기 학부모 상담주간 운영\n1. 가정통신문 발송\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고',
+       sensitive:true,priority:'mid',repeat:true,done:false,pending:false},
+      {name:'3·5학년 수영체험',startMonth:9,endMonth:null,deadline:'9월 4일',assignee:'체육부장',category:'c3',
+       desc:'3·5학년 수영체험 실시\n1. 수영장 예약 확인\n2. 학부모 동의서 수거\n3. 인솔 교사 배치',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'장애인식개선교육주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 25~27일',assignee:'연구부장',category:'c4',
+       desc:'장애인식개선교육 2차 운영\n1. 교육 자료 배부\n2. 학급별 수업 실시\n3. 실적 보고서 제출',
+       priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    10:[
+      {name:'운남축제 준비 및 운영',startMonth:10,endMonth:null,deadline:'10월 20일',assignee:'교무부장',category:'c3',
+       desc:'학교 축제 준비 및 운영\n1. 축제 기획안 작성 및 결재\n2. 학급별 프로그램 취합\n3. 장소·음향·방송 준비\n4. 안전 계획 수립\n5. 결과 보고서 작성',
+       note:'학생자치회와 협력 필요',
+       fileLocation:'공유폴더/교무부/행사/운남축제',
+       priority:'high',repeat:true,done:false,pending:false},
+      {name:'개교기념일 행사',startMonth:10,endMonth:null,deadline:'10월 2일',assignee:'교무부장',category:'c3',
+       desc:'개교기념일 관련 행사 준비\n1. 기념식 식순 작성\n2. 학교 역사 전시 자료 준비\n3. 가정통신문 발송',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'2학기 학교생활기록부 중간 점검',startMonth:10,endMonth:null,deadline:'10월 말',assignee:'교무부장',category:'c2',
+       desc:'2학기 생활기록부 입력 중간 점검\n1. 담임별 입력 현황 확인\n2. 누락 항목 안내\n3. 마감 일정 재안내',
+       system:'나이스(NEIS) → 생활기록부',
+       priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    11:[
+      {name:'수능일 등교 시간 조정',startMonth:11,endMonth:null,deadline:'11월 16일',assignee:'교무부장',category:'c1',
+       desc:'대학수학능력시험일 등교 시간 조정\n1. 교육청 공문 확인 (10시 등교)\n2. 가정통신문 발송\n3. 급식 시간 조정 안내',
+       priority:'high',repeat:true,done:false,pending:false},
+      {name:'학교 공개 수업 준비',startMonth:11,endMonth:null,deadline:'11월 22일',assignee:'연구부장',category:'c8',
+       desc:'학교 공개 수업 준비 및 운영\n1. 공개 수업 학급 및 교사 선정\n2. 수업 지도안 사전 검토\n3. 학부모 안내 가정통신문 발송\n4. 공개 수업 후 협의회 운영',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'1학년 체험학습 (11월)',startMonth:11,endMonth:null,deadline:'11월 3일',assignee:'교무부장',category:'c3',
+       desc:'1학년 가을 체험학습 인솔\n1. 장소·차량·인솔교사 확정\n2. 안전 계획서 결재\n3. 학부모 안내 및 동의서 수거',
+       priority:'mid',repeat:true,done:false,pending:false},
+    ],
+    12:[
+      {name:'졸업식 준비 및 졸업앨범 배부',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:'교무부장',category:'c3',
+       desc:'졸업식 행사 준비\n1. 졸업장·상장 인쇄 및 날인\n2. 졸업앨범 수령 및 배부\n3. 식순 작성 및 사회자 지정\n4. 강당 배치 확인',
+       note:'졸업앨범 업체 11월부터 협의',
+       fileLocation:'공유폴더/교무부/행사/졸업식',
+       priority:'high',repeat:true,done:false,pending:false},
+      {name:'종업식 및 겨울방학식',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:'교무부장',category:'c3',
+       desc:'종업식 및 겨울방학식 준비\n1. 식순 작성\n2. 방학 중 생활 안내 가정통신문\n3. 안전사고 예방 교육',
+       note:'졸업식과 같은 날 진행',
+       priority:'mid',repeat:true,done:false,pending:false},
+      {name:'2학기 학교생활기록부 마감',startMonth:12,endMonth:null,deadline:'12월 중',assignee:'교무부장',category:'c2',
+       desc:'2학기 생활기록부 최종 마감\n1. 담임별 입력 현황 최종 점검\n2. 누락 항목 확인\n3. 교장 최종 결재\n4. 마감 후 출력 보관',
+       system:'나이스(NEIS) → 생활기록부',
+       priority:'high',sensitive:true,repeat:true,done:false,pending:false},
+    ],
+    1:[
+      {name:'신학기 학급 편성 사전 준비',startMonth:1,endMonth:null,deadline:'1월 말',assignee:'교무부장',category:'c2',
+       desc:'새 학년도 학급 편성 사전 작업\n1. 학년별 학생 수 파악\n2. 학급 수 결정\n3. 전학 예정 학생 파악\n4. 담임 배정 초안 작성 (교장·교감 협의)',
+       note:'개인정보 보안 유의',
+       priority:'high',sensitive:true,repeat:true,done:false,pending:false},
+      {name:'교육과정 편성 및 학사력 작성',startMonth:1,endMonth:2,deadline:'2월 초',assignee:'교무부장',category:'c8',
+       desc:'새 학년도 교육과정 편성 및 학사력 작성\n1. 교육청 교육과정 편성 지침 확인\n2. 수업일수·행사일정 반영\n3. 학교운영위원회 심의\n4. 교육청 제출',
+       fileLocation:'공유폴더/교무부/교육과정',
+       priority:'high',repeat:true,done:false,pending:false},
+    ],
     2:[
-      {name:'졸업식 준비 및 졸업앨범 배부',deadline:'2월 중',assignee:'교무부장',category:'c3',desc:'졸업식 행사 준비\n- 졸업장·상장 인쇄 및 날인\n- 졸업앨범 수령 및 배부',note:'졸업앨범 업체 11월부터 협의',sensitive:false,repeat:true,done:false},
-      {name:'교직원 인사 이동 관련 공문',deadline:'2월 말',assignee:'행정실장',category:'c1',desc:'전출·전입 교직원 관련 교육청 공문 처리\n- 발령 통보 확인\n- 업무 인계인수서 제출',note:'',sensitive:true,repeat:true,done:false},
+      {name:'교직원 인사 이동 관련 공문',startMonth:2,endMonth:null,deadline:'2월 말',assignee:'행정실장',category:'c1',
+       desc:'전출·전입 교직원 관련 교육청 공문 처리\n1. 발령 통보 확인\n2. 업무 인계인수서 제출\n3. 전출 교원 환송 행사 준비',
+       sensitive:true,priority:'high',repeat:true,done:false,pending:false},
+      {name:'입학식 준비 (신입생 안내)',startMonth:2,endMonth:null,deadline:'2월 말',assignee:'교무부장',category:'c3',
+       desc:'신입생 입학 사전 안내\n1. 취학통지서 발송 확인\n2. 예비소집 운영\n3. 입학 안내문 제작 및 발송\n4. 1학년 교실 환경 정비',
+       fileLocation:'공유폴더/교무부/행사/입학식',
+       priority:'high',repeat:true,done:false,pending:false},
+      {name:'새 학년도 업무 분장 수립',startMonth:2,endMonth:null,deadline:'2월 중',assignee:'교무부장',category:'c8',
+       desc:'새 학년도 교직원 업무 분장 수립\n1. 전입 교원 파악\n2. 업무 분장 초안 작성\n3. 교장·교감 협의\n4. 최종 확정 및 공지',
+       priority:'high',repeat:true,done:false,pending:false},
     ],
   };
-  Object.entries(samples).forEach(([m,tasks])=>setMonthTasks(S.year,parseInt(m),tasks));
+
+  // 전 학년도 2월 준비 업무 (y-1 학년도의 2월)
+  const prevYearFeb=[
+    {name:'교직원 인사 이동 관련 공문',startMonth:2,endMonth:null,deadline:'2월 말',assignee:'행정실장',category:'c1',
+     desc:'전출·전입 교직원 관련 교육청 공문 처리\n1. 발령 통보 확인\n2. 업무 인계인수서 제출',
+     sensitive:true,priority:'high',repeat:true,done:false,pending:false},
+    {name:'신입생 예비소집 및 입학 안내',startMonth:2,endMonth:null,deadline:'2월 중',assignee:'교무부장',category:'c3',
+     desc:'신입생 입학 사전 안내\n1. 예비소집 운영\n2. 입학 안내문 발송\n3. 1학년 교실 환경 정비',
+     fileLocation:'공유폴더/교무부/행사/입학식',
+     priority:'high',repeat:true,done:false,pending:false},
+    {name:'새 학년도 업무 분장 수립',startMonth:2,endMonth:null,deadline:'2월 중',assignee:'교무부장',category:'c8',
+     desc:'새 학년도 교직원 업무 분장 수립\n1. 전입 교원 파악\n2. 업무 분장 초안 → 교장·교감 협의\n3. 최종 확정 및 공지',
+     priority:'high',repeat:true,done:false,pending:false},
+  ];
+  setMonthTasks(y-1, 2, prevYearFeb);
+  Object.entries(samples).forEach(([m,tasks])=>setMonthTasks(y,parseInt(m),tasks));
+  saveUserEdited();
 }
 
 /* ════════════════════════════════
