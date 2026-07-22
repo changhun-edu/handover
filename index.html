@@ -389,6 +389,37 @@ header{
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+
+      <!-- 전임자 파일로 시작 -->
+      <label class="btn setup-btn" id="fileStartBtn"
+        style="background:var(--navy);color:#fff;cursor:pointer;justify-content:center;gap:8px;border:none;">
+        📥 전임자 파일로 시작
+        <input type="file" accept=".json" onchange="loadSetupFile(event)" style="display:none">
+      </label>
+
+      <!-- 파일 로드 후 미리보기 -->
+      <div id="filePreview" style="display:none;background:var(--sky);border:1.5px solid var(--sky-m);border-radius:10px;padding:14px 16px;">
+        <p style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;">✅ 파일 확인 — 아래 내용으로 시작합니다</p>
+        <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--gray-d);">
+          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학교</span> <strong id="previewSchool">—</strong></div>
+          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">부서</span> <strong id="previewDept">—</strong></div>
+          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학년도</span> <strong id="previewYear">—</strong></div>
+          <div><span style="color:var(--gray-m);width:70px;display:inline-block;">업무 수</span> <strong id="previewTaskCount">—</strong></div>
+        </div>
+        <div style="margin-top:12px;">
+          <label class="setup-label" style="font-size:12px;">내 이름 (인수자) *</label>
+          <input class="setup-input" id="fileHandoverTo" placeholder="예: 홍길동" maxlength="20"
+            onkeydown="if(event.key==='Enter')startFromFile()" style="margin-bottom:8px;">
+          <button class="btn btn-primary setup-btn" onclick="startFromFile()">이 파일로 시작 →</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin:2px 0;">
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+        <span style="font-size:11px;color:var(--gray-m);">또는 새로 시작</span>
+        <div style="flex:1;height:1px;background:var(--border);"></div>
+      </div>
+
       <button class="btn btn-primary setup-btn" onclick="startApp(true)">
         📋 샘플 업무와 함께 시작
       </button>
@@ -1115,6 +1146,70 @@ function pickPreset(name){
   document.getElementById('setupDeptInput').value=name;
   document.getElementById('setupDeptInput').focus();
 }
+/* ── 시작 화면 파일 불러오기 ── */
+let _setupFileData=null;  // 파일에서 읽은 데이터 임시 보관
+
+function loadSetupFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.tasks) throw new Error('올바른 인계인수 파일이 아닙니다.');
+      _setupFileData=data;
+
+      // 설정 필드 자동 채우기
+      if(data.school) document.getElementById('setupSchoolInput').value=data.school;
+      if(data.dept)   document.getElementById('setupDeptInput').value=data.dept;
+
+      // 업무 총 건수 계산
+      const taskCount=Object.values(data.tasks||{}).reduce((s,a)=>s+(a?.length||0),0);
+
+      // 미리보기 표시
+      document.getElementById('previewSchool').textContent=data.school||'(없음)';
+      document.getElementById('previewDept').textContent=data.dept||'(없음)';
+      document.getElementById('previewYear').textContent=
+        data.year?`${data.year}학년도 (${data.year}.3 ~ ${data.year+1}.2)`:'(없음)';
+      document.getElementById('previewTaskCount').textContent=`${taskCount}건`;
+      document.getElementById('filePreview').style.display='block';
+      document.getElementById('fileHandoverTo').focus();
+
+      showToast('파일을 읽었습니다. 내 이름을 입력하고 시작하세요.','green');
+    } catch(err){
+      _setupFileData=null;
+      document.getElementById('filePreview').style.display='none';
+      showToast(err.message||'파일을 읽을 수 없습니다.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+function startFromFile(){
+  if(!_setupFileData){ showToast('파일을 먼저 선택하세요.'); return; }
+  const myName=document.getElementById('fileHandoverTo').value.trim();
+  if(!myName){ showToast('내 이름(인수자)을 입력하세요.'); document.getElementById('fileHandoverTo').focus(); return; }
+
+  const data=_setupFileData;
+
+  // 기존 데이터가 있으면 경고
+  const hasData=Object.keys(S.tasks).length>0;
+  if(hasData&&!confirm('기존 데이터를 지우고 파일의 데이터로 교체하시겠습니까?\n\n※ 삭제된 데이터는 복구할 수 없습니다.')) return;
+
+  // 데이터 적용
+  S.tasks=data.tasks||{}; saveTasks();
+  if(data.doneByYear){ Object.assign(S.doneByYear,data.doneByYear); saveDoneByYear(); }
+  if(data.cats){ S.cats=data.cats; saveCats(); }
+  S.schoolName=data.school||''; saveSchool();
+  S.deptName=document.getElementById('setupDeptInput').value.trim()||data.dept||''; saveDept();
+  S.handoverDate=new Date().toISOString().split('T')[0];  // 오늘을 인수일로
+  S.handoverTo=myName; saveHandover();
+
+  _setupFileData=null;
+  launchApp(true);
+  showToast(`환영합니다, ${myName}님! 인수가 완료되었습니다.`,'green');
+}
+
 function startApp(withSample=false){
   const name=document.getElementById('setupDeptInput').value.trim();
   if(!name){showToast('부서명을 입력하세요.');return;}
@@ -1158,6 +1253,9 @@ function goHome(){
   document.getElementById('setupDeptInput').value=S.deptName;
   document.getElementById('setupHandoverDate').value=S.handoverDate||'';
   document.getElementById('setupHandoverTo').value=S.handoverTo||'';
+  // 파일 미리보기 초기화
+  document.getElementById('filePreview').style.display='none';
+  _setupFileData=null;
 }
 
 /* ════════════════════════════════
