@@ -214,6 +214,57 @@ header{
 .task-meta-item.assignee{color:var(--purple);font-weight:600;}
 .task-desc{font-size:13px;color:#555;line-height:1.65;white-space:pre-wrap;margin-bottom:3px;}
 .task-note{font-size:12px;color:var(--gray-m);margin-top:3px;}
+/* ── 상세 정보 토글 ── */
+.detail-toggle{
+  width:100%;padding:9px 14px;border:1.5px dashed var(--border);
+  border-radius:8px;background:var(--gray-l);color:var(--gray-m);
+  font-size:13px;font-weight:500;cursor:pointer;text-align:left;
+  transition:all .15s;margin:4px 0 2px;
+}
+.detail-toggle:hover{background:var(--sky);border-color:var(--sky-m);color:var(--navy);}
+.detail-toggle.open{background:var(--sky);border-color:var(--sky-m);color:var(--navy);border-style:solid;}
+
+/* ② 카드 체크박스 완료 토글 */
+.task-check-wrap{
+  flex-shrink:0;margin-top:2px;
+}
+.task-checkbox{
+  width:22px;height:22px;border:2px solid var(--border);border-radius:6px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .15s;background:#fff;
+}
+.task-checkbox.checked{background:var(--green);border-color:var(--green);color:#fff;}
+.task-checkbox:hover{border-color:var(--green);background:var(--green-l);}
+
+/* ⑧ cat-stripe 제거 — 태그로 충분 */
+.cat-stripe{display:none;}
+
+/* ⑨ 검색 바 */
+.search-bar{
+  max-width:var(--container);margin:0 auto;
+  padding:8px 20px 0;
+}
+.search-input-wrap{
+  position:relative;
+}
+.search-input-wrap input{
+  width:100%;padding:8px 36px 8px 14px;
+  border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;font-family:inherit;background:#fff;
+  transition:border-color .15s;
+}
+.search-input-wrap input:focus{outline:none;border-color:var(--navy-l);}
+.search-input-wrap .search-icon{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  color:var(--gray-m);pointer-events:none;font-size:14px;
+}
+.search-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;color:var(--gray-m);
+  font-size:16px;padding:2px;line-height:1;
+}
+.search-clear:hover{color:var(--gray-d);}
+.search-highlight{background:#fff3c4;border-radius:2px;}
 .task-desc a,.task-note a{color:var(--navy-l);text-decoration:underline;word-break:break-all;}
 .task-desc a:hover,.task-note a:hover{color:var(--accent);}
 .task-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
@@ -487,6 +538,14 @@ header{
     </div>
   </div>
 
+  <div class="search-bar">
+    <div class="search-input-wrap">
+      <input type="text" id="searchInput" placeholder="🔍 업무명, 설명, 메모 검색..."
+        oninput="onSearch()" onkeydown="if(event.key==='Escape'){clearSearch();}">
+      <button class="search-clear" id="searchClearBtn" style="display:none;" onclick="clearSearch()">×</button>
+    </div>
+  </div>
+
   <div class="month-tabs-wrap">
     <div class="month-tabs" id="monthTabs"></div>
   </div>
@@ -496,6 +555,7 @@ header{
       <div class="month-title">
         <span id="curMonthTitle"></span>
         <span class="month-badge" id="curMonthBadge"></span>
+        <span id="monthSummary" style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;margin-left:4px;"></span>
       </div>
       <button class="btn btn-accent" onclick="openAddModal()">+ 업무 추가</button>
     </div>
@@ -516,6 +576,8 @@ header{
       <button class="modal-close" onclick="closeModal('taskModal')">×</button>
     </div>
     <div class="modal-body">
+
+      <!-- ★ 기본 정보 (항상 표시) -->
       <div class="form-group">
         <label class="form-label">업무명 *</label>
         <input class="form-input" id="taskName" placeholder="예: 학교생활기록부 마감 확인">
@@ -534,18 +596,6 @@ header{
           <input class="form-input" id="taskDeadline" placeholder="예: 매월 말일">
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">담당자</label>
-          <input class="form-input" id="taskAssignee" placeholder="예: 교무부장, 담임교사">
-        </div>
-        <div class="form-group">
-          <label class="form-label">카테고리</label>
-          <select class="form-select" id="taskCategory">
-            <option value="">— 선택 안 함 —</option>
-          </select>
-        </div>
-      </div>
       <div class="form-group">
         <label class="form-label">업무 설명 / 처리 방법</label>
         <div class="desc-guide">
@@ -558,62 +608,83 @@ header{
         <textarea class="form-textarea" id="taskDesc"
           placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.&#10;&#10;예)&#10;1. 에듀파인 로그인 → 공문 → 새 공문 작성&#10;2. 교장·교감 결재 후 발송&#10;3. 공문 번호 업무일지에 기록"></textarea>
       </div>
-      <div class="form-group">
-        <label class="form-label">참고 메모</label>
-        <input class="form-input" id="taskNote" placeholder="예: 교감선생님 결재 필요">
-      </div>
-      <div class="form-group">
-        <label class="form-label">📁 관련 파일 위치</label>
-        <input class="form-input" id="taskFileLocation"
-          placeholder="예: 공유폴더/교무부/학적서류  또는  USB/인계인수/2026양식.xlsx">
-        <p style="font-size:11px;color:var(--gray-m);margin-top:4px;">파일 자체가 아닌 보관 위치(경로)를 기록합니다.</p>
-      </div>
-      <div class="form-group">
-        <label class="form-label">💻 시스템 정보</label>
-        <input class="form-input" id="taskSystem"
-          placeholder="예: 에듀파인 → 예산관리 메뉴 / 계정: 교무부장 공용 / 권한: 결재자">
-      </div>
-      <div class="form-group">
-        <label class="form-label">📞 관련 연락처</label>
-        <div id="taskContactList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="addContactRow()">+ 연락처 추가</button>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">💰 예산 배정액</label>
-          <input class="form-input" id="taskBudgetTotal" placeholder="예: 1,200,000원">
-        </div>
-        <div class="form-group">
-          <label class="form-label">집행액</label>
-          <input class="form-input" id="taskBudgetUsed" placeholder="예: 800,000원">
-        </div>
-        <div class="form-group">
-          <label class="form-label">물품 보관 장소</label>
-          <input class="form-input" id="taskBudgetStorage" placeholder="예: 교무실 캐비닛 2번">
-        </div>
-      </div>
-      <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
-        <div class="form-group" style="margin:0;">
-          <label class="form-label" style="margin-bottom:5px;">⭐ 중요도</label>
-          <div style="display:flex;gap:6px;">
-            <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
-              <input type="radio" name="taskPriority" value="high" style="accent-color:#e74c3c;"> <span style="color:#e74c3c;font-weight:600;">상</span>
-            </label>
-            <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
-              <input type="radio" name="taskPriority" value="mid" checked style="accent-color:#e67e22;"> <span style="color:#e67e22;font-weight:600;">중</span>
-            </label>
-            <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
-              <input type="radio" name="taskPriority" value="low" style="accent-color:#7f8c8d;"> <span style="color:#7f8c8d;font-weight:600;">하</span>
-            </label>
+
+      <!-- ▼ 상세 정보 토글 -->
+      <button type="button" class="detail-toggle" id="detailToggleBtn" onclick="toggleDetailFields()">
+        <span id="detailToggleLabel">＋ 상세 정보 입력 (담당자·파일·연락처·예산 등)</span>
+      </button>
+
+      <!-- 상세 정보 (접혀 있음) -->
+      <div id="detailFields" style="display:none;">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">담당자</label>
+            <input class="form-input" id="taskAssignee" placeholder="예: 교무부장, 담임교사">
+          </div>
+          <div class="form-group">
+            <label class="form-label">카테고리</label>
+            <select class="form-select" id="taskCategory">
+              <option value="">— 선택 안 함 —</option>
+            </select>
           </div>
         </div>
-        <label class="form-check"><input type="checkbox" id="taskSensitive"><span>🔒 개인정보</span></label>
-        <label class="form-check"><input type="checkbox" id="taskRepeat"><span>🔁 반복</span></label>
-        <label class="form-check">
-          <input type="checkbox" id="taskPending" style="accent-color:#8e44ad;">
-          <span style="color:#8e44ad;font-weight:600;">🚨 미결 (후임자 처리 필요)</span>
-        </label>
-      </div>
+        <div class="form-group">
+          <label class="form-label">참고 메모</label>
+          <input class="form-input" id="taskNote" placeholder="예: 교감선생님 결재 필요">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📁 관련 파일 위치</label>
+          <input class="form-input" id="taskFileLocation"
+            placeholder="예: 공유폴더/교무부/학적서류  또는  USB/인계인수/2026양식.xlsx">
+        </div>
+        <div class="form-group">
+          <label class="form-label">💻 시스템 정보</label>
+          <input class="form-input" id="taskSystem"
+            placeholder="예: 에듀파인 → 예산관리 메뉴 / 계정: 교무부장 공용 / 권한: 결재자">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📞 관련 연락처</label>
+          <div id="taskContactList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px;"></div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="addContactRow()">+ 연락처 추가</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">💰 예산 배정액</label>
+            <input class="form-input" id="taskBudgetTotal" placeholder="예: 1,200,000원">
+          </div>
+          <div class="form-group">
+            <label class="form-label">집행액</label>
+            <input class="form-input" id="taskBudgetUsed" placeholder="예: 800,000원">
+          </div>
+          <div class="form-group">
+            <label class="form-label">물품 보관 장소</label>
+            <input class="form-input" id="taskBudgetStorage" placeholder="예: 교무실 캐비닛 2번">
+          </div>
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label" style="margin-bottom:5px;">⭐ 중요도</label>
+            <div style="display:flex;gap:6px;">
+              <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+                <input type="radio" name="taskPriority" value="high" style="accent-color:#e74c3c;"> <span style="color:#e74c3c;font-weight:600;">상</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+                <input type="radio" name="taskPriority" value="mid" checked style="accent-color:#e67e22;"> <span style="color:#e67e22;font-weight:600;">중</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer;">
+                <input type="radio" name="taskPriority" value="low" style="accent-color:#7f8c8d;"> <span style="color:#7f8c8d;font-weight:600;">하</span>
+              </label>
+            </div>
+          </div>
+          <label class="form-check"><input type="checkbox" id="taskSensitive"><span>🔒 개인정보</span></label>
+          <label class="form-check"><input type="checkbox" id="taskRepeat"><span>🔁 반복</span></label>
+          <label class="form-check">
+            <input type="checkbox" id="taskPending" style="accent-color:#8e44ad;">
+            <span style="color:#8e44ad;font-weight:600;">🚨 미결 (후임자 처리 필요)</span>
+          </label>
+        </div>
+      </div><!-- /detailFields -->
+
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('taskModal')">취소</button>
@@ -931,6 +1002,7 @@ const S={
   year:         schoolYear(),
   curMonth:     initMonth(),
   filter:       {status:'all',cat:''},
+  searchQuery:  '',
   editingIdx:   null,
   copyRef:      null,
   copyMonths:   new Set(),
@@ -1240,6 +1312,8 @@ function startFromFile(){
   if(data.cats){ S.cats=data.cats; saveCats(); }
   S.schoolName=data.school||''; saveSchool();
   S.deptName=document.getElementById('setupDeptInput').value.trim()||data.dept||''; saveDept();
+  // 파일 자체가 백업이므로 exportedAt을 lastBackup으로 설정 → 백업 경고 방지
+  if(data.exportedAt) saveBackupDate(data.exportedAt);
 
   if(isContinue){
     // 이어서 작업: 이름은 기존 유지 또는 입력값
@@ -1378,6 +1452,7 @@ function renderCatFilters(){
 function filteredTasks(tasks){
   const mKey=getKey(S.year,S.curMonth);
   const allT=getMonthTasks(S.year,S.curMonth);
+  const q=S.searchQuery.toLowerCase();
   return tasks.filter(t=>{
     const ri=allT.indexOf(t);
     const origKey=t._spanRef?getKey(S.year,t._spanStart):mKey;
@@ -1388,7 +1463,10 @@ function filteredTasks(tasks){
     const s=S.filter.status;
     const sok=s==='all'||(s==='done'?done:s==='todo'?!done:s==='sensitive'?t.sensitive:true);
     const cok=S.filter.cat===''||t.category===S.filter.cat;
-    return sok&&cok;
+    // 검색 필터
+    const sqok=!q||[t.name,t.desc,t.note,t.assignee,t.fileLocation,t.system]
+      .some(f=>f&&f.toLowerCase().includes(q));
+    return sok&&cok&&sqok;
   });
 }
 function renderTaskList(){
@@ -1398,45 +1476,65 @@ function renderTaskList(){
   const allT=getMonthTasks(S.year,m);
   const tasks=filteredTasks(allT);
   const el=document.getElementById('taskList');
+
+  // ⑪ 현황 요약 (업무 있을 때만)
+  const summaryEl=document.getElementById('monthSummary');
+  if(allT.length&&summaryEl){
+    const mKey=getKey(S.year,m);
+    const totalDirect=allT.filter(t=>!t._spanRef).length;
+    const doneCnt=allT.filter(t=>{
+      const ri=allT.indexOf(t);
+      const oKey=t._spanRef?getKey(S.year,t._spanStart):mKey;
+      const oIdx=t._spanRef?getDirectTasks(S.year,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth):ri;
+      return isDone(S.year,oKey,oIdx);
+    }).length;
+    const pct=allT.length?Math.round(doneCnt/allT.length*100):0;
+    summaryEl.innerHTML=`<span style="color:var(--green);font-weight:700;">✅ ${doneCnt}</span>
+      <span style="color:var(--gray-m);">/ ${allT.length}건</span>
+      <span style="background:var(--gray-l);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700;color:${pct===100?'var(--green)':'var(--navy)'};">${pct}%</span>
+      ${S.searchQuery?`<span style="color:var(--accent);font-size:11px;">🔍 "${esc(S.searchQuery)}" 검색 중</span>`:''}`;
+  } else if(summaryEl){ summaryEl.innerHTML=''; }
+
   if(!allT.length){
     el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>이 달에 등록된 업무가 없습니다.<br><strong>+ 업무 추가</strong>로 등록하세요.</p></div>`;
     return;
   }
   if(!tasks.length){
-    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><p>선택한 필터에 해당하는 업무가 없습니다.</p></div>`;
+    el.innerHTML=`<div class="empty-state"><div class="empty-icon">🔍</div><p>검색 결과가 없습니다.</p></div>`;
     return;
   }
+  const q=S.searchQuery;
   el.innerHTML=tasks.map(t=>{
     const ri=allT.indexOf(t);
     const mKey=getKey(S.year,S.curMonth);
-    // 기간 업무 참조는 원본 월 기준으로 완료 상태 확인
     const origKey=t._spanRef?getKey(S.year,t._spanStart):mKey;
     const origIdx=t._spanRef
       ? getDirectTasks(S.year,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth)
       : ri;
     const done=isDone(S.year, origKey, origIdx);
-    const isFirst=ri===0;
-    const isLast=ri===allT.length-1;
     const cat=t.category?getCat(t.category):null;
     const cc=cat?cat.color:'transparent';
     const prioMap={high:{label:'⭐상',color:'#e74c3c',bg:'#fdecea'},mid:{label:'⭐중',color:'#e67e22',bg:'#fef3e8'},low:{label:'⭐하',color:'#7f8c8d',bg:'#f4f4f4'}};
     const prio=prioMap[t.priority||'mid'];
     const displayNum=tasks.indexOf(t)+1;
     return `<div class="task-card${t.sensitive?' sensitive':''}${done?'':' todo'}${t.pending?' pending':''}"
-      draggable="true"
-      data-idx="${ri}"
+      draggable="true" data-idx="${ri}"
       ondragstart="onDragStart(event,${ri})"
       ondragover="onDragOver(event)"
       ondragleave="onDragLeave(event)"
       ondrop="onDrop(event,${ri})"
       ondragend="onDragEnd(event)">
       <div class="task-num">${displayNum}</div>
-      <div class="cat-stripe" style="background:${cc};"></div>
       <div class="task-top">
+        <!-- ② 큰 체크박스 완료 토글 -->
+        <div class="task-check-wrap">
+          <div class="task-checkbox${done?' checked':''}" onclick="toggleDoneByYear('${origKey}',${origIdx})" title="${done?'미처리로 되돌리기':'완료 처리'}">
+            ${done?'✓':''}
+          </div>
+        </div>
         <div class="task-info">
-          <div class="task-title-row" style="${done?'opacity:.6;':''}">
-            <span class="task-title" style="${done?'text-decoration:line-through;color:var(--gray-m);':''}">${esc(t.name)}</span>
-            ${done?'<span class="tag" style="background:#e8f8f1;color:#27ae60;font-weight:700;">✅ 완료</span>':'<span class="tag tag-todo">⬜ 미처리</span>'}
+          <div class="task-title-row" style="${done?'opacity:.55;':''}">
+            <span class="task-title" style="${done?'text-decoration:line-through;color:var(--gray-m);':''}">${highlightText(t.name,q)}</span>
             <span class="tag" style="background:${prio.bg};color:${prio.color};font-size:11px;">${prio.label}</span>
             ${t.pending?'<span class="tag" style="background:#f4ecf7;color:#8e44ad;font-weight:600;">🚨 미결</span>':''}
             ${isSpan(t)?`<span class="tag tag-span">📅 ${MN[t.startMonth]}~${MN[t.endMonth]}</span>`:''}
@@ -1449,21 +1547,15 @@ function renderTaskList(){
             ${t.deadline?`<span class="task-meta-item deadline">📅 ${esc(t.deadline)}</span>`:''}
             ${t.assignee?`<span class="task-meta-item assignee">👤 ${esc(t.assignee)}</span>`:''}
           </div>
-          ${done?'':`${t.desc?`<div class="task-desc">${linkify(t.desc)}</div>`:''}`}
-          ${done?'':`${t.note?`<div class="task-note">📌 ${linkify(t.note)}</div>`:''}`}
+          ${done?'':`${t.desc?`<div class="task-desc">${q?highlightText(t.desc,q):linkify(t.desc)}</div>`:''}`}
+          ${done?'':`${t.note?`<div class="task-note">📌 ${q?highlightText(t.note,q):linkify(t.note)}</div>`:''}`}
           ${done?'':`${t.fileLocation?`<div class="task-note" style="color:var(--teal);">📁 ${esc(t.fileLocation)}</div>`:''}`}
           ${done?'':`${t.system?`<div class="task-note" style="color:#2980b9;">💻 ${esc(t.system)}</div>`:''}`}
-          ${done?'':`${(t.contacts&&t.contacts.length)?`<div class="task-note" style="color:#8e44ad;">📞 ${t.contacts.map(c=>`${esc(c.name)} ${esc(c.tel)}`).join(' &nbsp;·&nbsp; ')}</div>`:''}`}
-          ${done?'':`${(t.budgetTotal||t.budgetUsed||t.budgetStorage)?`<div class="task-note" style="color:#d35400;">💰 ${[t.budgetTotal?'배정: '+esc(t.budgetTotal):'',t.budgetUsed?'집행: '+esc(t.budgetUsed):'',t.budgetStorage?'보관: '+esc(t.budgetStorage):''].filter(Boolean).join(' | ')}</div>`:''}`}
+          ${done?'':`${(t.contacts&&t.contacts.length)?`<div class="task-note" style="color:#8e44ad;">📞 ${t.contacts.map(c=>`${esc(c.name)} ${esc(c.tel)}`).join(' · ')}</div>`:''}`}
+          ${done?'':`${(t.budgetTotal||t.budgetUsed||t.budgetStorage)?`<div class="task-note" style="color:#d35400;">💰 ${[t.budgetTotal?'배정:'+esc(t.budgetTotal):'',t.budgetUsed?'집행:'+esc(t.budgetUsed):'',t.budgetStorage?'보관:'+esc(t.budgetStorage):''].filter(Boolean).join(' | ')}</div>`:''}`}
         </div>
       </div>
       <div class="task-actions">
-        ${done
-          ? `<button class="btn btn-sm" style="background:#e8f8f1;color:#27ae60;border:1px solid #a8ddd5;" onclick="toggleDoneByYear('${origKey}',${origIdx})">🔄 미처리로</button>`
-          : `<button class="btn btn-sm" style="background:#e8f8f1;color:#27ae60;border:1px solid #a8ddd5;" onclick="toggleDoneByYear('${origKey}',${origIdx})">✅ 완료</button>`
-        }
-        <button class="btn-order" onclick="moveTask(${ri},-1)" ${isFirst?'disabled':''} title="위로">▲</button>
-        <button class="btn-order" onclick="moveTask(${ri},1)"  ${isLast?'disabled':''} title="아래로">▼</button>
         <button class="btn btn-ghost btn-sm" onclick="openEditModal(${ri})">✏️ 수정</button>
         <button class="btn btn-copy btn-sm" onclick="openCopyModal(${ri})">📋 복사</button>
         <button class="btn btn-danger btn-sm" onclick="confirmDelete(this,${ri})">🗑 삭제</button>
@@ -1507,6 +1599,36 @@ function populateCatSel(selId){
     `<option value="">— 선택 안 함 —</option>`+
     S.cats.map(c=>`<option value="${c.id}"${c.id===selId?' selected':''}>${esc(c.name)}</option>`).join('');
 }
+/* ── 상세 정보 토글 ── */
+function toggleDetailFields(forceOpen){
+  const el=document.getElementById('detailFields');
+  const btn=document.getElementById('detailToggleBtn');
+  const label=document.getElementById('detailToggleLabel');
+  const open=forceOpen!==undefined?forceOpen:el.style.display==='none';
+  el.style.display=open?'block':'none';
+  btn.classList.toggle('open',open);
+  label.textContent=open?'－ 상세 정보 접기':'＋ 상세 정보 입력 (담당자·파일·연락처·예산 등)';
+}
+
+/* ── 검색 ── */
+function onSearch(){
+  S.searchQuery=document.getElementById('searchInput').value.trim();
+  document.getElementById('searchClearBtn').style.display=S.searchQuery?'block':'none';
+  renderTabs();renderTaskList();
+}
+function clearSearch(){
+  document.getElementById('searchInput').value='';
+  S.searchQuery='';
+  document.getElementById('searchClearBtn').style.display='none';
+  renderTabs();renderTaskList();
+}
+function highlightText(text,q){
+  if(!q) return esc(text);
+  const escaped=esc(text);
+  const escapedQ=esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return escaped.replace(new RegExp(escapedQ,'gi'),m=>`<span class="search-highlight">${m}</span>`);
+}
+
 function openAddModal(){
   S.editingIdx=null;
   document.getElementById('modalTitle').textContent='업무 추가';
@@ -1514,27 +1636,27 @@ function openAddModal(){
   ['taskName','taskDeadline','taskDesc','taskNote',
    'taskFileLocation','taskSystem','taskBudgetTotal','taskBudgetUsed','taskBudgetStorage'
   ].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('taskAssignee').value=S.deptName;  // 부서명 자동 입력
+  document.getElementById('taskAssignee').value=S.deptName;
   document.getElementById('taskSensitive').checked=false;
   document.getElementById('taskRepeat').checked=false;
   document.getElementById('taskPending').checked=false;
   document.querySelector('input[name=taskPriority][value=mid]').checked=true;
   document.getElementById('taskContactList').innerHTML='';
+  toggleDetailFields(false);  // 추가 시 상세 접기
   populateMonthSels(S.curMonth, '');
   populateCatSel('');
   document.getElementById('taskModal').classList.add('open');
   setTimeout(()=>document.getElementById('taskName').focus(),80);
 }
 function openEditModal(idx){
-  // 기간 업무의 참조 카드는 원본 월에서 수정
   const allT = getMonthTasks(S.year, S.curMonth);
   const t = allT[idx];
   if(t._spanRef){
-    // 원본이 있는 월로 이동 후 수정
     const origM = t._spanStart;
     const origTasks = getDirectTasks(S.year, origM);
     const origIdx = origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
     if(origIdx>=0){
+      showToast(`연속업무는 ${MN[origM]}(시작 월)에서 수정합니다.`);
       S.curMonth = origM;
       renderTabs();
       openEditModalDirect(origIdx);
@@ -1563,9 +1685,12 @@ function openEditModalDirect(idx){
   document.getElementById('taskPending').checked=!!t.pending;
   const prio=t.priority||'mid';
   document.querySelector(`input[name=taskPriority][value=${prio}]`).checked=true;
-  // 연락처 복원
   document.getElementById('taskContactList').innerHTML='';
   (t.contacts||[]).forEach(c=>addContactRow(c));
+  // 상세 정보가 있으면 자동 펼치기
+  const hasDetail=t.assignee||t.note||t.fileLocation||t.system||(t.contacts&&t.contacts.length)||
+    t.budgetTotal||t.budgetUsed||t.budgetStorage||t.sensitive||t.repeat||t.pending||t.priority!=='mid';
+  toggleDetailFields(!!hasDetail);
   populateMonthSels(t.startMonth||S.curMonth, t.endMonth||'');
   populateCatSel(t.category||'');
   document.getElementById('taskModal').classList.add('open');
@@ -1644,7 +1769,11 @@ function saveTask(){
   }
   setMonthTasks(S.year,startMonth,tasks);
   S.curMonth=startMonth;
-  closeModal('taskModal');render();
+  // 수정 시 스크롤 위치 보존
+  const scrollY=window.scrollY;
+  closeModal('taskModal');
+  render();
+  requestAnimationFrame(()=>window.scrollTo(0,scrollY));
 }
 function confirmDelete(btn,idx){
   document.querySelectorAll('.task-card.deleting').forEach(c=>c.classList.remove('deleting'));
