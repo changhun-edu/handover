@@ -2639,13 +2639,17 @@ function setCatFilter(id){S.filter.cat=id;renderCatFilters();renderTabs();render
    TASK MODAL
 ════════════════════════════════ */
 function populateMonthSels(startSel, endSel){
-  const opts = MONTHS.map(m=>`<option value="${m}">${MN[m]}</option>`).join('');
+  // 전 학년도 2월은 값 'p2'로 구분 (현 학년도 2월과 혼동 방지)
+  const isPrevFeb = S.curYear === S.year-1;
+  const startOpts =
+    `<option value="p2"${isPrevFeb&&startSel===2?' selected':''}>2월 (전 학년도 준비)</option>` +
+    MONTHS.map(m=>`<option value="${m}"${!isPrevFeb&&m===startSel?' selected':''}>${MN[m]}${m===2?` (${S.year+1}년)`:''}</option>`).join('');
+  document.getElementById('taskMonthStart').innerHTML = startOpts;
+
   const noneOpt = `<option value="">— 단일 월 —</option>`;
-  document.getElementById('taskMonthStart').innerHTML =
-    MONTHS.map(m=>`<option value="${m}"${m===startSel?' selected':''}>${MN[m]}</option>`).join('');
   document.getElementById('taskMonthEnd').innerHTML =
     noneOpt +
-    MONTHS.map(m=>`<option value="${m}"${m===endSel?' selected':''}>${MN[m]}</option>`).join('');
+    MONTHS.map(m=>`<option value="${m}"${m===endSel?' selected':''}>${MN[m]}${m===2?` (${S.year+1}년)`:''}</option>`).join('');
 }
 function populateCatSel(selId){
   document.getElementById('taskCategory').innerHTML=
@@ -2986,13 +2990,14 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 function saveTask(){
   const name=document.getElementById('taskName').value.trim();
   if(!name){showToast('업무명을 입력하세요.');return;}
-  const startMonth=parseInt(document.getElementById('taskMonthStart').value);
+  const startVal=document.getElementById('taskMonthStart').value;
+  // 'p2' = 전 학년도 2월 (현 학년도 2월과 구분)
+  const isPrevFebStart = startVal==='p2';
+  const startMonth = isPrevFebStart ? 2 : parseInt(startVal);
   const endMonthVal=document.getElementById('taskMonthEnd').value;
   const endMonth=endMonthVal?parseInt(endMonthVal):null;
 
-  // 전 학년도 2월에서 시작하는 업무는 현 학년도 전체(3월~2월)로 이어질 수 있음
-  const isPrevFebStart = (S.curYear === S.year-1 && startMonth === 2);
-  // 종료월이 시작월보다 앞이면 경고 (전 학년도 2월 시작은 예외)
+  // 종료월이 시작월보다 앞이면 경고 (전 학년도 2월 시작은 예외 — 현 학년도로 이어짐)
   if(!isPrevFebStart && endMonth && monthIdx(endMonth) < monthIdx(startMonth)){
     showToast('종료 월은 시작 월보다 뒤여야 합니다.');return;
   }
@@ -3018,16 +3023,18 @@ function saveTask(){
     done:false,  // 새로 추가/수정한 업무는 항상 미처리 상태
   };
 
-  // 항상 startMonth 기준으로 저장 (전 학년도 2월이면 curYear=year-1)
-  const saveYear=S.curYear;
+  // 저장 연도: 전 학년도 2월 선택 시 year-1, 그 외에는 현 학년도
+  const saveYear = isPrevFebStart ? S.year-1 : S.year;
   let tasks=getDirectTasks(saveYear,startMonth);
   if(S.editingIdx!==null){
-    const oldTask = getDirectTasks(saveYear,S.curMonth)[S.editingIdx];
+    const oldTask = getDirectTasks(S.curYear,S.curMonth)[S.editingIdx];
     const oldStart = oldTask?.startMonth||S.curMonth;
-    if(oldStart !== startMonth){
-      const oldTasks=getDirectTasks(saveYear,oldStart);
+    // 연도나 월이 바뀌면 기존 위치에서 제거 후 새 위치에 추가
+    if(oldStart !== startMonth || S.curYear !== saveYear){
+      const oldTasks=getDirectTasks(S.curYear,oldStart);
       oldTasks.splice(S.editingIdx,1);
-      setMonthTasks(saveYear,oldStart,oldTasks);
+      setMonthTasks(S.curYear,oldStart,oldTasks);
+      tasks=getDirectTasks(saveYear,startMonth);
       tasks.push(task);
     } else {
       tasks[S.editingIdx]=task;
@@ -3035,8 +3042,9 @@ function saveTask(){
     showToast('수정되었습니다.','green');
   } else {
     tasks.push(task);
-    const movedMonth=startMonth!==S.curMonth;
-    showToast(movedMonth?`${MN[startMonth]} 탭에 업무가 추가되었습니다.`:'업무가 추가되었습니다.','green');
+    const movedMonth=startMonth!==S.curMonth||saveYear!==S.curYear;
+    const label=isPrevFebStart?'2월(전 학년도)':MN[startMonth];
+    showToast(movedMonth?`${label} 탭에 업무가 추가되었습니다.`:'업무가 추가되었습니다.','green');
   }
   setMonthTasks(saveYear,startMonth,tasks);
   saveUserEdited();
