@@ -623,6 +623,20 @@ header{
 
 .empty-state{text-align:center;padding:56px 20px;color:var(--gray-m);}
 
+/* 기간 업무 범위 선택 버튼 */
+.scope-btn{
+  display:flex;align-items:center;gap:13px;
+  padding:14px 16px;border-radius:10px;
+  border:1.5px solid var(--border);background:#fff;
+  cursor:pointer;text-align:left;width:100%;
+  transition:all .15s;font-family:inherit;
+}
+.scope-btn:hover{border-color:var(--navy-l);background:var(--sky);}
+.scope-icon{font-size:22px;flex-shrink:0;}
+.scope-txt{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.scope-txt strong{font-size:13px;font-weight:700;color:var(--navy);}
+.scope-txt small{font-size:11px;color:var(--gray-m);line-height:1.5;}
+
 /* ── 연간 계획 한눈에 보기 ── */
 .yv-toolbar{
   padding:11px 20px;border-bottom:1px solid var(--gray-l);
@@ -1506,6 +1520,38 @@ header{
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('printModal')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 기간 업무 범위 선택 MODAL ── -->
+<div class="modal-overlay" id="spanScopeModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <span id="spanScopeTitle">📅 연속 업무 수정</span>
+      <button class="modal-close" onclick="closeModal('spanScopeModal')">×</button>
+    </div>
+    <div class="modal-body" style="gap:14px;">
+      <p style="font-size:13px;color:var(--gray-d);line-height:1.7;" id="spanScopeDesc"></p>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <button class="scope-btn" onclick="runSpanScope('all')">
+          <span class="scope-icon">📋</span>
+          <span class="scope-txt">
+            <strong id="scopeAllTitle">전체 기간 수정</strong>
+            <small id="scopeAllDesc"></small>
+          </span>
+        </button>
+        <button class="scope-btn" onclick="runSpanScope('one')">
+          <span class="scope-icon">📄</span>
+          <span class="scope-txt">
+            <strong id="scopeOneTitle">이 달만 수정</strong>
+            <small id="scopeOneDesc"></small>
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('spanScopeModal')">취소</button>
     </div>
   </div>
 </div>
@@ -2688,24 +2734,111 @@ function openEditModal(idx){
   const allT = getMonthTasks(S.curYear, S.curMonth);
   const t = allT[idx];
   if(t._spanRef){
-    const origM = t._spanStart;
-    const origTasks = getDirectTasks(S.curYear, origM);
-    const origIdx = origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
-    if(origIdx>=0){
-      // 참조 카드 안내 강화 — 원본이 바뀜을 명확히 알림
-      const ok=confirm(
-        `이 카드는 "${t.name}" 업무의 연속 표시입니다.\n\n`+
-        `원본은 ${MN[origM]}에 있으며, 수정하면 ${MN[t.startMonth]}~${MN[t.endMonth]} 전체에 반영됩니다.\n\n`+
-        `${MN[origM]}로 이동해서 수정하시겠습니까?`
-      );
-      if(!ok) return;
-      S.curMonth = origM;
-      renderTabs();
-      openEditModalDirect(origIdx);
-      return;
-    }
+    openSpanScopeModal('edit', idx, t);
+    return;
   }
   openEditModalDirect(idx);
+}
+
+/* ── 기간 업무 범위 선택 ── */
+let _spanScope={mode:null, idx:null, task:null};
+function openSpanScopeModal(mode, idx, t){
+  _spanScope={mode, idx, task:t};
+  const isEdit=mode==='edit';
+  const range=`${MN[t.startMonth]}~${MN[t.endMonth]}`;
+  const cur=MN[S.curMonth];
+  document.getElementById('spanScopeTitle').textContent=
+    isEdit?'📅 연속 업무 수정':'📅 연속 업무 삭제';
+  document.getElementById('spanScopeDesc').innerHTML=
+    `<strong>"${esc(t.name)}"</strong>은(는) <strong>${range}</strong> 연속 업무입니다.<br>`+
+    `${isEdit?'어떻게 수정할까요?':'어떻게 삭제할까요?'}`;
+  document.getElementById('scopeAllTitle').textContent=
+    isEdit?'전체 기간 수정':'전체 기간 삭제';
+  document.getElementById('scopeAllDesc').textContent=
+    isEdit?`${range} 모든 달에 반영됩니다.`:`${range} 모든 달에서 사라집니다.`;
+  document.getElementById('scopeOneTitle').textContent=
+    isEdit?`${cur}만 수정`:`${cur}만 삭제`;
+  document.getElementById('scopeOneDesc').textContent=
+    isEdit?`${cur}을 별도 업무로 분리해 수정합니다. 다른 달은 그대로 유지됩니다.`
+          :`${cur}에서만 제외합니다. 다른 달은 그대로 유지됩니다.`;
+  document.getElementById('spanScopeModal').classList.add('open');
+}
+
+function runSpanScope(scope){
+  closeModal('spanScopeModal');
+  const {mode, idx, task}=_spanScope;
+  if(!task) return;
+  if(scope==='all'){
+    // 원본으로 이동해 처리
+    const origM=task._spanStart;
+    const origTasks=getDirectTasks(S.curYear, origM);
+    const origIdx=origTasks.findIndex(ot=>ot.name===task.name&&ot.startMonth===task.startMonth);
+    if(origIdx<0){ showToast('원본 업무를 찾을 수 없습니다.'); return; }
+    if(mode==='edit'){
+      S.curMonth=origM; renderTabs();
+      openEditModalDirect(origIdx);
+    } else {
+      origTasks.splice(origIdx,1);
+      setMonthTasks(S.curYear, origM, origTasks);
+      render(); showToast('전체 기간에서 삭제되었습니다.');
+    }
+    return;
+  }
+  // 이 달만 — 현재 달을 기간에서 떼어내 독립 업무로 분리
+  const detached=detachMonthFromSpan(task, S.curMonth);
+  if(!detached){ showToast('분리에 실패했습니다.'); return; }
+  if(mode==='edit'){
+    render();
+    // 분리된 업무의 인덱스를 찾아 수정 모달 열기
+    const list=getDirectTasks(S.curYear, S.curMonth);
+    const newIdx=list.findIndex(x=>x===detached);
+    if(newIdx>=0) openEditModalDirect(newIdx);
+  } else {
+    // 삭제: 분리 후 바로 제거
+    const list=getDirectTasks(S.curYear, S.curMonth);
+    const i=list.findIndex(x=>x===detached);
+    if(i>=0){ list.splice(i,1); setMonthTasks(S.curYear, S.curMonth, list); }
+    render(); showToast(`${MN[S.curMonth]}에서만 삭제되었습니다.`);
+  }
+}
+
+/* 기간 업무에서 특정 달을 떼어내 독립 업무로 만들기
+   반환: 새로 만들어진 독립 업무 객체 */
+function detachMonthFromSpan(refTask, month){
+  const y=S.curYear;
+  const origM=refTask._spanStart;
+  const origTasks=getDirectTasks(y, origM);
+  const oi=origTasks.findIndex(ot=>ot.name===refTask.name&&ot.startMonth===refTask.startMonth);
+  if(oi<0) return null;
+  const orig=origTasks[oi];
+  const sIdx=monthIdx(orig.startMonth), eIdx=monthIdx(orig.endMonth), mIdx=monthIdx(month);
+  if(mIdx<=sIdx||mIdx>eIdx) return null;
+
+  // 1) 원본 기간을 분리 지점 앞까지로 축소
+  const newEndIdx=mIdx-1;
+  orig.endMonth = newEndIdx===sIdx ? null : MONTHS[newEndIdx];
+  origTasks[oi]=orig;
+  setMonthTasks(y, origM, origTasks);
+
+  // 2) 분리한 달에 독립 업무 생성
+  const copy={...orig, startMonth:month, endMonth:null};
+  delete copy._spanRef; delete copy._spanStart;
+  const cur=getDirectTasks(y, month);
+  cur.push(copy);
+  setMonthTasks(y, month, cur);
+
+  // 3) 분리 지점 이후가 남아 있으면 그 구간도 별도 기간 업무로 복원
+  if(mIdx<eIdx){
+    const restStart=MONTHS[mIdx+1];
+    const rest={...orig, startMonth:restStart,
+      endMonth: mIdx+1===eIdx ? null : MONTHS[eIdx]};
+    delete rest._spanRef; delete rest._spanStart;
+    const rl=getDirectTasks(y, restStart);
+    rl.push(rest);
+    setMonthTasks(y, restStart, rl);
+  }
+  saveTasks();
+  return copy;
 }
 function openEditModalDirect(idx){
   const t = getDirectTasks(S.curYear, S.curMonth)[idx];
@@ -2830,25 +2963,16 @@ function cancelDelete(btn){
   btn.closest('.task-card').classList.remove('deleting');
 }
 function deleteTask(idx){
-  // 기간 업무 참조 카드인 경우 → 원본 월에서 삭제
   const allT=getMonthTasks(S.curYear,S.curMonth);
   const t=allT[idx];
   if(t._spanRef){
-    const origM=t._spanStart;
-    // 참조 카드 안내 강화 — 원본이 삭제됨을 명확히 알림
-    const ok=confirm(
-      `이 카드는 "${t.name}" 업무의 연속 표시입니다.\n\n`+
-      `삭제하면 원본(${MN[origM]})과 함께 ${MN[t.startMonth]}~${MN[t.endMonth]} 전체에서 사라집니다.\n\n`+
-      `정말 삭제하시겠습니까?`
-    );
-    if(!ok){ render(); return; }
-    const origTasks=getDirectTasks(S.curYear,origM);
-    const origIdx=origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
-    if(origIdx>=0){origTasks.splice(origIdx,1);setMonthTasks(S.curYear,origM,origTasks);}
-  } else {
-    const tasks=getDirectTasks(S.curYear,S.curMonth);
-    tasks.splice(idx,1);setMonthTasks(S.curYear,S.curMonth,tasks);
+    // 연속 카드 → 전체/이 달만 선택
+    render();  // 인라인 삭제창 닫기
+    openSpanScopeModal('delete', idx, t);
+    return;
   }
+  const tasks=getDirectTasks(S.curYear,S.curMonth);
+  tasks.splice(idx,1);setMonthTasks(S.curYear,S.curMonth,tasks);
   render();showToast('삭제되었습니다.');
 }
 
