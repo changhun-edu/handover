@@ -2913,7 +2913,8 @@ function detachMonthFromSpan(refTask, month){
     setMonthTasks(o.year, o.month, origTasks);
     // 분리한 달에 독립 업무 생성
     const copy={...orig, startMonth:month, endMonth:null};
-    delete copy._spanRef; delete copy._spanStart; delete copy._spanPrevYear; delete copy.spanGroup;
+    delete copy._spanRef; delete copy._spanStart; delete copy._spanPrevYear;
+    delete copy.spanGroup; delete copy.prevFebStart;
     const cur=getDirectTasks(y, month);
     cur.push(copy); setMonthTasks(y, month, cur);
     // 이후 구간이 남으면 현 학년도에 같은 그룹으로 복원
@@ -2922,6 +2923,7 @@ function detachMonthFromSpan(refTask, month){
       const rest={...orig, startMonth:restStart,
         endMonth: mIdx+1===eIdx ? null : MONTHS[eIdx], spanGroup:gid};
       delete rest._spanRef; delete rest._spanStart; delete rest._spanPrevYear;
+      delete rest.prevFebStart;
       const rl=getDirectTasks(y, restStart);
       rl.push(rest); setMonthTasks(y, restStart, rl);
     }
@@ -2930,10 +2932,36 @@ function detachMonthFromSpan(refTask, month){
   }
 
   const sIdx=monthIdx(orig.startMonth), eIdx=monthIdx(orig.endMonth), mIdx=monthIdx(month);
-  if(mIdx<=sIdx||mIdx>eIdx) return null;
+  if(mIdx<sIdx||mIdx>eIdx) return null;   // 기간 밖이면 분리 불가
 
   // 같은 원본에서 나온 조각임을 표시할 그룹 ID (없으면 새로 생성)
   const gid = orig.spanGroup || ('sg'+Date.now()+Math.random().toString(36).slice(2,6));
+
+  // ── 시작 월을 분리하는 경우: 원본의 시작을 다음 달로 미룸 ──
+  if(mIdx===sIdx){
+    // 원본 자리에서 제거하고, 남은 구간을 다음 달부터로 재생성
+    origTasks.splice(oi,1);
+    setMonthTasks(y, o.month, origTasks);
+    // 분리한 달(=원래 시작월)에 독립 업무 생성
+    const copy={...orig, startMonth:month, endMonth:null};
+    delete copy._spanRef; delete copy._spanStart; delete copy.spanGroup;
+    const cur=getDirectTasks(y, month);
+    cur.push(copy);
+    setMonthTasks(y, month, cur);
+    // 남은 구간(다음 달 ~ 종료월)을 같은 그룹으로 복원
+    if(mIdx<eIdx){
+      const restStart=MONTHS[mIdx+1];
+      const rest={...orig, startMonth:restStart,
+        endMonth: mIdx+1===eIdx ? null : MONTHS[eIdx], spanGroup:gid};
+      delete rest._spanRef; delete rest._spanStart;
+      const rl=getDirectTasks(y, restStart);
+      rl.push(rest);
+      setMonthTasks(y, restStart, rl);
+    }
+    saveTasks();
+    return copy;
+  }
+
   orig.spanGroup = gid;
 
   // 1) 원본 기간을 분리 지점 앞까지로 축소
@@ -3113,8 +3141,8 @@ function deleteTask(idx){
     openSpanScopeModal('delete', idx, t);
     return;
   }
-  // 분리로 쪼개진 조각이 다른 달에도 있으면 범위 선택
-  if(t.spanGroup && findSpanGroupParts(S.curYear,t).length>1){
+  // 기간 업무의 시작 월(원본) 또는 분리로 쪼개진 조각 → 범위 선택
+  if(isSpan(t) || (t.spanGroup && findSpanGroupParts(S.curYear,t).length>1)){
     render();
     openSpanScopeModal('delete', idx, {...t,_spanRef:true,_spanStart:t.startMonth});
     return;
@@ -3640,7 +3668,7 @@ function buildPrintMonthGrid(){
   let html=`<button type="button" class="pm-btn prev${_printPicked.has('p2')?' on':''}${prevCnt?'':' empty'}"
     onclick="togglePrintMonth('p2')"><span>전 2월</span><span class="pm-cnt">${prevCnt}</span></button>`;
   MONTHS.forEach(m=>{
-    const cnt=getMonthTasks(S.year,m).length;
+    const cnt=getMonthTasks(S.year,m).filter(t=>!t._spanRef).length;
     html+=`<button type="button" class="pm-btn${_printPicked.has(m)?' on':''}${cnt?'':' empty'}"
       onclick="togglePrintMonth(${m})"><span>${MN[m]}</span><span class="pm-cnt">${cnt}</span></button>`;
   });
@@ -3686,7 +3714,8 @@ function doPrint(){
     months = S.curYear===S.year-1 ? [] : [S.curMonth];
     printPrevFeb = S.curYear===S.year-1;
   } else if(range==='nonempty'){
-    months = MONTHS.filter(m=>getMonthTasks(S.year,m).length>0);
+    // 본문 출력과 동일한 기준(참조 카드 제외)으로 판정
+    months = MONTHS.filter(m=>getMonthTasks(S.year,m).filter(t=>!t._spanRef).length>0);
     printPrevFeb = getMonthTasks(S.year-1,2).filter(t=>!t._spanRef).length>0;
   } else if(range==='pick'){
     if(_printPicked.size===0){ showToast('출력할 달을 선택하세요.'); return; }
