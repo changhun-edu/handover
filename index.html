@@ -592,12 +592,22 @@ header{
 }
 
 /* 미리보기 */
+.desc-preview-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:8px;margin-bottom:4px;
+  font-size:11px;font-weight:600;color:var(--gray-m);
+}
+.preview-collapse{
+  background:none;border:none;cursor:pointer;
+  font-size:11px;color:var(--navy-l);font-weight:600;padding:2px 6px;border-radius:4px;
+}
+.preview-collapse:hover{background:var(--sky);}
 .desc-preview{
   border:1.5px solid var(--sky-m);border-radius:8px;
   padding:12px 14px;background:#fbfcfe;
   font-size:13px;line-height:1.65;color:#555;
-  white-space:pre-wrap;min-height:80px;
-  max-height:320px;overflow-y:auto;
+  white-space:pre-wrap;min-height:60px;
+  max-height:260px;overflow-y:auto;
 }
 .desc-preview mark{background:#ffe9a8;padding:0 2px;border-radius:2px;}
 .desc-preview strong{font-weight:700;color:var(--gray-d);}
@@ -1132,8 +1142,6 @@ header{
           <button type="button" class="fmt-btn" onclick="applyFormat('list')" title="목록">• 목록</button>
           <button type="button" class="fmt-btn" onclick="applyFormat('num')" title="번호 목록">1. 번호</button>
           <button type="button" class="fmt-btn" onclick="applyFormat('warn')" title="주의 표시">⚠️ 주의</button>
-          <span class="fmt-sep"></span>
-          <button type="button" class="fmt-btn" id="descPreviewBtn" onclick="toggleDescPreview()" title="서식 적용 결과 미리보기">👁 미리보기</button>
         </div>
         <div class="desc-guide">
           <span class="desc-guide-label">템플릿:</span>
@@ -1142,10 +1150,14 @@ header{
           <button type="button" class="desc-tpl" onclick="applyDescTpl('doc')">📄 서류</button>
           <button type="button" class="desc-tpl" onclick="applyDescTpl('caution')">⚠️ 주의사항</button>
         </div>
-        <textarea class="form-textarea" id="taskDesc"
+        <textarea class="form-textarea" id="taskDesc" oninput="updateDescPreview()"
           placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.&#10;&#10;예)&#10;1. 에듀파인 로그인 → 공문 → 새 공문 작성&#10;2. 교장·교감 결재 후 발송&#10;3. 공문 번호 업무일지에 기록"></textarea>
-        <div id="descPreview" class="desc-preview" style="display:none;"></div>
-        <p class="fmt-hint">텍스트를 선택하고 버튼을 누르면 서식 기호가 삽입됩니다. 입력창에는 기호가 그대로 보이며, <strong>저장 후 카드</strong>나 <strong>👁 미리보기</strong>에서 적용된 모습을 확인할 수 있습니다.</p>
+        <div class="desc-preview-head">
+          <span>👁 적용 결과 미리보기</span>
+          <button type="button" class="preview-collapse" onclick="toggleDescPreview()" id="descPreviewBtn2">접기 ▴</button>
+        </div>
+        <div id="descPreview" class="desc-preview"></div>
+        <p class="fmt-hint">텍스트를 선택하고 버튼을 누르면 서식이 적용됩니다. 입력창에는 기호(<code>**</code>, <code>__</code> 등)가 보이고, 아래 미리보기에서 실제 모습을 확인할 수 있습니다.</p>
       </div>
 
       <!-- ▼ 상세 정보 토글 -->
@@ -2892,7 +2904,7 @@ function removeFormat(kind){
     el.focus(); el.setSelectionRange(lastOpen,lastOpen+inner.length);
   }
   autoResizeDesc(el);
-  if(_descPreviewOn) updateDescPreview();
+  updateDescPreview();
 }
 /* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수 */
 /* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수
@@ -2925,7 +2937,7 @@ function wrapSelection(openTag,closeTag,placeholder,kind){
         const st=lastOpen+openTag.length;
         el.setSelectionRange(st,st+inner.length);
         autoResizeDesc(el);
-        if(_descPreviewOn) updateDescPreview();
+        updateDescPreview();
         return;
       }
     }
@@ -2968,33 +2980,25 @@ function wrapSelection(openTag,closeTag,placeholder,kind){
   const start=before.length+openTag.length;
   el.setSelectionRange(start,start+text.length);
   autoResizeDesc(el);
-  if(_descPreviewOn) updateDescPreview();
+  updateDescPreview();
 }
 function resetDescPreview(){
-  _descPreviewOn=false;
-  const ta=document.getElementById('taskDesc');
   const pv=document.getElementById('descPreview');
-  const btn=document.getElementById('descPreviewBtn');
-  if(ta) ta.style.display='';
-  if(pv) pv.style.display='none';
-  if(btn){ btn.classList.remove('active'); btn.textContent='👁 미리보기'; }
+  const head=document.querySelector('.desc-preview-head');
+  const btn=document.getElementById('descPreviewBtn2');
+  if(pv) pv.style.display='';
+  if(head) head.style.display='';
+  if(btn) btn.textContent='접기 ▴';
   document.getElementById('fmtColorMenu')?.classList.remove('open');
+  updateDescPreview();
 }
-let _descPreviewOn=false;
+let _descPreviewOn=true;
 function toggleDescPreview(){
   _descPreviewOn=!_descPreviewOn;
-  const ta=document.getElementById('taskDesc');
   const pv=document.getElementById('descPreview');
-  const btn=document.getElementById('descPreviewBtn');
-  if(_descPreviewOn){
-    updateDescPreview();
-    ta.style.display='none'; pv.style.display='block';
-    btn.classList.add('active'); btn.textContent='✏️ 편집으로';
-  } else {
-    ta.style.display=''; pv.style.display='none';
-    btn.classList.remove('active'); btn.textContent='👁 미리보기';
-    ta.focus();
-  }
+  const btn=document.getElementById('descPreviewBtn2');
+  pv.style.display=_descPreviewOn?'':'none';
+  btn.textContent=_descPreviewOn?'접기 ▴':'펼치기 ▾';
 }
 function updateDescPreview(){
   const v=document.getElementById('taskDesc').value;
@@ -3586,22 +3590,29 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 /* URL을 클릭 가능한 링크로 변환 (esc 처리 후 적용) */
 /* 마크다운 서식 변환 — esc() 처리된 문자열에만 적용 (XSS 안전) */
 function applyMdFormat(escaped){
-  return escaped
-    // {color:#rrggbb}...{/color} — 값 검증으로 XSS 차단
-    .replace(/\{color:(#[0-9a-fA-F]{3,6})\}([\s\S]*?)\{\/color\}/g,
-      (m,c,txt)=>`<span style="color:${c}">${txt}</span>`)
-    // {size:NN}...{/size} — 8~40px만 허용
-    .replace(/\{size:(\d{1,2})\}([\s\S]*?)\{\/size\}/g,
-      (m,px,txt)=>{
-        const n=Math.min(40,Math.max(8,parseInt(px)));
-        return `<span style="font-size:${n}px">${txt}</span>`;
-      })
-    // ==강조== → 형광펜
-    .replace(/==([^=\n]+)==/g,'<mark>$1</mark>')
-    // **굵게**
-    .replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>')
-    // __밑줄__
-    .replace(/__([^_\n]+)__/g,'<u>$1</u>')
+  let out=escaped;
+  // color / size 는 중첩 가능하므로 안쪽부터 반복 처리
+  for(let i=0;i<6;i++){
+    const before=out;
+    out=out
+      // {color:#rrggbb}...{/color} — 가장 안쪽 쌍부터 (내부에 같은 태그 없는 것)
+      .replace(/\{color:(#[0-9a-fA-F]{3,6})\}((?:(?!\{color:|\{\/color\})[\s\S])*)\{\/color\}/g,
+        (m,c,txt)=>`<span style="color:${c}">${txt}</span>`)
+      // {size:NN}...{/size} — 8~40px만 허용
+      .replace(/\{size:(\d{1,2})\}((?:(?!\{size:|\{\/size\})[\s\S])*)\{\/size\}/g,
+        (m,px,txt)=>{
+          const n=Math.min(40,Math.max(8,parseInt(px)));
+          return `<span style="font-size:${n}px">${txt}</span>`;
+        });
+    if(out===before) break;
+  }
+  return out
+    // ==강조== (여러 줄 허용, 최소 매칭)
+    .replace(/==([\s\S]+?)==/g,'<mark>$1</mark>')
+    // **굵게** (최소 매칭 — 중간에 * 있어도 동작)
+    .replace(/\*\*([\s\S]+?)\*\*/g,'<strong>$1</strong>')
+    // __밑줄__ (최소 매칭 — 중간에 _ 있어도 동작)
+    .replace(/__([\s\S]+?)__/g,'<u>$1</u>')
     // *기울임* (굵게 처리 후 남은 단일 * 만)
     .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,'$1<em>$2</em>');
 }
