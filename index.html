@@ -785,12 +785,8 @@ header{
             <div><span style="color:var(--gray-m);width:70px;display:inline-block;">학년도</span> <strong id="previewYear">—</strong></div>
             <div><span style="color:var(--gray-m);width:70px;display:inline-block;">업무 수</span> <strong id="previewTaskCount">—</strong></div>
           </div>
-          <div id="fileNameSection" style="margin-top:12px;">
-            <label class="setup-label" style="font-size:12px;" id="fileNameLabel">내 이름 *</label>
-            <input class="setup-input" id="fileHandoverTo" placeholder="예: 홍길동" maxlength="20"
-              onkeydown="if(event.key==='Enter')startFromFile()" style="margin-bottom:8px;">
-          </div>
-          <button class="btn btn-primary setup-btn" onclick="startFromFile()" id="fileStartConfirmBtn">이 파일로 시작 →</button>
+          <button class="btn btn-primary setup-btn" onclick="startFromFile()" id="fileStartConfirmBtn" style="margin-top:12px;">이 파일로 시작 →</button>
+          <p style="font-size:11px;color:var(--gray-m);text-align:center;margin-top:8px;">인계일·인수자 이름은 시작 후 <strong>✏️ 설정 변경</strong>에서 입력할 수 있습니다.</p>
         </div>
 
       </div>
@@ -1731,29 +1727,10 @@ function loadSetupFile(e){
       // 업무 총 건수 계산
       const taskCount=Object.values(data.tasks||{}).reduce((s,a)=>s+(a?.length||0),0);
 
-      // 현재 저장된 부서명과 파일 부서명 비교 → 이어서 작업 vs 인수 구분
-      const savedDept=S.deptName||'';
-      const fileDept=data.dept||'';
-      const isContinue=savedDept&&fileDept&&savedDept===fileDept;
-
-      // 미리보기 제목·안내 분기
+      // 중립적 미리보기 — 내 백업/전임자 파일 구분 없음
       const previewTitle=document.getElementById('previewTitle');
-      const fileNameLabel=document.getElementById('fileNameLabel');
-      const fileHandoverTo=document.getElementById('fileHandoverTo');
-
-      if(isContinue){
-        previewTitle.textContent='📂 내 파일 — 이어서 작업합니다';
-        previewTitle.style.color='var(--navy)';
-        fileNameLabel.textContent='내 이름 (선택)';
-        fileHandoverTo.placeholder='비워두면 기존 이름 유지';
-      } else {
-        previewTitle.textContent='🤝 전임자 파일 — 인수를 시작합니다';
-        previewTitle.style.color='var(--green)';
-        fileNameLabel.textContent='내 이름 (인수자) *';
-        fileHandoverTo.placeholder='예: 홍길동';
-      }
-      // 기존 저장된 이름 기본값으로
-      fileHandoverTo.value=S.handoverTo||'';
+      previewTitle.textContent='📂 불러온 파일';
+      previewTitle.style.color='var(--navy)';
 
       document.getElementById('previewSchool').textContent=data.school||'(없음)';
       document.getElementById('previewDept').textContent=data.dept||'(없음)';
@@ -1762,8 +1739,7 @@ function loadSetupFile(e){
       document.getElementById('previewTaskCount').textContent=`${taskCount}건`;
       document.getElementById('filePreview').style.display='block';
 
-      if(!isContinue) fileHandoverTo.focus();
-      showToast(isContinue?'내 파일을 불러왔습니다. 바로 시작하세요.':'파일을 읽었습니다. 내 이름을 입력하고 시작하세요.','green');
+      showToast('파일을 읽었습니다. "이 파일로 시작"을 누르세요.','green');
     } catch(err){
       _setupFileData=null;
       document.getElementById('filePreview').style.display='none';
@@ -1777,27 +1753,11 @@ function loadSetupFile(e){
 function startFromFile(){
   if(!_setupFileData){ showToast('파일을 먼저 선택하세요.'); return; }
   const data=_setupFileData;
-  const myName=document.getElementById('fileHandoverTo').value.trim();
-
-  // 이어서 작업 vs 인수 구분
-  const savedDept=S.deptName||'';
-  const fileDept=data.dept||'';
-  const isContinue=savedDept&&fileDept&&savedDept===fileDept;
-
-  // 인수 모드에서는 이름 필수
-  if(!isContinue&&!myName){
-    showToast('내 이름(인수자)을 입력하세요.');
-    document.getElementById('fileHandoverTo').focus();
-    return;
-  }
 
   // 기존 데이터가 있으면 경고
   const hasData=Object.keys(S.tasks).length>0;
   if(hasData){
-    const msg=isContinue
-      ? '기존 데이터를 파일 내용으로 교체하시겠습니까?'
-      : '기존 데이터를 지우고 파일의 데이터로 교체하시겠습니까?';
-    if(!confirm(msg+'\n\n※ 삭제된 데이터는 복구할 수 없습니다.')) return;
+    if(!confirm('기존 데이터를 파일의 데이터로 교체하시겠습니까?\n\n※ 삭제된 데이터는 복구할 수 없습니다.')) return;
   }
 
   // 데이터 적용
@@ -1810,21 +1770,14 @@ function startFromFile(){
   S.deptName=document.getElementById('setupDeptInput').value.trim()||data.dept||''; saveDept();
   // 파일 자체가 백업이므로 exportedAt을 lastBackup으로 설정 → 백업 경고 방지
   if(data.exportedAt) saveBackupDate(data.exportedAt);
-
-  if(isContinue){
-    // 이어서 작업: 이름은 기존 유지 또는 입력값
-    if(myName) S.handoverTo=myName;
-    // 인계일은 그대로 유지
-  } else {
-    // 인수: 오늘을 인수일로, 내 이름 저장
-    S.handoverDate=new Date().toISOString().split('T')[0];
-    S.handoverTo=myName;
-  }
+  // 인계일·인수자는 파일에 저장된 값 유지 (없으면 설정 변경에서 입력)
+  if(data.handoverDate) S.handoverDate=data.handoverDate;
+  if(data.handoverTo) S.handoverTo=data.handoverTo;
   saveHandover();
 
   _setupFileData=null;
   launchApp(true);
-  showToast(isContinue?'이어서 작업합니다.':'인수가 완료되었습니다. 환영합니다!','green');
+  showToast('파일을 불러왔습니다.','green');
 }
 
 function startApp(withSample=false){
