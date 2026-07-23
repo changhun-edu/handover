@@ -566,6 +566,45 @@ header{
 .fmt-btn:hover{border-color:var(--navy-l);color:var(--navy);background:var(--sky);}
 .fmt-btn:active{transform:scale(.94);}
 .fmt-sep{width:1px;height:16px;background:var(--border);margin:0 3px;}
+
+/* 색상 선택 */
+.fmt-color-wrap{position:relative;}
+.fmt-color-menu{
+  display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:60;
+  background:#fff;border:1.5px solid var(--border);border-radius:8px;
+  padding:7px;box-shadow:0 6px 20px rgba(27,58,107,.16);
+  grid-template-columns:repeat(3,1fr);gap:5px;
+}
+.fmt-color-menu.open{display:grid;}
+.fmt-color-menu button{
+  width:24px;height:24px;border-radius:5px;
+  border:1.5px solid rgba(0,0,0,.12);cursor:pointer;
+  transition:transform .12s;
+}
+.fmt-color-menu button:hover{transform:scale(1.15);}
+
+/* 글자 크기 */
+.fmt-size-sel{
+  padding:4px 6px;border-radius:5px;
+  border:1px solid var(--border);background:#fff;
+  font-size:11px;color:var(--gray-d);cursor:pointer;
+  font-family:inherit;
+}
+
+/* 미리보기 */
+.desc-preview{
+  border:1.5px solid var(--sky-m);border-radius:8px;
+  padding:12px 14px;background:#fbfcfe;
+  font-size:13px;line-height:1.65;color:#555;
+  white-space:pre-wrap;min-height:80px;
+  max-height:320px;overflow-y:auto;
+}
+.desc-preview mark{background:#ffe9a8;padding:0 2px;border-radius:2px;}
+.desc-preview strong{font-weight:700;color:var(--gray-d);}
+.desc-preview em{font-style:italic;}
+.desc-preview u{text-decoration:underline;}
+.desc-preview a{color:var(--navy-l);text-decoration:underline;}
+.fmt-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
 .fmt-hint{
   font-size:11px;color:var(--gray-m);margin-top:5px;line-height:1.6;
 }
@@ -659,12 +698,12 @@ header{
 .copy-month-btn:disabled{opacity:.4;cursor:not-allowed;}
 
 /* ── MODAL ── */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(27,58,107,.38);z-index:300;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(12,26,50,.62);backdrop-filter:blur(2px);z-index:300;align-items:center;justify-content:center;padding:16px;}
 /* 카테고리 모달은 업무 모달 위에 표시 */
 #catModal{z-index:340;}
 .modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:14px;width:100%;max-width:640px;box-shadow:0 8px 40px rgba(27,58,107,.22);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
-.modal-header{background:var(--navy);color:#fff;padding:15px 20px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:640px;border:1px solid rgba(255,255,255,.9);box-shadow:0 18px 60px rgba(0,0,0,.4);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
+.modal-header{background:#12294D;color:#fff;padding:15px 20px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:3px solid var(--accent);}
 .modal-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;}
 .modal-body{padding:18px 20px;display:flex;flex-direction:column;gap:13px;overflow-y:auto;}
 .modal-footer{padding:13px 20px;border-top:1px solid var(--gray-l);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;}
@@ -1061,14 +1100,38 @@ header{
         <label class="form-label">업무 설명 / 처리 방법</label>
         <!-- 서식 툴바 -->
         <div class="desc-format-bar">
-          <button type="button" class="fmt-btn" onclick="applyFormat('bold')" title="굵게 (선택 후 클릭)"><strong>B</strong></button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('bold')" title="굵게"><strong>B</strong></button>
           <button type="button" class="fmt-btn" onclick="applyFormat('italic')" title="기울임"><em>I</em></button>
           <button type="button" class="fmt-btn" onclick="applyFormat('underline')" title="밑줄"><u>U</u></button>
-          <button type="button" class="fmt-btn" onclick="applyFormat('mark')" title="형광펜 강조"><span style="background:#ffe9a8;padding:0 3px;border-radius:2px;">H</span></button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('mark')" title="형광펜"><span style="background:#ffe9a8;padding:0 3px;border-radius:2px;">H</span></button>
+          <span class="fmt-sep"></span>
+          <!-- 글자 색상 -->
+          <div class="fmt-color-wrap">
+            <button type="button" class="fmt-btn" onclick="toggleColorPicker(event)" title="글자 색상">🎨 색</button>
+            <div class="fmt-color-menu" id="fmtColorMenu">
+              <button type="button" style="background:#e74c3c" onclick="applyColor('#e74c3c')" title="빨강"></button>
+              <button type="button" style="background:#e67e22" onclick="applyColor('#e67e22')" title="주황"></button>
+              <button type="button" style="background:#16a085" onclick="applyColor('#16a085')" title="초록"></button>
+              <button type="button" style="background:#2980b9" onclick="applyColor('#2980b9')" title="파랑"></button>
+              <button type="button" style="background:#8e44ad" onclick="applyColor('#8e44ad')" title="보라"></button>
+              <button type="button" style="background:#2c3e50" onclick="applyColor('#2c3e50')" title="검정"></button>
+            </div>
+          </div>
+          <!-- 글자 크기 -->
+          <select class="fmt-size-sel" onchange="applySize(this.value);this.selectedIndex=0;" title="글자 크기">
+            <option value="">크기</option>
+            <option value="11">11px (작게)</option>
+            <option value="13">13px (기본)</option>
+            <option value="15">15px</option>
+            <option value="18">18px</option>
+            <option value="22">22px (크게)</option>
+          </select>
           <span class="fmt-sep"></span>
           <button type="button" class="fmt-btn" onclick="applyFormat('list')" title="목록">• 목록</button>
           <button type="button" class="fmt-btn" onclick="applyFormat('num')" title="번호 목록">1. 번호</button>
           <button type="button" class="fmt-btn" onclick="applyFormat('warn')" title="주의 표시">⚠️ 주의</button>
+          <span class="fmt-sep"></span>
+          <button type="button" class="fmt-btn" id="descPreviewBtn" onclick="toggleDescPreview()" title="서식 적용 결과 미리보기">👁 미리보기</button>
         </div>
         <div class="desc-guide">
           <span class="desc-guide-label">템플릿:</span>
@@ -1079,7 +1142,8 @@ header{
         </div>
         <textarea class="form-textarea" id="taskDesc"
           placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.&#10;&#10;예)&#10;1. 에듀파인 로그인 → 공문 → 새 공문 작성&#10;2. 교장·교감 결재 후 발송&#10;3. 공문 번호 업무일지에 기록"></textarea>
-        <p class="fmt-hint">텍스트를 선택하고 버튼을 누르면 서식이 적용됩니다. <strong>**굵게**</strong> · <em>*기울임*</em> · <u>__밑줄__</u> · <span style="background:#ffe9a8;">==강조==</span></p>
+        <div id="descPreview" class="desc-preview" style="display:none;"></div>
+        <p class="fmt-hint">텍스트를 선택하고 버튼을 누르면 서식 기호가 삽입됩니다. 입력창에는 기호가 그대로 보이며, <strong>저장 후 카드</strong>나 <strong>👁 미리보기</strong>에서 적용된 모습을 확인할 수 있습니다.</p>
       </div>
 
       <!-- ▼ 상세 정보 토글 -->
@@ -2600,6 +2664,7 @@ function openAddModal(){
   toggleDetailFields(false);  // 추가 시 상세 접기
   populateMonthSels(S.curMonth, '');  // 전 학년도 2월일 때도 그대로 사용
   populateCatSel('');
+  resetDescPreview();
   document.getElementById('taskModal').classList.add('open');
   setTimeout(()=>{document.getElementById('taskName').focus();initAutoResize();},80);
 }
@@ -2653,6 +2718,7 @@ function openEditModalDirect(idx){
   toggleDetailFields(!!hasDetail);
   populateMonthSels(t.startMonth||S.curMonth, t.endMonth||'');
   populateCatSel(t.category||'');
+  resetDescPreview();
   document.getElementById('taskModal').classList.add('open');
   setTimeout(()=>initAutoResize(),80);
 }
@@ -2777,6 +2843,68 @@ const DESC_TPLS={
   doc:`■ 필요 서류:\n  - \n  - \n■ 제출처: \n■ 제출 기한: \n■ 보관 위치: `,
   caution:`⚠️ 주의사항:\n- \n- \n\n✅ 반드시 확인할 것:\n- \n\n📌 이전에 문제가 됐던 점:\n- `,
 };
+/* ── 색상 / 크기 / 미리보기 ── */
+function toggleColorPicker(e){
+  e.stopPropagation();
+  document.getElementById('fmtColorMenu').classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.fmt-color-wrap'))
+    document.getElementById('fmtColorMenu')?.classList.remove('open');
+});
+function applyColor(color){
+  document.getElementById('fmtColorMenu').classList.remove('open');
+  wrapSelection(`{color:${color}}`,'{/color}','색상 텍스트');
+}
+function applySize(px){
+  if(!px) return;
+  wrapSelection(`{size:${px}}`,'{/size}','크기 텍스트');
+}
+/* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수 */
+function wrapSelection(openTag,closeTag,placeholder){
+  const el=document.getElementById('taskDesc');
+  const s=el.selectionStart, e=el.selectionEnd, val=el.value;
+  const sel=val.slice(s,e);
+  const text=sel||placeholder;
+  el.value=val.slice(0,s)+openTag+text+closeTag+val.slice(e);
+  el.focus();
+  const start=s+openTag.length;
+  el.setSelectionRange(start,start+text.length);
+  autoResizeDesc(el);
+  if(_descPreviewOn) updateDescPreview();
+}
+function resetDescPreview(){
+  _descPreviewOn=false;
+  const ta=document.getElementById('taskDesc');
+  const pv=document.getElementById('descPreview');
+  const btn=document.getElementById('descPreviewBtn');
+  if(ta) ta.style.display='';
+  if(pv) pv.style.display='none';
+  if(btn){ btn.classList.remove('active'); btn.textContent='👁 미리보기'; }
+  document.getElementById('fmtColorMenu')?.classList.remove('open');
+}
+let _descPreviewOn=false;
+function toggleDescPreview(){
+  _descPreviewOn=!_descPreviewOn;
+  const ta=document.getElementById('taskDesc');
+  const pv=document.getElementById('descPreview');
+  const btn=document.getElementById('descPreviewBtn');
+  if(_descPreviewOn){
+    updateDescPreview();
+    ta.style.display='none'; pv.style.display='block';
+    btn.classList.add('active'); btn.textContent='✏️ 편집으로';
+  } else {
+    ta.style.display=''; pv.style.display='none';
+    btn.classList.remove('active'); btn.textContent='👁 미리보기';
+    ta.focus();
+  }
+}
+function updateDescPreview(){
+  const v=document.getElementById('taskDesc').value;
+  document.getElementById('descPreview').innerHTML=
+    v.trim()?linkify(v):'<span style="color:#aaa;">내용을 입력하면 여기에 적용된 모습이 표시됩니다.</span>';
+}
+
 /* ── 서식 적용 (마크다운 문법 삽입) ── */
 function applyFormat(kind){
   const el=document.getElementById('taskDesc');
@@ -3362,6 +3490,15 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 /* 마크다운 서식 변환 — esc() 처리된 문자열에만 적용 (XSS 안전) */
 function applyMdFormat(escaped){
   return escaped
+    // {color:#rrggbb}...{/color} — 값 검증으로 XSS 차단
+    .replace(/\{color:(#[0-9a-fA-F]{3,6})\}([\s\S]*?)\{\/color\}/g,
+      (m,c,txt)=>`<span style="color:${c}">${txt}</span>`)
+    // {size:NN}...{/size} — 8~40px만 허용
+    .replace(/\{size:(\d{1,2})\}([\s\S]*?)\{\/size\}/g,
+      (m,px,txt)=>{
+        const n=Math.min(40,Math.max(8,parseInt(px)));
+        return `<span style="font-size:${n}px">${txt}</span>`;
+      })
     // ==강조== → 형광펜
     .replace(/==([^=\n]+)==/g,'<mark>$1</mark>')
     // **굵게**
