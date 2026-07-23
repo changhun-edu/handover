@@ -1611,8 +1611,9 @@ function setDone(year, monthKey, idx, val){
 }
 
 function toggleDoneByYear(monthKey, idx){
-  const cur=isDone(S.year, monthKey, idx);
-  setDone(S.year, monthKey, idx, !cur);
+  const y=S.curYear;  // 전 학년도 2월(curYear=year-1)에서도 올바르게 동작
+  const cur=isDone(y, monthKey, idx);
+  setDone(y, monthKey, idx, !cur);
   render();
 }
 
@@ -2013,7 +2014,7 @@ function renderTaskList(){
   // ⑪ 현황 요약 (업무 있을 때만)
   const summaryEl=document.getElementById('monthSummary');
   if(allT.length&&summaryEl){
-    const mKey=getKey(S.year,m);
+    const mKey=getKey(y,m);
     const totalDirect=allT.filter(t=>!t._spanRef).length;
     const doneCnt=allT.filter(t=>{
       const ri=allT.indexOf(t);
@@ -2264,11 +2265,11 @@ function openAddModal(){
   setTimeout(()=>{document.getElementById('taskName').focus();initAutoResize();},80);
 }
 function openEditModal(idx){
-  const allT = getMonthTasks(S.year, S.curMonth);
+  const allT = getMonthTasks(S.curYear, S.curMonth);
   const t = allT[idx];
   if(t._spanRef){
     const origM = t._spanStart;
-    const origTasks = getDirectTasks(S.year, origM);
+    const origTasks = getDirectTasks(S.curYear, origM);
     const origIdx = origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
     if(origIdx>=0){
       showToast(`연속업무는 ${MN[origM]}(시작 월)에서 수정합니다.`);
@@ -2281,7 +2282,7 @@ function openEditModal(idx){
   openEditModalDirect(idx);
 }
 function openEditModalDirect(idx){
-  const t = getDirectTasks(S.year, S.curMonth)[idx];
+  const t = getDirectTasks(S.curYear, S.curMonth)[idx];
   S.editingIdx=idx;
   document.getElementById('modalTitle').textContent='업무 수정';
   document.getElementById('modalSaveBtn').textContent='수정 저장';
@@ -2405,7 +2406,7 @@ function cancelDelete(btn){
 }
 function deleteTask(idx){
   // 기간 업무 참조 카드인 경우 → 원본 월에서 삭제
-  const allT=getMonthTasks(S.year,S.curMonth);
+  const allT=getMonthTasks(S.curYear,S.curMonth);
   const t=allT[idx];
   if(t._spanRef){
     const origM=t._spanStart;
@@ -2413,8 +2414,8 @@ function deleteTask(idx){
     const origIdx=origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
     if(origIdx>=0){origTasks.splice(origIdx,1);setMonthTasks(S.year,origM,origTasks);}
   } else {
-    const tasks=getDirectTasks(S.year,S.curMonth);
-    tasks.splice(idx,1);setMonthTasks(S.year,S.curMonth,tasks);
+    const tasks=getDirectTasks(S.curYear,S.curMonth);
+    tasks.splice(idx,1);setMonthTasks(S.curYear,S.curMonth,tasks);
   }
   render();showToast('삭제되었습니다.');
 }
@@ -2436,15 +2437,15 @@ function applyDescTpl(key){
   el.setSelectionRange(pos,pos);
 }
 function moveTask(idx,dir){
-  const allT=getMonthTasks(S.year,S.curMonth);
+  const allT=getMonthTasks(S.curYear,S.curMonth);
   if(allT[idx]?._spanRef){showToast('연속업무는 시작 월에서 순서를 변경하세요.');return;}
-  const tasks=getDirectTasks(S.year,S.curMonth);
+  const tasks=getDirectTasks(S.curYear,S.curMonth);
   const directIdx=tasks.findIndex(t=>t===allT[idx]);
   if(directIdx<0)return;
   const to=directIdx+dir;
   if(to<0||to>=tasks.length)return;
   [tasks[directIdx],tasks[to]]=[tasks[to],tasks[directIdx]];
-  setMonthTasks(S.year,S.curMonth,tasks);render();
+  setMonthTasks(S.curYear,S.curMonth,tasks);render();
 }
 
 /* ── 드래그 앤 드롭 순서 변경 ── */
@@ -2467,7 +2468,7 @@ function onDrop(e,destIdx){
   e.currentTarget.classList.remove('drag-over');
   if(_dragSrcIdx===null||_dragSrcIdx===destIdx)return;
 
-  const allT=getMonthTasks(S.year,S.curMonth);
+  const allT=getMonthTasks(S.curYear,S.curMonth);
   if(allT[_dragSrcIdx]?._spanRef||allT[destIdx]?._spanRef){
     showToast('연속업무는 시작 월에서 순서를 변경하세요.');return;
   }
@@ -2484,13 +2485,13 @@ function onDrop(e,destIdx){
     }
   }
 
-  const tasks=getDirectTasks(S.year,S.curMonth);
+  const tasks=getDirectTasks(S.curYear,S.curMonth);
   const srcDirect=tasks.findIndex(t=>t===allT[_dragSrcIdx]);
   const dstDirect=tasks.findIndex(t=>t===allT[destIdx]);
   if(srcDirect<0||dstDirect<0)return;
   const [moved]=tasks.splice(srcDirect,1);
   tasks.splice(dstDirect,0,moved);
-  setMonthTasks(S.year,S.curMonth,tasks);
+  setMonthTasks(S.curYear,S.curMonth,tasks);
   render();
 }
 function onDragEnd(e){
@@ -2504,8 +2505,8 @@ function onDragEnd(e){
    COPY MODAL
 ════════════════════════════════ */
 function openCopyModal(idx){
-  const t=getMonthTasks(S.year,S.curMonth)[idx];
-  S.copyRef={year:S.year,month:S.curMonth,idx};S.copyMonths=new Set();
+  const t=getMonthTasks(S.curYear,S.curMonth)[idx];
+  S.copyRef={year:S.curYear,month:S.curMonth,idx};S.copyMonths=new Set();
   document.getElementById('copyTaskName').textContent=t.name;
   const ys=document.getElementById('copyYear');ys.innerHTML='';
   for(let y=S.year-1;y<=S.year+2;y++)
