@@ -2745,12 +2745,28 @@ let _spanScope={mode:null, idx:null, task:null};
 function openSpanScopeModal(mode, idx, t){
   _spanScope={mode, idx, task:t};
   const isEdit=mode==='edit';
-  const range=`${MN[t.startMonth]}~${MN[t.endMonth]}`;
+  // 같은 그룹의 모든 조각이 덮는 달 목록 계산
+  let months=[];
+  const origM=t._spanStart;
+  const origList=getDirectTasks(S.curYear, origM);
+  const orig=origList.find(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
+  const parts=orig?findSpanGroupParts(S.curYear, orig):[];
+  const srcs=parts.length>1?parts.map(p=>p.task):(orig?[orig]:[t]);
+  srcs.forEach(x=>{
+    const s=monthIdx(x.startMonth), e=x.endMonth?monthIdx(x.endMonth):s;
+    for(let i=s;i<=e;i++) months.push(MONTHS[i]);
+  });
+  months=[...new Set(months)].sort((a,b)=>monthIdx(a)-monthIdx(b));
+  const range=months.length>1
+    ? (months.length===monthIdx(months[months.length-1])-monthIdx(months[0])+1
+        ? `${MN[months[0]]}~${MN[months[months.length-1]]}`
+        : months.map(m=>MN[m]).join('·'))
+    : MN[months[0]||t.startMonth];
   const cur=MN[S.curMonth];
   document.getElementById('spanScopeTitle').textContent=
     isEdit?'📅 연속 업무 수정':'📅 연속 업무 삭제';
   document.getElementById('spanScopeDesc').innerHTML=
-    `<strong>"${esc(t.name)}"</strong>은(는) <strong>${range}</strong> 연속 업무입니다.<br>`+
+    `<strong>"${esc(t.name)}"</strong>은(는) <strong>${range}</strong>에 걸친 업무입니다.<br>`+
     `${isEdit?'어떻게 수정할까요?':'어떻게 삭제할까요?'}`;
   document.getElementById('scopeAllTitle').textContent=
     isEdit?'전체 기간 수정':'전체 기간 삭제';
@@ -2774,12 +2790,26 @@ function runSpanScope(scope){
     const origTasks=getDirectTasks(S.curYear, origM);
     const origIdx=origTasks.findIndex(ot=>ot.name===task.name&&ot.startMonth===task.startMonth);
     if(origIdx<0){ showToast('원본 업무를 찾을 수 없습니다.'); return; }
+    const orig=origTasks[origIdx];
     if(mode==='edit'){
       S.curMonth=origM; renderTabs();
       openEditModalDirect(origIdx);
     } else {
-      origTasks.splice(origIdx,1);
-      setMonthTasks(S.curYear, origM, origTasks);
+      // 같은 그룹(분리로 쪼개진 조각들)까지 모두 삭제
+      const parts=findSpanGroupParts(S.curYear, orig);
+      if(parts.length>1){
+        // 뒤에서부터 지워야 인덱스가 밀리지 않음
+        const byMonth={};
+        parts.forEach(p=>{ (byMonth[p.month]=byMonth[p.month]||[]).push(p.idx); });
+        Object.keys(byMonth).forEach(m=>{
+          const list=getDirectTasks(S.curYear, +m);
+          byMonth[m].sort((a,b)=>b-a).forEach(i=>list.splice(i,1));
+          setMonthTasks(S.curYear, +m, list);
+        });
+      } else {
+        origTasks.splice(origIdx,1);
+        setMonthTasks(S.curYear, origM, origTasks);
+      }
       render(); showToast('전체 기간에서 삭제되었습니다.');
     }
     return;
@@ -2803,6 +2833,7 @@ function runSpanScope(scope){
 }
 
 /* 기간 업무에서 특정 달을 떼어내 독립 업무로 만들기
+   조각들에 공통 spanGroup ID를 부여해 '전체' 작업 시 함께 처리되도록 함
    반환: 새로 만들어진 독립 업무 객체 */
 function detachMonthFromSpan(refTask, month){
   const y=S.curYear;
@@ -2814,24 +2845,28 @@ function detachMonthFromSpan(refTask, month){
   const sIdx=monthIdx(orig.startMonth), eIdx=monthIdx(orig.endMonth), mIdx=monthIdx(month);
   if(mIdx<=sIdx||mIdx>eIdx) return null;
 
+  // 같은 원본에서 나온 조각임을 표시할 그룹 ID (없으면 새로 생성)
+  const gid = orig.spanGroup || ('sg'+Date.now()+Math.random().toString(36).slice(2,6));
+  orig.spanGroup = gid;
+
   // 1) 원본 기간을 분리 지점 앞까지로 축소
   const newEndIdx=mIdx-1;
   orig.endMonth = newEndIdx===sIdx ? null : MONTHS[newEndIdx];
   origTasks[oi]=orig;
   setMonthTasks(y, origM, origTasks);
 
-  // 2) 분리한 달에 독립 업무 생성
+  // 2) 분리한 달에 독립 업무 생성 (그룹에서 떼어냄)
   const copy={...orig, startMonth:month, endMonth:null};
-  delete copy._spanRef; delete copy._spanStart;
+  delete copy._spanRef; delete copy._spanStart; delete copy.spanGroup;
   const cur=getDirectTasks(y, month);
   cur.push(copy);
   setMonthTasks(y, month, cur);
 
-  // 3) 분리 지점 이후가 남아 있으면 그 구간도 별도 기간 업무로 복원
+  // 3) 분리 지점 이후가 남아 있으면 그 구간도 같은 그룹으로 복원
   if(mIdx<eIdx){
     const restStart=MONTHS[mIdx+1];
     const rest={...orig, startMonth:restStart,
-      endMonth: mIdx+1===eIdx ? null : MONTHS[eIdx]};
+      endMonth: mIdx+1===eIdx ? null : MONTHS[eIdx], spanGroup:gid};
     delete rest._spanRef; delete rest._spanStart;
     const rl=getDirectTasks(y, restStart);
     rl.push(rest);
@@ -2839,6 +2874,18 @@ function detachMonthFromSpan(refTask, month){
   }
   saveTasks();
   return copy;
+}
+
+/* 같은 그룹(원래 하나였던 기간 업무)의 모든 조각 찾기 */
+function findSpanGroupParts(y, task){
+  const parts=[];
+  const gid=task.spanGroup;
+  MONTHS.forEach(m=>{
+    getDirectTasks(y,m).forEach((t,i)=>{
+      if(gid && t.spanGroup===gid) parts.push({month:m,idx:i,task:t});
+    });
+  });
+  return parts;
 }
 function openEditModalDirect(idx){
   const t = getDirectTasks(S.curYear, S.curMonth)[idx];
@@ -2969,6 +3016,12 @@ function deleteTask(idx){
     // 연속 카드 → 전체/이 달만 선택
     render();  // 인라인 삭제창 닫기
     openSpanScopeModal('delete', idx, t);
+    return;
+  }
+  // 분리로 쪼개진 조각이 다른 달에도 있으면 범위 선택
+  if(t.spanGroup && findSpanGroupParts(S.curYear,t).length>1){
+    render();
+    openSpanScopeModal('delete', idx, {...t,_spanRef:true,_spanStart:t.startMonth});
     return;
   }
   const tasks=getDirectTasks(S.curYear,S.curMonth);
