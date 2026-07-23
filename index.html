@@ -591,24 +591,25 @@ header{
   font-family:inherit;
 }
 
-/* 미리보기 */
-.desc-preview-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-top:8px;margin-bottom:4px;
-  font-size:11px;font-weight:600;color:var(--gray-m);
+/* 리치 편집기 (contenteditable) */
+.rich-editor{
+  border:1.5px solid var(--border);border-radius:8px;
+  padding:11px 13px;background:#fff;
+  font-size:13px;line-height:1.7;color:var(--gray-d);
+  min-height:150px;max-height:400px;overflow-y:auto;
+  font-family:inherit;outline:none;
+  white-space:pre-wrap;word-break:break-word;
+  transition:border-color .15s,box-shadow .15s;
 }
-.preview-collapse{
-  background:none;border:none;cursor:pointer;
-  font-size:11px;color:var(--navy-l);font-weight:600;padding:2px 6px;border-radius:4px;
+.rich-editor:focus{border-color:var(--navy-l);box-shadow:0 0 0 3px rgba(42,82,152,.1);}
+.rich-editor:empty::before{
+  content:attr(data-placeholder);
+  color:#b8c2d0;white-space:pre-wrap;pointer-events:none;
 }
-.preview-collapse:hover{background:var(--sky);}
-.desc-preview{
-  border:1.5px solid var(--sky-m);border-radius:8px;
-  padding:12px 14px;background:#fbfcfe;
-  font-size:13px;line-height:1.65;color:#555;
-  white-space:pre-wrap;min-height:60px;
-  max-height:260px;overflow-y:auto;
-}
+.rich-editor mark{background:#ffe9a8;padding:0 2px;border-radius:2px;}
+.rich-editor strong{font-weight:700;color:#1a2b42;}
+.rich-editor em{font-style:italic;}
+.rich-editor u{text-decoration:underline;}
 .desc-preview mark{background:#ffe9a8;padding:0 2px;border-radius:2px;}
 .desc-preview strong{font-weight:700;color:var(--gray-d);}
 .desc-preview em{font-style:italic;}
@@ -1150,14 +1151,14 @@ header{
           <button type="button" class="desc-tpl" onclick="applyDescTpl('doc')">📄 서류</button>
           <button type="button" class="desc-tpl" onclick="applyDescTpl('caution')">⚠️ 주의사항</button>
         </div>
-        <textarea class="form-textarea" id="taskDesc" oninput="updateDescPreview()"
-          placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.&#10;&#10;예)&#10;1. 에듀파인 로그인 → 공문 → 새 공문 작성&#10;2. 교장·교감 결재 후 발송&#10;3. 공문 번호 업무일지에 기록"></textarea>
-        <div class="desc-preview-head">
-          <span>👁 적용 결과 미리보기</span>
-          <button type="button" class="preview-collapse" onclick="toggleDescPreview()" id="descPreviewBtn2">접기 ▴</button>
-        </div>
-        <div id="descPreview" class="desc-preview"></div>
-        <p class="fmt-hint">텍스트를 선택하고 버튼을 누르면 서식이 적용됩니다. 입력창에는 기호(<code>**</code>, <code>__</code> 등)가 보이고, 아래 미리보기에서 실제 모습을 확인할 수 있습니다.</p>
+        <div class="rich-editor" id="taskDesc" contenteditable="true"
+          data-placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.
+
+예)
+1. 에듀파인 로그인 → 공문 → 새 공문 작성
+2. 교장·교감 결재 후 발송
+3. 공문 번호 업무일지에 기록"></div>
+        <p class="fmt-hint">텍스트를 선택하고 위 버튼을 누르면 <strong>바로 서식이 적용</strong>됩니다. 붙여넣기는 서식 없이 텍스트만 들어옵니다.</p>
       </div>
 
       <!-- ▼ 상세 정보 토글 -->
@@ -2666,9 +2667,10 @@ function openAddModal(){
   S.editingIdx=null;
   document.getElementById('modalTitle').textContent='업무 추가';
   document.getElementById('modalSaveBtn').textContent='저장';
-  ['taskName','taskDeadline','taskDesc',
+  ['taskName','taskDeadline',
    'taskFileLocation','taskSystem','taskBudgetTotal','taskBudgetUsed','taskBudgetStorage'
   ].forEach(id=>document.getElementById(id).value='');
+  setDescValue('');
   document.getElementById('taskAssignee').value=S.deptName;
   document.getElementById('taskSensitive').checked=false;
   document.getElementById('taskRepeat').checked=false;
@@ -2713,7 +2715,7 @@ function openEditModalDirect(idx){
   document.getElementById('taskName').value=t.name;
   document.getElementById('taskDeadline').value=t.deadline||'';
   document.getElementById('taskAssignee').value=t.assignee||'';
-  document.getElementById('taskDesc').value=t.desc||'';
+  setDescValue(t.desc||'');
   document.getElementById('taskFileLocation').value=t.fileLocation||'';
   document.getElementById('taskSystem').value=t.system||'';
   document.getElementById('taskBudgetTotal').value=t.budgetTotal||'';
@@ -2773,7 +2775,7 @@ function saveTask(){
     deadline:document.getElementById('taskDeadline').value.trim(),
     assignee:document.getElementById('taskAssignee').value.trim(),
     category:document.getElementById('taskCategory').value||'',
-    desc:document.getElementById('taskDesc').value.trim(),
+    desc:getDescValue().trim(),
     fileLocation:document.getElementById('taskFileLocation').value.trim(),
     system:document.getElementById('taskSystem').value.trim(),
     budgetTotal:document.getElementById('taskBudgetTotal').value.trim(),
@@ -2868,209 +2870,201 @@ document.addEventListener('click',e=>{
 });
 function applyColor(color){
   document.getElementById('fmtColorMenu').classList.remove('open');
-  wrapSelection(`{color:${color}}`,'{/color}','색상 텍스트','color');
+  const el=document.getElementById('taskDesc');
+  el.focus();
+  document.execCommand('styleWithCSS',false,true);
+  document.execCommand('foreColor',false,color);
 }
 function applySize(px){
   if(!px) return;
+  const el=document.getElementById('taskDesc');
+  el.focus();
   if(px==='__clear'){ removeFormat('size'); return; }
-  wrapSelection(`{size:${px}}`,'{/size}','크기 텍스트','size');
+  // execCommand fontSize는 1~7만 지원 → 직접 span 적용
+  const sel=window.getSelection();
+  if(!sel.rangeCount||sel.getRangeAt(0).collapsed){ showToast('크기를 적용할 텍스트를 선택하세요.'); return; }
+  const range=sel.getRangeAt(0);
+  const span=document.createElement('span');
+  span.style.fontSize=px+'px';
+  try{ range.surroundContents(span); }
+  catch(e){ span.appendChild(range.extractContents()); range.insertNode(span); }
+  sel.removeAllRanges();
+  const r=document.createRange(); r.selectNodeContents(span); sel.addRange(r);
 }
-/* 선택 영역(또는 커서 위치)에서 color/size 태그 제거 */
+/* 선택 영역의 색상/크기 서식 제거 */
 function removeFormat(kind){
   document.getElementById('fmtColorMenu')?.classList.remove('open');
   const el=document.getElementById('taskDesc');
-  const s=el.selectionStart, e=el.selectionEnd, val=el.value;
-  const tagRe=kind==='color'
-    ? /\{color:#[0-9a-fA-F]{3,6}\}|\{\/color\}/g
-    : /\{size:\d{1,2}\}|\{\/size\}/g;
-
-  if(s!==e){
-    const cleaned=val.slice(s,e).replace(tagRe,'');
-    el.value=val.slice(0,s)+cleaned+val.slice(e);
-    el.focus(); el.setSelectionRange(s,s+cleaned.length);
-  } else {
-    const openRe=kind==='color'?/\{color:#[0-9a-fA-F]{3,6}\}/g:/\{size:\d{1,2}\}/g;
-    const closeStr=kind==='color'?'{/color}':'{/size}';
-    let m,lastOpen=-1,lastLen=0;
-    while((m=openRe.exec(val))!==null){
-      if(m.index<s){ lastOpen=m.index; lastLen=m[0].length; } else break;
-    }
-    const closeAt=lastOpen>=0?val.indexOf(closeStr,lastOpen):-1;
-    if(lastOpen<0||closeAt<0||closeAt+closeStr.length<s){
-      showToast('제거할 서식이 없습니다.'); return;
-    }
-    const inner=val.slice(lastOpen+lastLen,closeAt);
-    el.value=val.slice(0,lastOpen)+inner+val.slice(closeAt+closeStr.length);
-    el.focus(); el.setSelectionRange(lastOpen,lastOpen+inner.length);
-  }
-  autoResizeDesc(el);
-  updateDescPreview();
-}
-/* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수 */
-/* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수
-   - 같은 종류(color/size) 태그가 이미 있으면 교체
-   - 선택 범위 안팎의 기존 태그를 정리해 중첩 방지 */
-function wrapSelection(openTag,closeTag,placeholder,kind){
-  const el=document.getElementById('taskDesc');
-  let s=el.selectionStart, e=el.selectionEnd, val=el.value;
-
-  // kind별 정규식 (color 또는 size)
-  const tagRe=kind==='color'
-    ? /\{color:#[0-9a-fA-F]{3,6}\}|\{\/color\}/g
-    : /\{size:\d{1,2}\}|\{\/size\}/g;
-
-  // 1) 선택이 없으면: 커서가 같은 종류 태그 쌍 안에 있는지 확인 → 그 범위를 대상으로
-  if(s===e){
-    const openRe=kind==='color'?/\{color:#[0-9a-fA-F]{3,6}\}/g:/\{size:\d{1,2}\}/g;
-    const closeStr=kind==='color'?'{/color}':'{/size}';
-    let m,lastOpen=-1,lastOpenLen=0;
-    while((m=openRe.exec(val))!==null){
-      if(m.index<s){ lastOpen=m.index; lastOpenLen=m[0].length; } else break;
-    }
-    if(lastOpen>=0){
-      const closeAt=val.indexOf(closeStr,lastOpen);
-      if(closeAt>=0&&closeAt+closeStr.length>=s){
-        // 기존 태그 안 → 내용만 남기고 태그 교체
-        const inner=val.slice(lastOpen+lastOpenLen,closeAt);
-        el.value=val.slice(0,lastOpen)+openTag+inner+closeTag+val.slice(closeAt+closeStr.length);
-        el.focus();
-        const st=lastOpen+openTag.length;
-        el.setSelectionRange(st,st+inner.length);
-        autoResizeDesc(el);
-        updateDescPreview();
-        return;
-      }
-    }
-  }
-
-  // 2) 선택 영역 안의 같은 종류 태그 제거 (중첩 방지)
-  let sel=val.slice(s,e).replace(tagRe,'');
-  const text=sel||placeholder;
-
-  // 3) 선택을 감싸고 있던 같은 종류 태그 제거 (사이에 다른 종류 태그가 껴 있어도 처리)
-  let before=val.slice(0,s), after=val.slice(e);
-  const anyTag=/\{(?:\/)?(?:color:#[0-9a-fA-F]{3,6}|size:\d{1,2}|\/color|\/size)\}$/;
-  const openRe2=kind==='color'?/\{color:#[0-9a-fA-F]{3,6}\}$/:/\{size:\d{1,2}\}$/;
-  const closeRe2=kind==='color'?/^\{\/color\}/:/^\{\/size\}/;
-  const otherOpen=kind==='color'?/\{size:\d{1,2}\}$/:/\{color:#[0-9a-fA-F]{3,6}\}$/;
-  const otherClose=kind==='color'?/^\{\/size\}/:/^\{\/color\}/;
-
-  let guard=0;
-  while(guard++<10){
-    if(openRe2.test(before)&&closeRe2.test(after)){
-      // 같은 종류가 바로 감싸고 있음 → 제거
-      before=before.replace(openRe2,'');
-      after=after.replace(closeRe2,'');
-    } else if(otherOpen.test(before)&&otherClose.test(after)){
-      // 다른 종류가 감싸고 있음 → 유지하되 그 바깥을 계속 검사
-      const om=before.match(otherOpen)[0];
-      const cm=after.match(otherClose)[0];
-      const innerBefore=before.slice(0,before.length-om.length);
-      const innerAfter=after.slice(cm.length);
-      if(openRe2.test(innerBefore)&&closeRe2.test(innerAfter)){
-        // 바깥에 같은 종류가 있으면 그것만 제거하고 다른 종류는 보존
-        before=innerBefore.replace(openRe2,'')+om;
-        after=cm+innerAfter.replace(closeRe2,'');
-      } else break;
-    } else break;
-  }
-
-  el.value=before+openTag+text+closeTag+after;
   el.focus();
-  const start=before.length+openTag.length;
-  el.setSelectionRange(start,start+text.length);
-  autoResizeDesc(el);
-  updateDescPreview();
+  const sel=window.getSelection();
+  if(!sel.rangeCount) return;
+  const range=sel.getRangeAt(0);
+  if(range.collapsed){
+    // 커서가 속한 span에서 해당 속성 제거
+    let node=sel.anchorNode;
+    node=node.nodeType===1?node:node.parentElement;
+    const span=node?.closest('span[style]');
+    if(!span||!el.contains(span)){ showToast('제거할 서식이 없습니다.'); return; }
+    if(kind==='color') span.style.color='';
+    else span.style.fontSize='';
+    if(!span.getAttribute('style')){
+      const p=span.parentNode;
+      while(span.firstChild) p.insertBefore(span.firstChild,span);
+      p.removeChild(span);
+    }
+    return;
+  }
+  // 선택 영역 안의 span에서 속성 제거
+  const frag=range.cloneContents();
+  frag.querySelectorAll('span[style]').forEach(s=>{
+    if(kind==='color') s.style.color=''; else s.style.fontSize='';
+  });
+  const tmp=document.createElement('div'); tmp.appendChild(frag);
+  tmp.querySelectorAll('span:not([style]),span[style=""]').forEach(s=>{
+    const p=s.parentNode;
+    while(s.firstChild) p.insertBefore(s.firstChild,s);
+    p.removeChild(s);
+  });
+  range.deleteContents();
+  const df=document.createDocumentFragment();
+  while(tmp.firstChild) df.appendChild(tmp.firstChild);
+  range.insertNode(df);
 }
+
+/* 편집기 초기화 (모달 열 때) */
 function resetDescPreview(){
-  const pv=document.getElementById('descPreview');
-  const head=document.querySelector('.desc-preview-head');
-  const btn=document.getElementById('descPreviewBtn2');
-  if(pv) pv.style.display='';
-  if(head) head.style.display='';
-  if(btn) btn.textContent='접기 ▴';
   document.getElementById('fmtColorMenu')?.classList.remove('open');
-  updateDescPreview();
 }
-let _descPreviewOn=true;
-function toggleDescPreview(){
-  _descPreviewOn=!_descPreviewOn;
-  const pv=document.getElementById('descPreview');
-  const btn=document.getElementById('descPreviewBtn2');
-  pv.style.display=_descPreviewOn?'':'none';
-  btn.textContent=_descPreviewOn?'접기 ▴':'펼치기 ▾';
-}
-function updateDescPreview(){
-  const v=document.getElementById('taskDesc').value;
-  document.getElementById('descPreview').innerHTML=
-    v.trim()?linkify(v):'<span style="color:#aaa;">내용을 입력하면 여기에 적용된 모습이 표시됩니다.</span>';
-}
+function updateDescPreview(){ /* 편집기에 즉시 반영되므로 불필요 */ }
 
 /* ── 서식 적용 (마크다운 문법 삽입) ── */
 function applyFormat(kind){
   const el=document.getElementById('taskDesc');
-  const start=el.selectionStart, end=el.selectionEnd;
-  const val=el.value;
-  const sel=val.slice(start,end);
-
+  el.focus();
   // 줄 단위 서식 (목록·번호·주의)
   if(kind==='list'||kind==='num'||kind==='warn'){
-    // 선택이 없으면 현재 줄, 있으면 선택된 줄들에 적용
-    let ls=val.lastIndexOf('\n',start-1)+1;
-    let le=val.indexOf('\n',end); if(le<0) le=val.length;
-    const block=val.slice(ls,le);
-    const lines=block.split('\n');
-    const marked=lines.map((line,i)=>{
-      const t=line.replace(/^(\s*)([-•]\s|\d+\.\s|⚠️\s)?/,'$1');
-      if(!t.trim()) return line;
-      if(kind==='list') return t.replace(/^(\s*)/,'$1- ');
-      if(kind==='num')  return t.replace(/^(\s*)/,`$1${i+1}. `);
-      return t.replace(/^(\s*)/,'$1⚠️ ');
-    }).join('\n');
-    el.value=val.slice(0,ls)+marked+val.slice(le);
-    el.focus();
-    el.setSelectionRange(ls,ls+marked.length);
-    autoResizeDesc(el);
+    applyLinePrefix(kind); return;
+  }
+  const cmd={bold:'bold',italic:'italic',underline:'underline'}[kind];
+  if(cmd){ document.execCommand(cmd,false,null); return; }
+  if(kind==='mark') toggleMark();
+}
+
+/* 형광펜 토글 — <mark> 감싸기/해제 */
+function toggleMark(){
+  const sel=window.getSelection();
+  if(!sel.rangeCount) return;
+  const node=sel.anchorNode;
+  const inMark=node&&(node.nodeType===1?node:node.parentElement)?.closest('mark');
+  if(inMark){
+    // 해제: mark 태그를 내용으로 대체
+    const parent=inMark.parentNode;
+    while(inMark.firstChild) parent.insertBefore(inMark.firstChild,inMark);
+    parent.removeChild(inMark);
     return;
   }
+  const range=sel.getRangeAt(0);
+  if(range.collapsed) return;
+  const m=document.createElement('mark');
+  try{ range.surroundContents(m); }
+  catch(e){ m.appendChild(range.extractContents()); range.insertNode(m); }
+  sel.removeAllRanges();
+  const r=document.createRange(); r.selectNodeContents(m); sel.addRange(r);
+}
 
-  // 인라인 서식 (굵게·기울임·밑줄·강조)
-  const wrap={bold:'**',italic:'*',underline:'__',mark:'=='}[kind];
-  if(!wrap) return;
-  const placeholder={bold:'굵게',italic:'기울임',underline:'밑줄',mark:'강조'}[kind];
-
-  // 이미 감싸져 있으면 해제 (토글)
-  const before=val.slice(Math.max(0,start-wrap.length),start);
-  const after=val.slice(end,end+wrap.length);
-  if(sel&&before===wrap&&after===wrap){
-    el.value=val.slice(0,start-wrap.length)+sel+val.slice(end+wrap.length);
-    el.focus();
-    el.setSelectionRange(start-wrap.length,end-wrap.length);
-    autoResizeDesc(el);
-    return;
+/* 줄 앞 기호 추가 (목록·번호·주의) */
+function applyLinePrefix(kind){
+  const el=document.getElementById('taskDesc');
+  const sel=window.getSelection();
+  if(!sel.rangeCount) return;
+  const text=sel.toString();
+  const prefix=kind==='list'?'- ':kind==='warn'?'⚠️ ':null;
+  if(text){
+    const lines=text.split('\n').map((l,i)=>{
+      const t=l.replace(/^(\s*)([-•]\s|\d+\.\s|⚠️\s)?/,'$1');
+      if(!t.trim()) return l;
+      return kind==='num'?t.replace(/^(\s*)/,`$1${i+1}. `):t.replace(/^(\s*)/,`$1${prefix}`);
+    });
+    document.execCommand('insertText',false,lines.join('\n'));
+  } else {
+    document.execCommand('insertText',false,kind==='num'?'1. ':prefix);
   }
+}
 
-  const text=sel||placeholder;
-  el.value=val.slice(0,start)+wrap+text+wrap+val.slice(end);
-  el.focus();
-  // 선택이 없었으면 안내 텍스트를 선택 상태로 → 바로 덮어쓰기 가능
-  const s=start+wrap.length;
-  el.setSelectionRange(s, s+text.length);
-  autoResizeDesc(el);
+/* ── HTML ↔ 저장용 텍스트 변환 ── */
+/* 편집기 HTML → 마크다운 텍스트 (저장용) */
+function editorToText(root){
+  let out='';
+  const walk=(node,fmt)=>{
+    node.childNodes.forEach(n=>{
+      if(n.nodeType===3){ out+=n.nodeValue; return; }
+      if(n.nodeType!==1) return;
+      const tag=n.tagName.toLowerCase();
+      if(tag==='br'){ out+='\n'; return; }
+      if(tag==='div'||tag==='p'){
+        if(out&&!out.endsWith('\n')) out+='\n';
+        walk(n,fmt); 
+        return;
+      }
+      let open='',close='';
+      if(tag==='strong'||tag==='b'){ open=close='**'; }
+      else if(tag==='em'||tag==='i'){ open=close='*'; }
+      else if(tag==='u'){ open=close='__'; }
+      else if(tag==='mark'){ open=close='=='; }
+      else if(tag==='span'){
+        const st=n.getAttribute('style')||'';
+        const cm=st.match(/color:\s*(#[0-9a-fA-F]{3,6}|rgb\([^)]+\))/);
+        const sm=st.match(/font-size:\s*(\d{1,2})px/);
+        if(cm){ const hx=toHex(cm[1]); if(hx){ open+=`{color:${hx}}`; close=`{/color}`+close; } }
+        if(sm){ open+=`{size:${sm[1]}}`; close=`{/size}`+close; }
+      }
+      out+=open; walk(n,fmt); out+=close;
+    });
+  };
+  walk(root,'');
+  return out.replace(/\u00a0/g,' ').replace(/\n{3,}/g,'\n\n').trim();
 }
-function autoResizeDesc(el){
-  el.style.height='auto';
-  el.style.height=Math.max(80,el.scrollHeight)+'px';
+function toHex(v){
+  if(v.startsWith('#')) return v.length===4
+    ? '#'+v.slice(1).split('').map(x=>x+x).join('') : v;
+  const m=v.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if(!m) return null;
+  return '#'+[1,2,3].map(i=>(+m[i]).toString(16).padStart(2,'0')).join('');
 }
+/* 저장 텍스트 → 편집기 HTML (불러오기용) */
+function textToEditor(txt){
+  return applyMdFormat(esc(txt||''));
+}
+/* 편집기 값 읽기/쓰기 헬퍼 */
+function getDescValue(){
+  return editorToText(document.getElementById('taskDesc'));
+}
+function setDescValue(txt){
+  document.getElementById('taskDesc').innerHTML=textToEditor(txt);
+}
+/* 붙여넣기: 외부 서식 제거하고 순수 텍스트만 삽입 */
+document.addEventListener('DOMContentLoaded',()=>{
+  const ed=document.getElementById('taskDesc');
+  if(!ed) return;
+  ed.addEventListener('paste',e=>{
+    e.preventDefault();
+    const text=(e.clipboardData||window.clipboardData).getData('text/plain');
+    document.execCommand('insertText',false,text);
+  });
+  // Enter는 <div> 대신 줄바꿈으로
+  ed.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){
+      e.preventDefault();
+      document.execCommand('insertLineBreak');
+    }
+  });
+});
 
 function applyDescTpl(key){
   const el=document.getElementById('taskDesc');
-  if(el.value.trim()&&!confirm('현재 내용을 템플릿으로 대체하시겠습니까?'))return;
-  el.value=DESC_TPLS[key];
+  if(getDescValue().trim()&&!confirm('현재 내용을 템플릿으로 대체하시겠습니까?'))return;
+  setDescValue(DESC_TPLS[key]);
   el.focus();
-  // 첫 번째 빈 칸으로 커서 이동
-  const pos=el.value.indexOf(': \n')>-1?el.value.indexOf(': \n')+2:el.value.length;
-  el.setSelectionRange(pos,pos);
 }
 function moveTask(idx,dir){
   const allT=getMonthTasks(S.curYear,S.curMonth);
