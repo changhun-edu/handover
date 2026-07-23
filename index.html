@@ -378,6 +378,29 @@ header{
 .task-meta-item.deadline{color:var(--accent);font-weight:500;}
 .task-meta-item.assignee{color:var(--purple);font-weight:600;}
 .task-desc{font-size:13px;color:#555;line-height:1.65;white-space:pre-wrap;margin-bottom:3px;}
+
+/* 긴 설명 접기 — 8줄 초과 시 페이드 + 더 보기 */
+.task-desc-wrap{position:relative;margin-bottom:3px;}
+.task-desc-wrap.clamped .task-desc{
+  max-height:calc(13px * 1.65 * 8);
+  overflow:hidden;
+}
+.task-desc-wrap.clamped::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:34px;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),#fff 85%);
+  pointer-events:none;
+}
+.task-card.done-card .task-desc-wrap.clamped::after{
+  background:linear-gradient(to bottom,rgba(247,248,250,0),#f7f8fa 85%);
+}
+.desc-toggle{
+  display:block;width:100%;margin-top:2px;
+  background:none;border:none;cursor:pointer;
+  font-size:11px;font-weight:600;color:var(--navy-l);
+  padding:4px 0;text-align:center;border-radius:5px;
+  transition:background .12s,color .12s;
+}
+.desc-toggle:hover{background:var(--sky);color:var(--navy);}
 .task-note{font-size:12px;color:var(--gray-m);margin-top:3px;}
 /* ── 상세 정보 토글 ── */
 .detail-toggle{
@@ -438,6 +461,10 @@ header{
 .search-clear:hover{color:var(--gray-d);}
 .search-highlight{background:#fff3c4;border-radius:2px;}
 .task-desc a,.task-note a{color:var(--navy-l);text-decoration:underline;word-break:break-all;}
+.task-desc mark{background:#ffe9a8;color:inherit;padding:0 2px;border-radius:2px;}
+.task-desc strong{font-weight:700;color:var(--gray-d);}
+.task-desc em{font-style:italic;}
+.task-desc u{text-decoration:underline;}
 .task-desc a:hover,.task-note a:hover{color:var(--accent);}
 .task-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
 
@@ -523,7 +550,90 @@ header{
 }
 .desc-tpl:hover{border-color:var(--navy-l);color:var(--navy);background:var(--sky);}
 .desc-guide-label{font-size:11px;color:var(--gray-m);align-self:center;}
+
+/* ── 서식 툴바 ── */
+.desc-format-bar{
+  display:flex;gap:4px;flex-wrap:wrap;align-items:center;
+  margin-bottom:6px;padding:5px 7px;
+  background:var(--gray-l);border-radius:7px;
+}
+.fmt-btn{
+  min-width:28px;padding:4px 8px;border-radius:5px;
+  border:1px solid transparent;background:#fff;
+  font-size:12px;color:var(--gray-d);cursor:pointer;
+  transition:all .12s;line-height:1.4;
+}
+.fmt-btn:hover{border-color:var(--navy-l);color:var(--navy);background:var(--sky);}
+.fmt-btn:active{transform:scale(.94);}
+.fmt-sep{width:1px;height:16px;background:var(--border);margin:0 3px;}
+.fmt-hint{
+  font-size:11px;color:var(--gray-m);margin-top:5px;line-height:1.6;
+}
+.fmt-hint strong,.fmt-hint em,.fmt-hint u{color:var(--gray-d);}
+
 .empty-state{text-align:center;padding:56px 20px;color:var(--gray-m);}
+
+/* ── 연간 계획 한눈에 보기 ── */
+.yv-toolbar{
+  padding:11px 20px;border-bottom:1px solid var(--gray-l);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;flex-wrap:wrap;flex-shrink:0;background:#fafbfd;
+}
+.yv-summary{font-size:12px;color:var(--gray-d);font-weight:600;}
+.yv-filter-btn{
+  padding:4px 11px;border-radius:13px;
+  border:1.5px solid var(--border);background:#fff;
+  font-size:11px;font-weight:500;color:var(--gray-m);
+  cursor:pointer;transition:all .13s;white-space:nowrap;
+}
+.yv-filter-btn:hover{border-color:var(--navy-l);color:var(--navy);}
+.yv-filter-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+
+.yv-month{margin-bottom:16px;}
+.yv-month-head{
+  display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+  padding:7px 11px;border-radius:8px;
+  background:var(--sky);border-left:4px solid var(--navy-l);
+  margin-bottom:7px;
+}
+.yv-month.prev-year .yv-month-head{background:#f4ecf7;border-left-color:#8e44ad;}
+.yv-month-name{font-size:14px;font-weight:700;color:var(--navy);}
+.yv-month.prev-year .yv-month-name{color:#6c3483;}
+.yv-month-badge{font-size:10px;color:var(--gray-m);background:#fff;padding:1px 7px;border-radius:9px;}
+.yv-month-stat{margin-left:auto;font-size:11px;font-weight:700;color:var(--gray-m);display:flex;align-items:center;gap:7px;}
+.yv-bar{width:56px;height:5px;background:var(--gray-l);border-radius:3px;overflow:hidden;}
+.yv-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s;}
+
+.yv-item{
+  border:1px solid var(--gray-l);border-radius:7px;
+  margin-bottom:5px;overflow:hidden;transition:border-color .13s;
+}
+.yv-item:hover{border-color:var(--sky-m);}
+.yv-item-head{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 11px;cursor:pointer;font-size:13px;
+  background:#fff;transition:background .12s;
+}
+.yv-item-head:hover{background:var(--sky);}
+.yv-item.open .yv-item-head{background:var(--sky);border-bottom:1px solid var(--gray-l);}
+.yv-check{font-size:13px;flex-shrink:0;width:16px;text-align:center;}
+.yv-name{flex:1;min-width:0;color:var(--gray-d);font-weight:500;}
+.yv-item.done .yv-name{text-decoration:line-through;color:var(--gray-m);}
+.yv-arrow{font-size:9px;color:var(--gray-m);transition:transform .2s;flex-shrink:0;}
+.yv-item.open .yv-arrow{transform:rotate(90deg);}
+.yv-body{padding:10px 13px 12px 34px;background:#fbfcfe;font-size:12px;color:#555;line-height:1.65;}
+.yv-body .yv-desc{white-space:pre-wrap;margin-bottom:7px;}
+.yv-body .yv-desc mark{background:#ffe9a8;padding:0 2px;border-radius:2px;}
+.yv-body .yv-desc strong{font-weight:700;color:var(--gray-d);}
+.yv-body .yv-desc em{font-style:italic;}
+.yv-body .yv-desc u{text-decoration:underline;}
+.yv-meta{display:flex;gap:11px;flex-wrap:wrap;font-size:11px;color:var(--gray-m);margin-bottom:8px;}
+.yv-goto{
+  font-size:11px;color:var(--navy-l);background:none;border:none;
+  cursor:pointer;padding:3px 0;font-weight:600;
+}
+.yv-goto:hover{text-decoration:underline;color:var(--accent);}
+.yv-empty{font-size:12px;color:var(--gray-m);padding:5px 11px;font-style:italic;}
 .empty-icon{font-size:42px;margin-bottom:10px;}
 
 /* ── FOOTER ── */
@@ -550,6 +660,8 @@ header{
 
 /* ── MODAL ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(27,58,107,.38);z-index:300;align-items:center;justify-content:center;padding:16px;}
+/* 카테고리 모달은 업무 모달 위에 표시 */
+#catModal{z-index:340;}
 .modal-overlay.open{display:flex;}
 .modal{background:#fff;border-radius:14px;width:100%;max-width:640px;box-shadow:0 8px 40px rgba(27,58,107,.22);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;}
 .modal-header{background:var(--navy);color:#fff;padding:15px 20px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
@@ -650,6 +762,10 @@ header{
   body{background:#fff;}
   .main{max-width:100%;padding:10px;}
   .task-card{break-inside:avoid;box-shadow:none;border:1px solid #ccc;}
+  /* 인쇄 시 접힌 설명 전체 표시 */
+  .task-desc-wrap.clamped .task-desc{max-height:none!important;overflow:visible!important;}
+  .task-desc-wrap.clamped::after{display:none!important;}
+  .desc-toggle{display:none!important;}
 }
 </style>
 </head>
@@ -825,6 +941,7 @@ header{
       <div class="header-actions">
         <div class="backup-badge" id="backupBadge" onclick="openBackupModal()"></div>
         <span class="save-indicator" id="saveIndicator">✓ 저장됨</span>
+        <button class="btn btn-outline btn-sm" onclick="openYearViewModal()" title="연간 계획 한눈에 보기">📅 연간 보기</button>
         <button class="btn btn-outline btn-sm" onclick="openPrintModal()">🖨️ 출력</button>
         <button class="btn btn-outline btn-sm" onclick="openExportModal()">📤 내보내기</button>
         <!-- ① 더보기 메뉴 -->
@@ -942,6 +1059,17 @@ header{
       </div>
       <div class="form-group">
         <label class="form-label">업무 설명 / 처리 방법</label>
+        <!-- 서식 툴바 -->
+        <div class="desc-format-bar">
+          <button type="button" class="fmt-btn" onclick="applyFormat('bold')" title="굵게 (선택 후 클릭)"><strong>B</strong></button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('italic')" title="기울임"><em>I</em></button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('underline')" title="밑줄"><u>U</u></button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('mark')" title="형광펜 강조"><span style="background:#ffe9a8;padding:0 3px;border-radius:2px;">H</span></button>
+          <span class="fmt-sep"></span>
+          <button type="button" class="fmt-btn" onclick="applyFormat('list')" title="목록">• 목록</button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('num')" title="번호 목록">1. 번호</button>
+          <button type="button" class="fmt-btn" onclick="applyFormat('warn')" title="주의 표시">⚠️ 주의</button>
+        </div>
         <div class="desc-guide">
           <span class="desc-guide-label">템플릿:</span>
           <button type="button" class="desc-tpl" onclick="applyDescTpl('steps')">📋 단계별</button>
@@ -951,6 +1079,7 @@ header{
         </div>
         <textarea class="form-textarea" id="taskDesc"
           placeholder="처리 절차, 주의사항, 관련 시스템 등을 자세히 적어주세요.&#10;&#10;예)&#10;1. 에듀파인 로그인 → 공문 → 새 공문 작성&#10;2. 교장·교감 결재 후 발송&#10;3. 공문 번호 업무일지에 기록"></textarea>
+        <p class="fmt-hint">텍스트를 선택하고 버튼을 누르면 서식이 적용됩니다. <strong>**굵게**</strong> · <em>*기울임*</em> · <u>__밑줄__</u> · <span style="background:#ffe9a8;">==강조==</span></p>
       </div>
 
       <!-- ▼ 상세 정보 토글 -->
@@ -967,14 +1096,15 @@ header{
           </div>
           <div class="form-group">
             <label class="form-label">카테고리</label>
-            <select class="form-select" id="taskCategory">
-              <option value="">— 선택 안 함 —</option>
-            </select>
+            <div style="display:flex;gap:6px;align-items:stretch;">
+              <select class="form-select" id="taskCategory" style="flex:1;min-width:0;">
+                <option value="">— 선택 안 함 —</option>
+              </select>
+              <button type="button" class="btn btn-ghost" onclick="openCatModalFromTask()"
+                title="카테고리 추가·삭제"
+                style="flex-shrink:0;padding:0 12px;font-size:15px;line-height:1;">⚙</button>
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">참고 메모</label>
-          <input class="form-input" id="taskNote" placeholder="예: 교감선생님 결재 필요">
         </div>
         <div class="form-group">
           <label class="form-label">📁 관련 파일 위치</label>
@@ -1068,7 +1198,7 @@ header{
   <div class="modal" style="max-width:460px;">
     <div class="modal-header">
       <span>🏷️ 카테고리 관리</span>
-      <button class="modal-close" onclick="closeModal('catModal')">×</button>
+      <button class="modal-close" onclick="closeCatModal()">×</button>
     </div>
     <div class="modal-body">
 
@@ -1105,7 +1235,7 @@ header{
 
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('catModal')">닫기</button>
+      <button class="btn btn-ghost" onclick="closeCatModal()">닫기</button>
     </div>
   </div>
 </div>
@@ -1301,6 +1431,29 @@ header{
   </div>
 </div>
 
+<!-- ── 연간 계획 한눈에 보기 MODAL ── -->
+<div class="modal-overlay" id="yearViewModal">
+  <div class="modal" style="max-width:820px;">
+    <div class="modal-header">
+      <span id="yearViewTitle">📅 연간 계획 한눈에 보기</span>
+      <button class="modal-close" onclick="closeModal('yearViewModal')">×</button>
+    </div>
+    <div class="yv-toolbar">
+      <div class="yv-summary" id="yvSummary"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="yv-filter-btn active" id="yvfAll" onclick="setYvFilter('all')">전체</button>
+        <button class="yv-filter-btn" id="yvfTodo" onclick="setYvFilter('todo')">미처리</button>
+        <button class="yv-filter-btn" id="yvfPending" onclick="setYvFilter('pending')">🚨 미결</button>
+        <button class="yv-filter-btn" id="yvfHigh" onclick="setYvFilter('high')">⭐ 중요</button>
+        <span class="fmt-sep"></span>
+        <button class="yv-filter-btn" onclick="toggleAllYv(true)">전체 펼치기</button>
+        <button class="yv-filter-btn" onclick="toggleAllYv(false)">전체 접기</button>
+      </div>
+    </div>
+    <div class="modal-body" id="yearViewBody" style="padding-top:12px;"></div>
+  </div>
+</div>
+
 <!-- ── 도움말 MODAL ── -->
 <div class="modal-overlay" id="helpModal">
   <div class="modal" style="max-width:480px;">
@@ -1378,6 +1531,130 @@ document.addEventListener('click',e=>{
   }
 });
 
+/* ════════════════════════════════
+   연간 계획 한눈에 보기
+════════════════════════════════ */
+let _yvFilter='all';
+function openYearViewModal(){
+  _yvFilter='all';
+  ['yvfAll','yvfTodo','yvfPending','yvfHigh'].forEach(id=>
+    document.getElementById(id).classList.remove('active'));
+  document.getElementById('yvfAll').classList.add('active');
+  document.getElementById('yearViewTitle').textContent=
+    `📅 ${S.year}학년도 연간 계획 한눈에 보기`;
+  renderYearView();
+  document.getElementById('yearViewModal').classList.add('open');
+}
+function setYvFilter(f){
+  _yvFilter=f;
+  const map={all:'yvfAll',todo:'yvfTodo',pending:'yvfPending',high:'yvfHigh'};
+  Object.values(map).forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.getElementById(map[f]).classList.add('active');
+  renderYearView();
+}
+function toggleAllYv(open){
+  document.querySelectorAll('#yearViewBody .yv-item').forEach(el=>
+    el.classList.toggle('open',open));
+}
+function toggleYvItem(el){ el.closest('.yv-item').classList.toggle('open'); }
+
+function yvGoTo(year,month){
+  S.curYear=year; S.curMonth=month;
+  try{localStorage.setItem('si_last_month',month);}catch(e){}
+  closeModal('yearViewModal');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderYearView(){
+  const body=document.getElementById('yearViewBody');
+  // 전 학년도 2월 + 3월~2월
+  const months=[{y:S.year-1,m:2,prev:true},...MONTHS.map(m=>({y:S.year,m,prev:false}))];
+  let html='', gTotal=0, gDone=0, gPending=0;
+
+  months.forEach(({y,m,prev})=>{
+    const allT=getMonthTasks(y,m);
+    const mKey=getKey(y,m);
+    // 완료 여부 계산
+    const withDone=allT.map((t,ri)=>{
+      const oKey=t._spanRef?getKey(y,t._spanStart):mKey;
+      const oIdx=t._spanRef
+        ? getDirectTasks(y,t._spanStart).findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth)
+        : ri;
+      return {t,ri,done:isDone(y,oKey,oIdx)};
+    });
+    const total=withDone.length;
+    const doneCnt=withDone.filter(x=>x.done).length;
+    gTotal+=total; gDone+=doneCnt;
+    gPending+=withDone.filter(x=>x.t.pending).length;
+
+    // 필터 적용
+    const shown=withDone.filter(({t,done})=>{
+      if(_yvFilter==='todo') return !done;
+      if(_yvFilter==='pending') return !!t.pending;
+      if(_yvFilter==='high') return (t.priority||'mid')==='high';
+      return true;
+    });
+    // 필터 중이고 해당 없으면 월 자체를 숨김
+    if(_yvFilter!=='all'&&!shown.length) return;
+
+    const pct=total?Math.round(doneCnt/total*100):0;
+    const label=prev?'2월 (전 학년도 준비)':MN[m];
+    const badge=prev?'신학년 준비':(ML[m]||'');
+
+    html+=`<div class="yv-month${prev?' prev-year':''}">
+      <div class="yv-month-head">
+        <span class="yv-month-name">${label}</span>
+        ${badge?`<span class="yv-month-badge">${badge}</span>`:''}
+        <span class="yv-month-stat">
+          <span>${doneCnt}/${total}</span>
+          <span class="yv-bar"><span class="yv-bar-fill" style="width:${pct}%"></span></span>
+          <span>${pct}%</span>
+        </span>
+      </div>`;
+
+    if(!shown.length){
+      html+=`<p class="yv-empty">등록된 업무가 없습니다.</p>`;
+    } else {
+      shown.forEach(({t,done})=>{
+        const cat=t.category?getCat(t.category):null;
+        const metas=[
+          t.deadline?`📅 ${esc(t.deadline)}`:'',
+          t.assignee?`👤 ${esc(t.assignee)}`:'',
+          t.fileLocation?`📁 ${esc(t.fileLocation)}`:'',
+          t.system?`💻 ${esc(t.system)}`:'',
+        ].filter(Boolean);
+        html+=`<div class="yv-item${done?' done':''}">
+          <div class="yv-item-head" onclick="toggleYvItem(this)">
+            <span class="yv-check">${done?'✅':'⬜'}</span>
+            <span class="yv-name">${esc(t.name)}</span>
+            ${(t.priority||'mid')==='high'?'<span class="tag" style="background:#fdecea;color:#e74c3c;font-size:10px;">⭐</span>':''}
+            ${t.pending?'<span class="tag" style="background:#f4ecf7;color:#8e44ad;font-size:10px;">🚨 미결</span>':''}
+            ${t._spanRef?'<span class="tag" style="background:#EAF4FB;color:#1a6b9a;font-size:10px;">↗ 연속</span>':''}
+            ${isSpan(t)&&!t._spanRef?`<span class="tag tag-span" style="font-size:10px;">📅 ${MN[t.startMonth]}~${MN[t.endMonth]}</span>`:''}
+            ${cat?`<span class="tag" style="background:${cat.color}33;color:${cat.color};font-size:10px;">${esc(cat.name)}</span>`:''}
+            ${t.sensitive?'<span class="tag tag-sensitive" style="font-size:10px;">🔒</span>':''}
+            <span class="yv-arrow">▶</span>
+          </div>
+          <div class="yv-body">
+            ${metas.length?`<div class="yv-meta">${metas.map(x=>`<span>${x}</span>`).join('')}</div>`:''}
+            ${t.desc?`<div class="yv-desc">${linkify(t.desc)}</div>`:'<div class="yv-desc" style="color:#aaa;">설명이 없습니다.</div>'}
+            <button class="yv-goto" onclick="event.stopPropagation();yvGoTo(${y},${m})">→ ${prev?'2월(전 학년도)':MN[m]} 탭으로 이동해서 수정</button>
+          </div>
+        </div>`;
+      });
+    }
+    html+='</div>';
+  });
+
+  const gPct=gTotal?Math.round(gDone/gTotal*100):0;
+  document.getElementById('yvSummary').innerHTML=
+    `전체 <strong style="color:var(--navy);">${gDone}/${gTotal}</strong> · ${gPct}% 완료`
+    + (gPending?` · <span style="color:#8e44ad;">🚨 미결 ${gPending}건</span>`:'');
+
+  body.innerHTML=html||`<div class="empty-state"><div class="empty-icon">📋</div><p>해당하는 업무가 없습니다.</p></div>`;
+}
+
 function openHelpModal(){
   document.getElementById('helpModal').classList.add('open');
 }
@@ -1401,7 +1678,9 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape') return;
   const open=document.querySelector('.modal-overlay.open');
-  if(open) open.classList.remove('open');
+  if(!open) return;
+  if(open.id==='catModal'){ closeCatModal(); return; }
+  open.classList.remove('open');
 });
 
 /* ① 인쇄 상세 토글 */
@@ -1683,9 +1962,30 @@ window.addEventListener('popstate',e=>{
   else showApp(false);
 });
 
+/* 기존 데이터 마이그레이션: note 필드를 desc 끝에 통합 후 제거 */
+function migrateNoteToDesc(){
+  let changed=false;
+  Object.keys(S.tasks).forEach(k=>{
+    const arr=S.tasks[k];
+    if(!Array.isArray(arr)) return;
+    arr.forEach(t=>{
+      if(t && t.note){
+        const noteText=String(t.note).trim();
+        if(noteText){
+          t.desc = t.desc ? `${t.desc}\n\n※ 참고: ${noteText}` : `※ 참고: ${noteText}`;
+        }
+        delete t.note;
+        changed=true;
+      }
+    });
+  });
+  if(changed) saveTasks();
+}
+
 // DOMContentLoaded 기준으로 초기화 (GitHub Pages 포함 모든 환경 호환)
 document.addEventListener('DOMContentLoaded',()=>{
   try {
+    migrateNoteToDesc();  // 구버전 note 데이터 통합
     if(S.deptName){
       replaceState('app');
       launchApp(false);
@@ -1771,6 +2071,7 @@ function startFromFile(){
 
   // 데이터 적용
   S.tasks=data.tasks||{}; saveTasks();
+  migrateNoteToDesc();  // 구버전 파일의 note 통합
   saveUserEdited();  // 파일로 시작 = 실제 데이터 있음
   S.startedSample=false; try{localStorage.removeItem('si_started_sample');}catch(e){}
   if(data.doneByYear){ Object.assign(S.doneByYear,data.doneByYear); saveDoneByYear(); }
@@ -1991,7 +2292,7 @@ function filteredTasksFor(tasks, year, month){
     const s=S.filter.status;
     const sok=s==='all'||(s==='done'?done:s==='todo'?!done:s==='sensitive'?t.sensitive:true);
     const cok=S.filter.cat===''||t.category===S.filter.cat;
-    const sqok=!q||[t.name,t.desc,t.note,t.assignee,t.fileLocation,t.system]
+    const sqok=!q||[t.name,t.desc,t.assignee,t.fileLocation,t.system]
       .some(f=>f&&f.toLowerCase().includes(q));
     return sok&&cok&&sqok;
   });
@@ -2070,7 +2371,7 @@ function renderTaskList(){
       <div class="task-top">
         <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;padding-top:2px;">
           <div class="task-num">${displayNum}</div>
-          <div class="drag-handle" title="드래그하여 순서 변경">⠿</div>
+          <div class="drag-handle" title="드래그하여 원하는 위치로 이동">⠿</div>
         </div>
         <!-- ⑥ 큰 체크박스 완료 토글 -->
         <div class="task-check-wrap">
@@ -2095,8 +2396,7 @@ function renderTaskList(){
             ${t.deadline?`<span class="task-meta-item deadline">📅 ${esc(t.deadline)}</span>`:''}
             ${t.assignee?`<span class="task-meta-item assignee">👤 ${esc(t.assignee)}</span>`:''}
           </div>
-          ${done?'':`${t.desc?`<div class="task-desc">${q?highlightText(t.desc,q):linkify(t.desc)}</div>`:''}`}
-          ${done?'':`${t.note?`<div class="task-note">📌 ${q?highlightText(t.note,q):linkify(t.note)}</div>`:''}`}
+          ${done?'':`${t.desc?`<div class="task-desc-wrap" data-desc-wrap><div class="task-desc">${q?highlightText(t.desc,q):linkify(t.desc)}</div></div>`:''}`}
           ${done?'':`${t.fileLocation?`<div class="task-note" style="color:var(--teal);">📁 ${q?highlightText(t.fileLocation,q):linkify(t.fileLocation)}</div>`:''}`}
           ${done?'':`${t.system?`<div class="task-note" style="color:#2980b9;">💻 ${q?highlightText(t.system,q):linkify(t.system)}</div>`:''}`}
           ${done?'':`${(t.contacts&&t.contacts.length)?`<div class="task-note" style="color:#8e44ad;">📞 ${t.contacts.map(c=>`${esc(c.name)} ${esc(c.tel)}`).join(' · ')}</div>`:''}`}
@@ -2123,6 +2423,44 @@ function renderTaskList(){
       </div>
     </div>`;
   }).join('');
+
+  // 긴 설명만 접기 처리 (8줄 초과)
+  applyDescClamp();
+}
+
+/* ── 긴 설명 접기/펼치기 ── */
+const _descExpanded=new Set();  // 펼친 카드 유지 (업무명 기준)
+function applyDescClamp(){
+  const LINE=13*1.65, MAX=LINE*8;
+  const searching=!!S.searchQuery;  // 검색 중엔 접지 않음 (하이라이트가 가려지지 않도록)
+  document.querySelectorAll('#taskList [data-desc-wrap]').forEach(wrap=>{
+    const card=wrap.closest('.task-card');
+    const name=card?.querySelector('.task-title')?.textContent||'';
+    // 기존 토글 버튼 제거 후 재계산
+    const oldBtn=wrap.parentElement.querySelector('.desc-toggle');
+    if(oldBtn) oldBtn.remove();
+    wrap.classList.remove('clamped');
+
+    const inner=wrap.querySelector('.task-desc');
+    if(!inner) return;
+    if(searching) return;
+    if(inner.scrollHeight<=MAX+4) return;  // 짧으면 그대로
+
+    const btn=document.createElement('button');
+    btn.className='desc-toggle';
+    btn.type='button';
+    const expanded=_descExpanded.has(name);
+    if(!expanded) wrap.classList.add('clamped');
+    btn.textContent=expanded?'▴ 접기':'▾ 더 보기';
+    btn.onclick=e=>{
+      e.stopPropagation();
+      const nowClamped=wrap.classList.toggle('clamped');
+      btn.textContent=nowClamped?'▾ 더 보기':'▴ 접기';
+      if(nowClamped) _descExpanded.delete(name);
+      else _descExpanded.add(name);
+    };
+    wrap.insertAdjacentElement('afterend',btn);
+  });
 }
 
 /* ════════════════════════════════
@@ -2191,7 +2529,7 @@ function onSearch(){
   const allMonths=[{y:S.year-1,m:2},...MONTHS.map(m=>({y:S.year,m}))];
   allMonths.forEach(({y,m})=>{
     getMonthTasks(y,m).filter(t=>!t._spanRef).forEach(t=>{
-      if([t.name,t.desc,t.note,t.assignee,t.fileLocation,t.system]
+      if([t.name,t.desc,t.assignee,t.fileLocation,t.system]
         .some(f=>f&&f.toLowerCase().includes(q))){
         results.push({t,y,m});
       }
@@ -2203,7 +2541,7 @@ function onSearch(){
   } else {
     panel.innerHTML=results.slice(0,20).map(({t,y,m})=>{
       const monthLabel=y===S.year-1?`${y+1}년 2월(준비)`:MN[m];
-      const snippet=[t.desc,t.note].filter(Boolean).map(s=>s.slice(0,40)).join(' · ');
+      const snippet=[t.desc].filter(Boolean).map(s=>s.slice(0,40)).join(' · ');
       return `<div class="gs-item" onclick="goToTask(${y},${m},'${esc(t.name)}')">
         <div class="gs-item-title">${highlightText(t.name,S.searchQuery)}</div>
         <div class="gs-item-meta">${monthLabel}${snippet?' · '+esc(snippet.slice(0,50)):''}</div>
@@ -2239,17 +2577,18 @@ function clearSearch(){
   renderTabs();renderTaskList();
 }
 function highlightText(text,q){
-  if(!q) return esc(text);
-  const escaped=esc(text);
+  if(!q) return applyMdFormat(esc(text));
+  const escaped=applyMdFormat(esc(text));
   const escapedQ=esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  return escaped.replace(new RegExp(escapedQ,'gi'),m=>`<span class="search-highlight">${m}</span>`);
+  // 태그 안쪽(<...>)은 건드리지 않고 텍스트만 하이라이트
+  return escaped.replace(new RegExp(`(${escapedQ})(?![^<]*>)`,'gi'),m=>`<span class="search-highlight">${m}</span>`);
 }
 
 function openAddModal(){
   S.editingIdx=null;
   document.getElementById('modalTitle').textContent='업무 추가';
   document.getElementById('modalSaveBtn').textContent='저장';
-  ['taskName','taskDeadline','taskDesc','taskNote',
+  ['taskName','taskDeadline','taskDesc',
    'taskFileLocation','taskSystem','taskBudgetTotal','taskBudgetUsed','taskBudgetStorage'
   ].forEach(id=>document.getElementById(id).value='');
   document.getElementById('taskAssignee').value=S.deptName;
@@ -2272,7 +2611,13 @@ function openEditModal(idx){
     const origTasks = getDirectTasks(S.curYear, origM);
     const origIdx = origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
     if(origIdx>=0){
-      showToast(`연속업무는 ${MN[origM]}(시작 월)에서 수정합니다.`);
+      // 참조 카드 안내 강화 — 원본이 바뀜을 명확히 알림
+      const ok=confirm(
+        `이 카드는 "${t.name}" 업무의 연속 표시입니다.\n\n`+
+        `원본은 ${MN[origM]}에 있으며, 수정하면 ${MN[t.startMonth]}~${MN[t.endMonth]} 전체에 반영됩니다.\n\n`+
+        `${MN[origM]}로 이동해서 수정하시겠습니까?`
+      );
+      if(!ok) return;
       S.curMonth = origM;
       renderTabs();
       openEditModalDirect(origIdx);
@@ -2290,7 +2635,6 @@ function openEditModalDirect(idx){
   document.getElementById('taskDeadline').value=t.deadline||'';
   document.getElementById('taskAssignee').value=t.assignee||'';
   document.getElementById('taskDesc').value=t.desc||'';
-  document.getElementById('taskNote').value=t.note||'';
   document.getElementById('taskFileLocation').value=t.fileLocation||'';
   document.getElementById('taskSystem').value=t.system||'';
   document.getElementById('taskBudgetTotal').value=t.budgetTotal||'';
@@ -2304,7 +2648,7 @@ function openEditModalDirect(idx){
   document.getElementById('taskContactList').innerHTML='';
   (t.contacts||[]).forEach(c=>addContactRow(c));
   // 상세 정보가 있으면 자동 펼치기
-  const hasDetail=t.assignee||t.note||t.fileLocation||t.system||(t.contacts&&t.contacts.length)||
+  const hasDetail=t.assignee||t.fileLocation||t.system||(t.contacts&&t.contacts.length)||
     t.budgetTotal||t.budgetUsed||t.budgetStorage||t.sensitive||t.repeat||t.pending||t.priority!=='mid';
   toggleDetailFields(!!hasDetail);
   populateMonthSels(t.startMonth||S.curMonth, t.endMonth||'');
@@ -2350,7 +2694,6 @@ function saveTask(){
     assignee:document.getElementById('taskAssignee').value.trim(),
     category:document.getElementById('taskCategory').value||'',
     desc:document.getElementById('taskDesc').value.trim(),
-    note:document.getElementById('taskNote').value.trim(),
     fileLocation:document.getElementById('taskFileLocation').value.trim(),
     system:document.getElementById('taskSystem').value.trim(),
     budgetTotal:document.getElementById('taskBudgetTotal').value.trim(),
@@ -2410,9 +2753,16 @@ function deleteTask(idx){
   const t=allT[idx];
   if(t._spanRef){
     const origM=t._spanStart;
-    const origTasks=getDirectTasks(S.year,origM);
+    // 참조 카드 안내 강화 — 원본이 삭제됨을 명확히 알림
+    const ok=confirm(
+      `이 카드는 "${t.name}" 업무의 연속 표시입니다.\n\n`+
+      `삭제하면 원본(${MN[origM]})과 함께 ${MN[t.startMonth]}~${MN[t.endMonth]} 전체에서 사라집니다.\n\n`+
+      `정말 삭제하시겠습니까?`
+    );
+    if(!ok){ render(); return; }
+    const origTasks=getDirectTasks(S.curYear,origM);
     const origIdx=origTasks.findIndex(ot=>ot.name===t.name&&ot.startMonth===t.startMonth);
-    if(origIdx>=0){origTasks.splice(origIdx,1);setMonthTasks(S.year,origM,origTasks);}
+    if(origIdx>=0){origTasks.splice(origIdx,1);setMonthTasks(S.curYear,origM,origTasks);}
   } else {
     const tasks=getDirectTasks(S.curYear,S.curMonth);
     tasks.splice(idx,1);setMonthTasks(S.curYear,S.curMonth,tasks);
@@ -2427,6 +2777,63 @@ const DESC_TPLS={
   doc:`■ 필요 서류:\n  - \n  - \n■ 제출처: \n■ 제출 기한: \n■ 보관 위치: `,
   caution:`⚠️ 주의사항:\n- \n- \n\n✅ 반드시 확인할 것:\n- \n\n📌 이전에 문제가 됐던 점:\n- `,
 };
+/* ── 서식 적용 (마크다운 문법 삽입) ── */
+function applyFormat(kind){
+  const el=document.getElementById('taskDesc');
+  const start=el.selectionStart, end=el.selectionEnd;
+  const val=el.value;
+  const sel=val.slice(start,end);
+
+  // 줄 단위 서식 (목록·번호·주의)
+  if(kind==='list'||kind==='num'||kind==='warn'){
+    // 선택이 없으면 현재 줄, 있으면 선택된 줄들에 적용
+    let ls=val.lastIndexOf('\n',start-1)+1;
+    let le=val.indexOf('\n',end); if(le<0) le=val.length;
+    const block=val.slice(ls,le);
+    const lines=block.split('\n');
+    const marked=lines.map((line,i)=>{
+      const t=line.replace(/^(\s*)([-•]\s|\d+\.\s|⚠️\s)?/,'$1');
+      if(!t.trim()) return line;
+      if(kind==='list') return t.replace(/^(\s*)/,'$1- ');
+      if(kind==='num')  return t.replace(/^(\s*)/,`$1${i+1}. `);
+      return t.replace(/^(\s*)/,'$1⚠️ ');
+    }).join('\n');
+    el.value=val.slice(0,ls)+marked+val.slice(le);
+    el.focus();
+    el.setSelectionRange(ls,ls+marked.length);
+    autoResizeDesc(el);
+    return;
+  }
+
+  // 인라인 서식 (굵게·기울임·밑줄·강조)
+  const wrap={bold:'**',italic:'*',underline:'__',mark:'=='}[kind];
+  if(!wrap) return;
+  const placeholder={bold:'굵게',italic:'기울임',underline:'밑줄',mark:'강조'}[kind];
+
+  // 이미 감싸져 있으면 해제 (토글)
+  const before=val.slice(Math.max(0,start-wrap.length),start);
+  const after=val.slice(end,end+wrap.length);
+  if(sel&&before===wrap&&after===wrap){
+    el.value=val.slice(0,start-wrap.length)+sel+val.slice(end+wrap.length);
+    el.focus();
+    el.setSelectionRange(start-wrap.length,end-wrap.length);
+    autoResizeDesc(el);
+    return;
+  }
+
+  const text=sel||placeholder;
+  el.value=val.slice(0,start)+wrap+text+wrap+val.slice(end);
+  el.focus();
+  // 선택이 없었으면 안내 텍스트를 선택 상태로 → 바로 덮어쓰기 가능
+  const s=start+wrap.length;
+  el.setSelectionRange(s, s+text.length);
+  autoResizeDesc(el);
+}
+function autoResizeDesc(el){
+  el.style.height='auto';
+  el.style.height=Math.max(80,el.scrollHeight)+'px';
+}
+
 function applyDescTpl(key){
   const el=document.getElementById('taskDesc');
   if(el.value.trim()&&!confirm('현재 내용을 템플릿으로 대체하시겠습니까?'))return;
@@ -2471,18 +2878,6 @@ function onDrop(e,destIdx){
   const allT=getMonthTasks(S.curYear,S.curMonth);
   if(allT[_dragSrcIdx]?._spanRef||allT[destIdx]?._spanRef){
     showToast('연속업무는 시작 월에서 순서를 변경하세요.');return;
-  }
-
-  // ⑥ 2열 그리드: 같은 열(홀짝 위치)끼리만 드래그 허용
-  const cards=[...document.querySelectorAll('.task-list .task-card')];
-  const srcCard=cards.find(c=>parseInt(c.dataset.idx)===_dragSrcIdx);
-  const dstCard=cards.find(c=>parseInt(c.dataset.idx)===destIdx);
-  if(srcCard&&dstCard){
-    const srcPos=cards.indexOf(srcCard);
-    const dstPos=cards.indexOf(dstCard);
-    if(srcPos%2!==dstPos%2){
-      showToast('같은 열 안에서만 순서를 바꿀 수 있습니다.');return;
-    }
   }
 
   const tasks=getDirectTasks(S.curYear,S.curMonth);
@@ -2533,13 +2928,52 @@ function doCopy(){
   if(!S.copyMonths.size){showToast('복사할 월을 선택하세요.');return;}
   const destYear=parseInt(document.getElementById('copyYear').value);
   const src={...getMonthTasks(S.copyRef.year,S.copyRef.month)[S.copyRef.idx],done:false};
-  S.copyMonths.forEach(m=>{const t=getMonthTasks(destYear,m);t.push({...src});setMonthTasks(destYear,m,t);});
+  // 참조 카드 관련 내부 필드는 복사하지 않음
+  delete src._spanRef; delete src._spanStart;
+
+  // 기간 업무면 기간 길이를 유지한 채 대상 월 기준으로 이동
+  const spanLen=isSpan(src)
+    ? monthIdx(src.endMonth)-monthIdx(src.startMonth)
+    : 0;
+
+  S.copyMonths.forEach(m=>{
+    const copy={...src, startMonth:m};
+    if(spanLen>0){
+      const endI=monthIdx(m)+spanLen;
+      // 학년도(3월~2월) 범위를 넘으면 2월까지만
+      copy.endMonth = endI<MONTHS.length ? MONTHS[endI] : MONTHS[MONTHS.length-1];
+    } else {
+      copy.endMonth=null;
+    }
+    const t=getDirectTasks(destYear,m);
+    t.push(copy);
+    setMonthTasks(destYear,m,t);
+  });
   closeModal('copyModal');render();showToast(`${S.copyMonths.size}개 월에 복사되었습니다.`,'green');
 }
 
 /* ════════════════════════════════
    CATEGORY MODAL
 ════════════════════════════════ */
+/* 업무 모달에서 카테고리 관리 열기 — 닫으면 셀렉트 갱신 */
+let _catModalFromTask=false;
+let _catSelBeforeManage='';
+function openCatModalFromTask(){
+  _catModalFromTask=true;
+  // 현재 선택값 보존
+  _catSelBeforeManage=document.getElementById('taskCategory').value;
+  openCatModal();
+}
+function closeCatModal(){
+  closeModal('catModal');
+  if(_catModalFromTask){
+    _catModalFromTask=false;
+    // 삭제된 카테고리였다면 '선택 안 함'으로
+    const stillExists=S.cats.some(c=>c.id===_catSelBeforeManage);
+    populateCatSel(stillExists?_catSelBeforeManage:'');
+  }
+}
+
 function openCatModal(){
   renderCatManageList();
   renderCatPresetList();
@@ -2582,13 +3016,16 @@ function renderCatPresetList(){
 function addPresetCat(id){
   const p=PRESET_CATS.find(c=>c.id===id);
   if(!p||S.cats.find(c=>c.name===p.name))return;
-  S.cats.push({id:'c'+Date.now(),name:p.name,color:p.color});
+  const newId='c'+Date.now();
+  S.cats.push({id:newId,name:p.name,color:p.color});
   saveCats();
+  // 업무 모달에서 추가한 경우 방금 만든 카테고리를 자동 선택
+  if(_catModalFromTask) _catSelBeforeManage=newId;
   renderCatManageList();
   renderCatPresetList();
   renderCatFilters();
-  populateCatSel('');
-  showToast(`"${p.name}" 추가되었습니다.`,'green');
+  populateCatSel(_catModalFromTask?newId:'');
+  showToast(_catModalFromTask?`"${p.name}" 추가 후 선택되었습니다.`:`"${p.name}" 추가되었습니다.`,'green');
 }
 
 function resetCats(){
@@ -2620,10 +3057,13 @@ function addCategory(){
   const name=document.getElementById('newCatName').value.trim();
   if(!name){showToast('카테고리 이름을 입력하세요.');return;}
   if(S.cats.find(c=>c.name===name)){showToast('이미 있는 카테고리입니다.');return;}
-  S.cats.push({id:'c'+Date.now(),name,color:S.newCatColor});saveCats();
+  const newId='c'+Date.now();
+  S.cats.push({id:newId,name,color:S.newCatColor});saveCats();
   document.getElementById('newCatName').value='';
-  renderCatManageList();renderCatPresetList();renderCatFilters();populateCatSel('');
-  showToast('추가되었습니다.','green');
+  // 업무 모달에서 추가한 경우 방금 만든 카테고리를 자동 선택
+  if(_catModalFromTask) _catSelBeforeManage=newId;
+  renderCatManageList();renderCatPresetList();renderCatFilters();populateCatSel(_catModalFromTask?newId:'');
+  showToast(_catModalFromTask?`"${name}" 추가 후 선택되었습니다.`:'추가되었습니다.','green');
 }
 function deleteCat(i){
   const c=S.cats[i];
@@ -2738,7 +3178,6 @@ function doPrint(){
         ${showAssignee&&t.assignee?`<span class="as">👤 ${esc(t.assignee)}</span>`:''}
       </div>
       ${t.desc?`<div class="desc${hideDesc?' hidden':''}">${hideDesc?'[개인정보 포함 — 가림 처리]':linkify(t.desc)}</div>`:''}
-      ${t.note?`<div class="note">📌 ${linkify(t.note)}</div>`:''}
       ${t.fileLocation?`<div class="file-loc">📁 ${esc(t.fileLocation)}</div>`:''}
       ${t.system?`<div class="sys-info">💻 ${esc(t.system)}</div>`:''}
       ${(t.contacts&&t.contacts.length)?`<div class="contacts">📞 ${t.contacts.map(c=>`${esc(c.name)} ${esc(c.tel)}`).join(' &nbsp;·&nbsp; ')}</div>`:''}
@@ -2762,6 +3201,10 @@ function doPrint(){
     .m2{font-size:11px;color:#7f8c8d;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:3px;}
     .dl{color:#E67E22;font-weight:600;}.as{color:#8E44AD;font-weight:600;}
     .desc{font-size:12px;color:#555;white-space:pre-wrap;line-height:1.55;}
+    .desc mark{background:#ffe9a8;color:inherit;padding:0 2px;}
+    .desc strong{font-weight:700;color:#2c3e50;}
+    .desc em{font-style:italic;}
+    .desc u{text-decoration:underline;}
     .desc.hidden{background:#ccc;color:transparent;border-radius:3px;}
     .note{font-size:11px;color:#7f8c8d;margin-top:4px;}
     .file-loc{font-size:11px;color:#16A085;font-weight:600;margin-top:4px;}
@@ -2916,11 +3359,25 @@ function doPrint(){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 /* URL을 클릭 가능한 링크로 변환 (esc 처리 후 적용) */
+/* 마크다운 서식 변환 — esc() 처리된 문자열에만 적용 (XSS 안전) */
+function applyMdFormat(escaped){
+  return escaped
+    // ==강조== → 형광펜
+    .replace(/==([^=\n]+)==/g,'<mark>$1</mark>')
+    // **굵게**
+    .replace(/\*\*([^*\n]+)\*\*/g,'<strong>$1</strong>')
+    // __밑줄__
+    .replace(/__([^_\n]+)__/g,'<u>$1</u>')
+    // *기울임* (굵게 처리 후 남은 단일 * 만)
+    .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,'$1<em>$2</em>');
+}
 function linkify(s){
   // 먼저 HTML 이스케이프 처리
   const escaped=esc(s);
+  // 마크다운 서식 적용
+  const formatted=applyMdFormat(escaped);
   // http(s)://, ftp://, www. 로 시작하는 URL 감지
-  return escaped.replace(
+  return formatted.replace(
     /(https?:\/\/|ftp:\/\/|www\.)[^\s<>"']+/g,
     url=>{
       const href=url.startsWith('www.')?'https://'+url:url;
@@ -2944,35 +3401,29 @@ function loadSampleIfEmpty(){
   const samples={
     3:[
       {name:'입학식 및 시업식 준비',startMonth:3,endMonth:null,deadline:'3월 2일',assignee:S.deptName,category:'c3',
-       desc:'1학년 입학식, 2~6학년 시업식 준비\n1. 식순 작성 및 사회자 지정\n2. 입학 통지서 및 학용품 준비\n3. 학부모 안내 가정통신문 발송\n4. 강당(또는 운동장) 배치 확인',
-       note:'교장·교감 결재 필수. 전년도 식순 파일 참고',fileLocation:'공유폴더/교무부/행사/입학식',
+       desc:'1학년 입학식, 2~6학년 시업식 준비\n1. 식순 작성 및 사회자 지정\n2. 입학 통지서 및 학용품 준비\n3. 학부모 안내 가정통신문 발송\n4. 강당(또는 운동장) 배치 확인\n\n※ 참고: 교장·교감 결재 필수. 전년도 식순 파일 참고',fileLocation:'공유폴더/교무부/행사/입학식',
        priority:'high',repeat:true,done:false,pending:false,contacts:[{name:'행정실 담당',tel:'958-5702'}]},
       {name:'학급 편성 및 담임 배정 공문',startMonth:3,endMonth:null,deadline:'3월 초',assignee:S.deptName,category:'c1',
-       desc:'학급 편성 결과를 교육청에 공문으로 제출\n1. 에듀파인 접속 → 공문 → 새 공문 작성\n2. 학급 수·학생 수 기재\n3. 교장 결재 후 발송',
-       note:'전년도 공문 양식 참고',fileLocation:'에듀파인 공문 시스템',
+       desc:'학급 편성 결과를 교육청에 공문으로 제출\n1. 에듀파인 접속 → 공문 → 새 공문 작성\n2. 학급 수·학생 수 기재\n3. 교장 결재 후 발송\n\n※ 참고: 전년도 공문 양식 참고',fileLocation:'에듀파인 공문 시스템',
        priority:'high',repeat:true,done:false,pending:false},
       {name:'신입생 학적 등록 (나이스)',startMonth:3,endMonth:null,deadline:'3월 첫째 주',assignee:S.deptName,category:'c2',
-       desc:'입학생 기본정보 나이스 등록\n1. 나이스 접속 → 학적 → 신입생 등록\n2. 이름·생년월일·주소·학부모 연락처 입력\n3. 입력 완료 후 교감 확인',
-       note:'개인정보 포함. 출력물 보안 유의',fileLocation:'나이스 → 학적관리',
+       desc:'입학생 기본정보 나이스 등록\n1. 나이스 접속 → 학적 → 신입생 등록\n2. 이름·생년월일·주소·학부모 연락처 입력\n3. 입력 완료 후 교감 확인\n\n※ 참고: 개인정보 포함. 출력물 보안 유의',fileLocation:'나이스 → 학적관리',
        system:'나이스(NEIS) → 학적 → 학생 등록',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
       {name:'진단평가 실시 및 결과 처리',startMonth:3,endMonth:null,deadline:'3월 말',assignee:S.deptName,category:'c8',
-       desc:'2~6학년 진단활동 실시 및 결과 취합\n1. 교육청 진단평가 계획 공문 확인\n2. 학급별 실시 일정 안내\n3. 결과 취합 후 교육청 보고',
-       note:'기초학력 대상 학생 별도 관리',priority:'mid',repeat:true,done:false,pending:false},
+       desc:'2~6학년 진단활동 실시 및 결과 취합\n1. 교육청 진단평가 계획 공문 확인\n2. 학급별 실시 일정 안내\n3. 결과 취합 후 교육청 보고\n\n※ 참고: 기초학력 대상 학생 별도 관리',priority:'mid',repeat:true,done:false,pending:false},
       {name:'인성·생명존중·친구사랑주간 운영',startMonth:3,endMonth:null,deadline:'3월 27~31일',assignee:S.deptName,category:'c4',
        desc:'주간 운영 계획 수립 및 가정통신문 발송\n1. 학급별 활동 계획 안내\n2. 복도 게시물 부착\n3. 결과 보고서 작성',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     4:[
       {name:'학부모 상담주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 3~14일',assignee:S.deptName,category:'c8',
-       desc:'학부모 상담주간 운영\n1. 가정통신문 발송 (상담 신청서 포함)\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고',
-       note:'상담 내용 개인정보 관리 유의',priority:'mid',sensitive:true,repeat:true,done:false,pending:false},
+       desc:'학부모 상담주간 운영\n1. 가정통신문 발송 (상담 신청서 포함)\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고\n\n※ 참고: 상담 내용 개인정보 관리 유의',priority:'mid',sensitive:true,repeat:true,done:false,pending:false},
       {name:'장애인식개선교육주간 운영 (1차)',startMonth:4,endMonth:null,deadline:'4월 10~14일',assignee:S.deptName,category:'c4',
        desc:'장애인식개선교육 실시\n1. 교육청 지침 공문 확인\n2. 학급별 수업 자료 배부\n3. 실적 보고서 제출',
        priority:'mid',repeat:true,done:false,pending:false},
       {name:'학교폭력 실태조사',startMonth:4,endMonth:null,deadline:'4월 중',assignee:S.deptName,category:'c4',
-       desc:'온라인 학교폭력 실태조사 실시\n1. 교육청 안내 공문 확인\n2. 학생 대상 설문 링크 학급 배포\n3. 학급별 참여율 독려 및 결과 보고',
-       note:'교육청 지침 공문 확인 필수',sensitive:true,repeat:true,done:false,pending:false,
+       desc:'온라인 학교폭력 실태조사 실시\n1. 교육청 안내 공문 확인\n2. 학생 대상 설문 링크 학급 배포\n3. 학급별 참여율 독려 및 결과 보고\n\n※ 참고: 교육청 지침 공문 확인 필수',sensitive:true,repeat:true,done:false,pending:false,
        system:'학교폭력 실태조사 온라인 시스템',priority:'high'},
       {name:'1학년 체험학습',startMonth:4,endMonth:null,deadline:'4월 25일',assignee:S.deptName,category:'c3',
        desc:'1학년 봄 체험학습 인솔 및 행정 처리\n1. 장소·차량·인솔교사 확정\n2. 안전 계획서 교장 결재\n3. 학부모 안내 가정통신문 발송\n4. 결과 보고서 작성',
@@ -2989,8 +3440,7 @@ function loadSampleIfEmpty(){
        desc:'전교 지진 대피훈련 실시\n1. 훈련 계획 수립 및 안내\n2. 학급별 대피 동선 확인\n3. 훈련 실시 후 결과 보고\n4. 미흡 사항 개선 계획 수립',
        priority:'mid',repeat:true,done:false,pending:false},
       {name:'봄 현장체험학습 계획 및 공문',startMonth:5,endMonth:null,deadline:'5월 초',assignee:S.deptName,category:'c3',
-       desc:'봄 현장체험학습 계획 수립\n1. 장소·이동수단·안전계획 포함\n2. 교장 결재 후 교육청 보고\n3. 차량 계약 확인',
-       note:'차량 계약 3월부터 시작',fileLocation:'공유폴더/교무부/체험학습',
+       desc:'봄 현장체험학습 계획 수립\n1. 장소·이동수단·안전계획 포함\n2. 교장 결재 후 교육청 보고\n3. 차량 계약 확인\n\n※ 참고: 차량 계약 3월부터 시작',fileLocation:'공유폴더/교무부/체험학습',
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     6:[
@@ -2998,8 +3448,7 @@ function loadSampleIfEmpty(){
        desc:'재량휴업일(6월 5일) 안내 가정통신문 발송\n1. 휴업일 근거 및 날짜 명시\n2. 돌봄 교실 운영 여부 안내\n3. 교장 결재 후 발송',
        priority:'mid',repeat:true,done:false,pending:false},
       {name:'5학년 수련활동',startMonth:6,endMonth:null,deadline:'6월 28~30일',assignee:S.deptName,category:'c3',
-       desc:'5학년 수련활동 운영\n1. 수련관 예약 및 계약\n2. 안전 계획서 작성 및 결재\n3. 학부모 안내 및 비용 수납\n4. 인솔 교사 배치\n5. 결과 보고서 작성',
-       note:'수련관 예약은 전년도 12월부터',fileLocation:'공유폴더/교무부/수련활동',
+       desc:'5학년 수련활동 운영\n1. 수련관 예약 및 계약\n2. 안전 계획서 작성 및 결재\n3. 학부모 안내 및 비용 수납\n4. 인솔 교사 배치\n5. 결과 보고서 작성\n\n※ 참고: 수련관 예약은 전년도 12월부터',fileLocation:'공유폴더/교무부/수련활동',
        priority:'high',repeat:true,done:false,pending:false,
        contacts:[{name:'수련관 담당자',tel:'062-000-0000'}]},
     ],
@@ -3009,8 +3458,7 @@ function loadSampleIfEmpty(){
        priority:'high',repeat:true,done:false,pending:false,
        contacts:[{name:'수영장 담당',tel:'062-000-0000'}]},
       {name:'1학기 학교생활기록부 마감',startMonth:7,endMonth:null,deadline:'7월 말',assignee:S.deptName,category:'c2',
-       desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n1. 담임교사별 입력 현황 점검\n2. 누락 항목 확인\n3. 교장 최종 결재',
-       note:'관리자 계정 필요. 마감 후 수정 불가',
+       desc:'나이스에서 1학기 생활기록부 항목 입력 마감\n1. 담임교사별 입력 현황 점검\n2. 누락 항목 확인\n3. 교장 최종 결재\n\n※ 참고: 관리자 계정 필요. 마감 후 수정 불가',
        system:'나이스(NEIS) → 학생생활 → 생활기록부',
        fileLocation:'나이스 생활기록부 시스템',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
@@ -3043,8 +3491,7 @@ function loadSampleIfEmpty(){
     ],
     10:[
       {name:'운남축제 준비 및 운영',startMonth:10,endMonth:null,deadline:'10월 20일',assignee:S.deptName,category:'c3',
-       desc:'학교 축제 준비 및 운영\n1. 축제 기획안 작성 및 결재\n2. 학급별 프로그램 취합\n3. 장소·음향·방송 준비\n4. 안전 계획 수립\n5. 결과 보고서 작성',
-       note:'학생자치회와 협력 필요',
+       desc:'학교 축제 준비 및 운영\n1. 축제 기획안 작성 및 결재\n2. 학급별 프로그램 취합\n3. 장소·음향·방송 준비\n4. 안전 계획 수립\n5. 결과 보고서 작성\n\n※ 참고: 학생자치회와 협력 필요',
        fileLocation:'공유폴더/교무부/행사/운남축제',
        priority:'high',repeat:true,done:false,pending:false},
       {name:'개교기념일 행사',startMonth:10,endMonth:null,deadline:'10월 2일',assignee:S.deptName,category:'c3',
@@ -3068,13 +3515,11 @@ function loadSampleIfEmpty(){
     ],
     12:[
       {name:'졸업식 준비 및 졸업앨범 배부',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:S.deptName,category:'c3',
-       desc:'졸업식 행사 준비\n1. 졸업장·상장 인쇄 및 날인\n2. 졸업앨범 수령 및 배부\n3. 식순 작성 및 사회자 지정\n4. 강당 배치 확인',
-       note:'졸업앨범 업체 11월부터 협의',
+       desc:'졸업식 행사 준비\n1. 졸업장·상장 인쇄 및 날인\n2. 졸업앨범 수령 및 배부\n3. 식순 작성 및 사회자 지정\n4. 강당 배치 확인\n\n※ 참고: 졸업앨범 업체 11월부터 협의',
        fileLocation:'공유폴더/교무부/행사/졸업식',
        priority:'high',repeat:true,done:false,pending:false},
       {name:'종업식 및 겨울방학식',startMonth:12,endMonth:null,deadline:'12월 29일',assignee:S.deptName,category:'c3',
-       desc:'종업식 및 겨울방학식 준비\n1. 식순 작성\n2. 방학 중 생활 안내 가정통신문\n3. 안전사고 예방 교육',
-       note:'졸업식과 같은 날 진행',
+       desc:'종업식 및 겨울방학식 준비\n1. 식순 작성\n2. 방학 중 생활 안내 가정통신문\n3. 안전사고 예방 교육\n\n※ 참고: 졸업식과 같은 날 진행',
        priority:'mid',repeat:true,done:false,pending:false},
       {name:'2학기 학교생활기록부 마감',startMonth:12,endMonth:null,deadline:'12월 중',assignee:S.deptName,category:'c2',
        desc:'2학기 생활기록부 최종 마감\n1. 담임별 입력 현황 최종 점검\n2. 누락 항목 확인\n3. 교장 최종 결재\n4. 마감 후 출력 보관',
@@ -3083,8 +3528,7 @@ function loadSampleIfEmpty(){
     ],
     1:[
       {name:'신학기 학급 편성 사전 준비',startMonth:1,endMonth:null,deadline:'1월 말',assignee:S.deptName,category:'c2',
-       desc:'새 학년도 학급 편성 사전 작업\n1. 학년별 학생 수 파악\n2. 학급 수 결정\n3. 전학 예정 학생 파악\n4. 담임 배정 초안 작성 (교장·교감 협의)',
-       note:'개인정보 보안 유의',
+       desc:'새 학년도 학급 편성 사전 작업\n1. 학년별 학생 수 파악\n2. 학급 수 결정\n3. 전학 예정 학생 파악\n4. 담임 배정 초안 작성 (교장·교감 협의)\n\n※ 참고: 개인정보 보안 유의',
        priority:'high',sensitive:true,repeat:true,done:false,pending:false},
       {name:'교육과정 편성 및 학사력 작성',startMonth:1,endMonth:2,deadline:'2월 초',assignee:S.deptName,category:'c8',
        desc:'새 학년도 교육과정 편성 및 학사력 작성\n1. 교육청 교육과정 편성 지침 확인\n2. 수업일수·행사일정 반영\n3. 학교운영위원회 심의\n4. 교육청 제출',
