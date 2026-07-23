@@ -2074,11 +2074,13 @@ function getCat(id){return S.cats.find(c=>c.id===id)||null;}
 ════════════════════════════════ */
 // 현재 화면을 history state 로 저장
 // state: 'setup' | 'app'
+/* URL을 깔끔하게 유지하면서 뒤로가기는 지원
+   — 주소창에 #setup / #app 을 남기지 않고 history.state 로만 화면 구분 */
 function pushState(screen){
-  history.pushState({screen},'',(screen==='setup'?'#setup':'#app'));
+  history.pushState({screen},'',location.pathname+location.search);
 }
 function replaceState(screen){
-  history.replaceState({screen},'',(screen==='setup'?'#setup':'#app'));
+  history.replaceState({screen},'',location.pathname+location.search);
 }
 
 window.addEventListener('popstate',e=>{
