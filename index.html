@@ -133,7 +133,7 @@ body{font-family:var(--font-sans);background:#F2F5FB;color:var(--gray-d);min-hei
    메인 앱
 ══════════════════════════════ */
 #appScreen{display:none;}
-#appScreen.show{display:block;}
+#appScreen.show{display:flex;}
 
 /* ── HEADER ── */
 header{
@@ -527,8 +527,16 @@ header{
 .empty-icon{font-size:42px;margin-bottom:10px;}
 
 /* ── FOOTER ── */
+#appScreen.show{
+  min-height:100vh;
+  flex-direction:column;
+}
+#appScreen .main{
+  flex:1 0 auto;  /* 남은 공간을 채워 footer를 아래로 밀어냄 */
+}
 .app-footer{
-  max-width:var(--container);margin:0 auto;padding:0 20px 20px;
+  flex-shrink:0;
+  max-width:var(--container);width:100%;margin:0 auto;padding:16px 20px 20px;
   text-align:right;
 }
 .app-footer span{font-size:11px;color:#bcc8d8;letter-spacing:.3px;}
@@ -1995,7 +2003,7 @@ function renderTaskList(){
   const y=S.curYear;
   const isPrevYear=y===S.year-1;
   document.getElementById('curMonthTitle').textContent=
-    isPrevYear?`${y-1}년 2월`:MN[m];
+    isPrevYear?`${y+1}년 2월`:MN[m];
   document.getElementById('curMonthBadge').textContent=
     isPrevYear?'전 학년도 준비':(ML[m]||'');
   const allT=getMonthTasks(y,m);
@@ -2193,7 +2201,7 @@ function onSearch(){
     panel.innerHTML=`<div class="gs-empty">검색 결과가 없습니다.</div>`;
   } else {
     panel.innerHTML=results.slice(0,20).map(({t,y,m})=>{
-      const monthLabel=y===S.year-1?`${y-1}년 2월(준비)`:MN[m];
+      const monthLabel=y===S.year-1?`${y+1}년 2월(준비)`:MN[m];
       const snippet=[t.desc,t.note].filter(Boolean).map(s=>s.slice(0,40)).join(' · ');
       return `<div class="gs-item" onclick="goToTask(${y},${m},'${esc(t.name)}')">
         <div class="gs-item-title">${highlightText(t.name,S.searchQuery)}</div>
