@@ -1115,6 +1115,7 @@ header{
               <button type="button" style="background:#2980b9" onclick="applyColor('#2980b9')" title="파랑"></button>
               <button type="button" style="background:#8e44ad" onclick="applyColor('#8e44ad')" title="보라"></button>
               <button type="button" style="background:#2c3e50" onclick="applyColor('#2c3e50')" title="검정"></button>
+              <button type="button" style="background:#fff;color:var(--gray-m);font-size:13px;line-height:1;grid-column:span 3;height:22px;" onclick="removeFormat('color')" title="색상 제거">색 지우기</button>
             </div>
           </div>
           <!-- 글자 크기 -->
@@ -1125,6 +1126,7 @@ header{
             <option value="15">15px</option>
             <option value="18">18px</option>
             <option value="22">22px (크게)</option>
+            <option value="__clear">크기 지우기</option>
           </select>
           <span class="fmt-sep"></span>
           <button type="button" class="fmt-btn" onclick="applyFormat('list')" title="목록">• 목록</button>
@@ -2854,21 +2856,116 @@ document.addEventListener('click',e=>{
 });
 function applyColor(color){
   document.getElementById('fmtColorMenu').classList.remove('open');
-  wrapSelection(`{color:${color}}`,'{/color}','색상 텍스트');
+  wrapSelection(`{color:${color}}`,'{/color}','색상 텍스트','color');
 }
 function applySize(px){
   if(!px) return;
-  wrapSelection(`{size:${px}}`,'{/size}','크기 텍스트');
+  if(px==='__clear'){ removeFormat('size'); return; }
+  wrapSelection(`{size:${px}}`,'{/size}','크기 텍스트','size');
 }
-/* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수 */
-function wrapSelection(openTag,closeTag,placeholder){
+/* 선택 영역(또는 커서 위치)에서 color/size 태그 제거 */
+function removeFormat(kind){
+  document.getElementById('fmtColorMenu')?.classList.remove('open');
   const el=document.getElementById('taskDesc');
   const s=el.selectionStart, e=el.selectionEnd, val=el.value;
-  const sel=val.slice(s,e);
+  const tagRe=kind==='color'
+    ? /\{color:#[0-9a-fA-F]{3,6}\}|\{\/color\}/g
+    : /\{size:\d{1,2}\}|\{\/size\}/g;
+
+  if(s!==e){
+    const cleaned=val.slice(s,e).replace(tagRe,'');
+    el.value=val.slice(0,s)+cleaned+val.slice(e);
+    el.focus(); el.setSelectionRange(s,s+cleaned.length);
+  } else {
+    const openRe=kind==='color'?/\{color:#[0-9a-fA-F]{3,6}\}/g:/\{size:\d{1,2}\}/g;
+    const closeStr=kind==='color'?'{/color}':'{/size}';
+    let m,lastOpen=-1,lastLen=0;
+    while((m=openRe.exec(val))!==null){
+      if(m.index<s){ lastOpen=m.index; lastLen=m[0].length; } else break;
+    }
+    const closeAt=lastOpen>=0?val.indexOf(closeStr,lastOpen):-1;
+    if(lastOpen<0||closeAt<0||closeAt+closeStr.length<s){
+      showToast('제거할 서식이 없습니다.'); return;
+    }
+    const inner=val.slice(lastOpen+lastLen,closeAt);
+    el.value=val.slice(0,lastOpen)+inner+val.slice(closeAt+closeStr.length);
+    el.focus(); el.setSelectionRange(lastOpen,lastOpen+inner.length);
+  }
+  autoResizeDesc(el);
+  if(_descPreviewOn) updateDescPreview();
+}
+/* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수 */
+/* 선택 영역을 여는/닫는 태그로 감싸는 공통 함수
+   - 같은 종류(color/size) 태그가 이미 있으면 교체
+   - 선택 범위 안팎의 기존 태그를 정리해 중첩 방지 */
+function wrapSelection(openTag,closeTag,placeholder,kind){
+  const el=document.getElementById('taskDesc');
+  let s=el.selectionStart, e=el.selectionEnd, val=el.value;
+
+  // kind별 정규식 (color 또는 size)
+  const tagRe=kind==='color'
+    ? /\{color:#[0-9a-fA-F]{3,6}\}|\{\/color\}/g
+    : /\{size:\d{1,2}\}|\{\/size\}/g;
+
+  // 1) 선택이 없으면: 커서가 같은 종류 태그 쌍 안에 있는지 확인 → 그 범위를 대상으로
+  if(s===e){
+    const openRe=kind==='color'?/\{color:#[0-9a-fA-F]{3,6}\}/g:/\{size:\d{1,2}\}/g;
+    const closeStr=kind==='color'?'{/color}':'{/size}';
+    let m,lastOpen=-1,lastOpenLen=0;
+    while((m=openRe.exec(val))!==null){
+      if(m.index<s){ lastOpen=m.index; lastOpenLen=m[0].length; } else break;
+    }
+    if(lastOpen>=0){
+      const closeAt=val.indexOf(closeStr,lastOpen);
+      if(closeAt>=0&&closeAt+closeStr.length>=s){
+        // 기존 태그 안 → 내용만 남기고 태그 교체
+        const inner=val.slice(lastOpen+lastOpenLen,closeAt);
+        el.value=val.slice(0,lastOpen)+openTag+inner+closeTag+val.slice(closeAt+closeStr.length);
+        el.focus();
+        const st=lastOpen+openTag.length;
+        el.setSelectionRange(st,st+inner.length);
+        autoResizeDesc(el);
+        if(_descPreviewOn) updateDescPreview();
+        return;
+      }
+    }
+  }
+
+  // 2) 선택 영역 안의 같은 종류 태그 제거 (중첩 방지)
+  let sel=val.slice(s,e).replace(tagRe,'');
   const text=sel||placeholder;
-  el.value=val.slice(0,s)+openTag+text+closeTag+val.slice(e);
+
+  // 3) 선택을 감싸고 있던 같은 종류 태그 제거 (사이에 다른 종류 태그가 껴 있어도 처리)
+  let before=val.slice(0,s), after=val.slice(e);
+  const anyTag=/\{(?:\/)?(?:color:#[0-9a-fA-F]{3,6}|size:\d{1,2}|\/color|\/size)\}$/;
+  const openRe2=kind==='color'?/\{color:#[0-9a-fA-F]{3,6}\}$/:/\{size:\d{1,2}\}$/;
+  const closeRe2=kind==='color'?/^\{\/color\}/:/^\{\/size\}/;
+  const otherOpen=kind==='color'?/\{size:\d{1,2}\}$/:/\{color:#[0-9a-fA-F]{3,6}\}$/;
+  const otherClose=kind==='color'?/^\{\/size\}/:/^\{\/color\}/;
+
+  let guard=0;
+  while(guard++<10){
+    if(openRe2.test(before)&&closeRe2.test(after)){
+      // 같은 종류가 바로 감싸고 있음 → 제거
+      before=before.replace(openRe2,'');
+      after=after.replace(closeRe2,'');
+    } else if(otherOpen.test(before)&&otherClose.test(after)){
+      // 다른 종류가 감싸고 있음 → 유지하되 그 바깥을 계속 검사
+      const om=before.match(otherOpen)[0];
+      const cm=after.match(otherClose)[0];
+      const innerBefore=before.slice(0,before.length-om.length);
+      const innerAfter=after.slice(cm.length);
+      if(openRe2.test(innerBefore)&&closeRe2.test(innerAfter)){
+        // 바깥에 같은 종류가 있으면 그것만 제거하고 다른 종류는 보존
+        before=innerBefore.replace(openRe2,'')+om;
+        after=cm+innerAfter.replace(closeRe2,'');
+      } else break;
+    } else break;
+  }
+
+  el.value=before+openTag+text+closeTag+after;
   el.focus();
-  const start=s+openTag.length;
+  const start=before.length+openTag.length;
   el.setSelectionRange(start,start+text.length);
   autoResizeDesc(el);
   if(_descPreviewOn) updateDescPreview();
