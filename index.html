@@ -949,7 +949,7 @@ header{
 
       <!-- ③ 선택 항목 나중에 — 기관 이름 -->
       <label class="setup-label" style="margin-top:4px;">기관(학교) 이름 <span style="font-weight:400;color:#bbb;font-size:11px;">(선택)</span></label>
-      <input class="setup-input" id="setupSchoolInput" placeholder="예: 운남초등학교" maxlength="30"
+      <input class="setup-input" id="setupSchoolInput" placeholder="예: ○○초등학교" maxlength="30"
         onkeydown="if(event.key==='Enter')startApp(false)">
 
       <!-- 숨겨진 필드 -->
@@ -1103,7 +1103,7 @@ header{
   </div>
 
   <div class="app-footer">
-    <span>만든이 2026 최창훈</span>
+    <span>© 2026 최창훈. All rights reserved.</span>
   </div>
 
   <!-- ⑥ 모바일 플로팅 버튼 -->
@@ -1361,7 +1361,7 @@ header{
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">기관(학교) 이름</label>
-        <input class="form-input" id="deptEditSchool" placeholder="예: 운남초등학교" maxlength="30">
+        <input class="form-input" id="deptEditSchool" placeholder="예: ○○초등학교" maxlength="30">
       </div>
       <div class="form-group">
         <label class="form-label">부서명 *</label>
@@ -4009,7 +4009,7 @@ function loadSampleIfEmpty(){
     3:[
       {name:'입학식 및 시업식 준비',startMonth:3,endMonth:null,deadline:'3월 2일',assignee:S.deptName,category:'c3',
        desc:'1학년 입학식, 2~6학년 시업식 준비\n1. 식순 작성 및 사회자 지정\n2. 입학 통지서 및 학용품 준비\n3. 학부모 안내 가정통신문 발송\n4. 강당(또는 운동장) 배치 확인\n\n※ 참고: 교장·교감 결재 필수. 전년도 식순 파일 참고',fileLocation:'공유폴더/교무부/행사/입학식',
-       priority:'high',repeat:true,done:false,pending:false,contacts:[{name:'행정실 담당',tel:'958-5702'}]},
+       priority:'high',repeat:true,done:false,pending:false,contacts:[{name:'행정실 담당',tel:'062-000-0000'}]},
       {name:'학급 편성 및 담임 배정 공문',startMonth:3,endMonth:null,deadline:'3월 초',assignee:S.deptName,category:'c1',
        desc:'학급 편성 결과를 교육청에 공문으로 제출\n1. 에듀파인 접속 → 공문 → 새 공문 작성\n2. 학급 수·학생 수 기재\n3. 교장 결재 후 발송\n\n※ 참고: 전년도 공문 양식 참고',fileLocation:'에듀파인 공문 시스템',
        priority:'high',repeat:true,done:false,pending:false},
@@ -4085,7 +4085,7 @@ function loadSampleIfEmpty(){
       {name:'화재 대피훈련',startMonth:9,endMonth:null,deadline:'9월 8일',assignee:S.deptName,category:'c4',
        desc:'전교 화재 대피훈련 실시\n1. 소방서 협조 요청\n2. 훈련 계획 수립 및 학급 안내\n3. 대피 동선 확인\n4. 훈련 실시 및 결과 보고',
        priority:'high',repeat:true,done:false,pending:false,
-       contacts:[{name:'광산소방서',tel:'119'}]},
+       contacts:[{name:'관할 소방서',tel:'119'}]},
       {name:'학부모 상담주간 운영 (2차)',startMonth:9,endMonth:null,deadline:'9월 18~29일',assignee:S.deptName,category:'c8',
        desc:'2학기 학부모 상담주간 운영\n1. 가정통신문 발송\n2. 담임별 상담 일정 취합\n3. 상담 결과 보고',
        sensitive:true,priority:'mid',repeat:true,done:false,pending:false},
@@ -4097,9 +4097,9 @@ function loadSampleIfEmpty(){
        priority:'mid',repeat:true,done:false,pending:false},
     ],
     10:[
-      {name:'운남축제 준비 및 운영',startMonth:10,endMonth:null,deadline:'10월 20일',assignee:S.deptName,category:'c3',
+      {name:'학교 축제 준비 및 운영',startMonth:10,endMonth:null,deadline:'10월 20일',assignee:S.deptName,category:'c3',
        desc:'학교 축제 준비 및 운영\n1. 축제 기획안 작성 및 결재\n2. 학급별 프로그램 취합\n3. 장소·음향·방송 준비\n4. 안전 계획 수립\n5. 결과 보고서 작성\n\n※ 참고: 학생자치회와 협력 필요',
-       fileLocation:'공유폴더/교무부/행사/운남축제',
+       fileLocation:'공유폴더/교무부/행사/학교축제',
        priority:'high',repeat:true,done:false,pending:false},
       {name:'개교기념일 행사',startMonth:10,endMonth:null,deadline:'10월 2일',assignee:S.deptName,category:'c3',
        desc:'개교기념일 관련 행사 준비\n1. 기념식 식순 작성\n2. 학교 역사 전시 자료 준비\n3. 가정통신문 발송',
