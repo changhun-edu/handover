@@ -914,7 +914,7 @@ header{
             <div style="font-size:11px;color:rgba(255,255,255,.85);margin-top:4px;font-weight:600;line-height:1.4;">후임자가<br>이어받기</div>
           </div>
         </div>
-        <p class="setup-copyright">© 2026 최창훈. All rights reserved.</p>
+        <p class="setup-copyright">© 2026 최창훈. All rights reserved. · <a href="#" onclick="openOss(); return false;" style="color:inherit;text-decoration:underline;text-underline-offset:2px">오픈소스 라이선스</a></p>
       </div>
     </div>
 
@@ -1111,7 +1111,7 @@ header{
   </div>
 
   <div class="app-footer">
-    <span>© 2026 최창훈. All rights reserved.</span>
+    <span>© 2026 최창훈. All rights reserved. · <a href="#" onclick="openOss(); return false;" style="color:inherit;text-decoration:underline;text-underline-offset:2px">오픈소스 라이선스</a></span>
   </div>
 
   <!-- ⑥ 모바일 플로팅 버튼 -->
@@ -4185,5 +4185,125 @@ function loadSampleIfEmpty(){
 ════════════════════════════════ */
 // (window load 이벤트 핸들러가 위에서 등록됨)
 </script>
+    <!-- ===== 오픈소스 라이선스 고지 (버튼 + 팝업) ===== -->
+    <style>
+        #ossBtn { position: fixed; right: 16px; bottom: 16px; z-index: 240; display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px; border-radius: 999px; border: 1px solid #cbd5e1; background: rgba(255,255,255,.95);
+            color: #334155; font-size: 13px; font-weight: 600; line-height: 1.2; font-family: inherit; box-shadow: 0 4px 14px rgba(15,23,42,.12);
+            cursor: pointer; min-height: 0; backdrop-filter: blur(4px); }
+        #ossBtn:hover { border-color: #64748b; color: #0f172a; }
+        #ossBtn:focus-visible, #ossModal :focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; }
+        #ossModal { position: fixed; inset: 0; z-index: 900; display: none; align-items: center; justify-content: center;
+            padding: 16px; background: rgba(15,23,42,.55); }
+        #ossModal.open { display: flex; }
+        .oss-panel { background: #fff; color: #1e293b; width: 100%; max-width: 860px; max-height: calc(100vh - 32px);
+            border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,.3); display: flex; flex-direction: column; overflow: hidden; }
+        .oss-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0; }
+        .oss-head h2 { font-size: 20px; font-weight: 700;  margin: 0; }
+        .oss-close { border: 1px solid #cbd5e1; background: #fff; border-radius: 10px; padding: 6px 14px; font-weight: 700; font-family: inherit;
+            font-size: 14px; cursor: pointer; min-height: 0; }
+        .oss-close:hover { background: #f1f5f9; }
+        .oss-body { overflow-y: auto; padding: 18px 20px 24px; font-size: 14.5px; line-height: 1.65; }
+        .oss-body h3 { font-size: 18px; font-weight: 800; margin: 22px 0 10px; }
+        .oss-body h3:first-child { margin-top: 0; }
+        .oss-note { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; color: #475569; }
+        .oss-table-wrap { overflow-x: auto; }
+        .oss-body table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .oss-body th, .oss-body td { border-bottom: 1px solid #e2e8f0; padding: 9px 8px; text-align: left; vertical-align: top; }
+        .oss-body th { background: #f1f5f9; font-weight: 800; white-space: nowrap; }
+        .oss-name { font-weight: 700; min-width: 150px; }
+        .oss-link { color: #1d4ed8; word-break: break-all; font-size: 14px; }
+        .oss-badge { display: inline-block; margin: 1px 0; padding: 1px 8px; border-radius: 999px; background: #eff6ff;
+            color: #1e40af; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+        .oss-lic { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 8px; }
+        .oss-lic summary { cursor: pointer; padding: 10px 14px; list-style-position: inside; }
+        .oss-lic[open] summary { border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+        .oss-sub { color: #64748b; font-size: 14px; font-weight: 400; }
+        .oss-lic pre { margin: 0; padding: 14px; max-height: 50vh; overflow: auto; white-space: pre-wrap; word-break: break-word;
+            font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; line-height: 1.55; color: #334155; }
+        body.oss-lock { overflow: hidden; }
+        @media (max-width: 600px) { body:has(.fab:not([style*="none"])) #ossBtn { bottom: 88px !important; right: 16px !important; } }
+        .oss-body th { color: #1e293b !important; background: #f1f5f9 !important; }
+        .oss-body tr, .oss-body td { color: #1e293b; background: #fff !important; }
+        @media (max-width: 640px) {
+            .oss-body thead { display: none; }
+            .oss-body table, .oss-body tbody, .oss-body tr, .oss-body td { display: block; width: 100%; }
+            .oss-body tr { border-bottom: 1px solid #e2e8f0; padding: 10px 0; }
+            .oss-body td { border: 0; padding: 2px 4px; }
+        }
+        @media (max-width: 640px) {
+            #ossBtn { right: 12px; bottom: 12px; padding: 7px 11px; font-size: 12px; }
+            #ossModal { padding: 0; }
+            .oss-panel { max-height: 100vh; height: 100%; border-radius: 0; }
+            .oss-name { white-space: normal; }
+        }
+        @media print { #ossBtn, #ossModal { display: none !important; } }
+    </style>
+
+    <button type="button" id="ossBtn" aria-haspopup="dialog" aria-controls="ossModal" onclick="openOss()">ⓘ 오픈소스 라이선스</button>
+
+    <div id="ossModal" role="dialog" aria-modal="true" aria-labelledby="ossTitle" aria-hidden="true">
+        <div class="oss-panel">
+            <div class="oss-head">
+                <h2 id="ossTitle">오픈소스 라이선스</h2>
+                <button type="button" class="oss-close" onclick="closeOss()" aria-label="라이선스 창 닫기">✕ 닫기</button>
+            </div>
+            <div class="oss-body">
+                <p class="oss-note">이 사이트는 <b>외부 오픈소스를 쓰지 않습니다.</b>
+                    외부 스크립트·라이브러리·웹 글꼴을 하나도 불러오지 않고, 기능과 화면은 모두 이 파일 안에서 직접 작성했습니다.
+                    따라서 Apache-2.0 · MIT · BSD-3-Clause · ISC 등 오픈소스 라이선스를 고지해야 할 구성요소가 없습니다.</p>
+
+                <h3>사용 구성요소와 저작권자</h3>
+                <div class="oss-table-wrap"><table>
+                    <thead><tr><th>구분</th><th>내용</th><th>고지 대상</th></tr></thead>
+                    <tbody>
+<tr><td class="oss-name">코드 · 화면</td><td>ⓒ 2026 최창훈 — 이 파일 안에서 직접 작성</td><td>해당 없음</td></tr>
+<tr><td class="oss-name">글꼴</td><td>외부 글꼴을 내려받지 않습니다. 이용자 기기에 설치된 글꼴(Apple SD Gothic Neo · 맑은 고딕 순)로 표시되며, 내보내는 인쇄용 파일도 같은 방식입니다.</td><td>해당 없음</td></tr>
+<tr><td class="oss-name">아이콘</td><td>유니코드 표준 이모지 문자(📥 등). 실제 모양은 이용자 운영체제가 그립니다.</td><td>해당 없음</td></tr>
+                    </tbody>
+                </table></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        const modal = document.getElementById('ossModal');
+        let lastFocus = null;
+        window.openOss = function () {
+            lastFocus = document.activeElement;
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('oss-lock');
+            modal.querySelector('.oss-close').focus();
+        };
+        window.closeOss = function () {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('oss-lock');
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        };
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) { closeOss(); return; }
+            const j = e.target.closest('[data-oss-jump]');
+            if (j) {
+                e.preventDefault();
+                const d = document.getElementById('oss-' + j.dataset.ossJump);
+                if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' }); d.querySelector('summary').focus(); }
+            }
+        });
+        window.addEventListener('keydown', function (e) {
+            if (!modal.classList.contains('open')) return;
+            if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); closeOss(); return; }
+            if (e.key === 'Tab') {
+                const f = modal.querySelectorAll('button, a[href], summary');
+                const first = f[0], last = f[f.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+        }, true);
+    })();
+    </script>
 </body>
 </html>
